@@ -6,3 +6,6 @@ scripts/*.py -text whitespace=cr-at-eol,-blank-at-eof
 resources/** -text
 tests/fixtures/** -text
 frontend/public/** -text
+
+# Tokenizer assets are integrity-checked byte resources
+backend/app/retrieval/assets/** -text
