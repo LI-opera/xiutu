@@ -1,0 +1,49 @@
+name: xiutu-v5
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.2-pg16-bookworm@sha256:00ba258a66dac104fd5171074a0084462a64a1369d8513f3d0a634e2f24d15bc
+    environment:
+      POSTGRES_USER: xiutu
+      POSTGRES_PASSWORD: ${XIUTU_DB_PASSWORD:?Supply a local isolated database password}
+      POSTGRES_DB: xiutu_dev
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - wp01_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U xiutu -d xiutu_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  manual-mcp:
+    profiles: [manual-mcp]
+    build:
+      context: ..
+      dockerfile: deploy/manual-mcp.Dockerfile
+    image: xiutu-manual-mcp:wp08
+    read_only: true
+    user: "10001:10001"
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    tmpfs: [/tmp]
+    volumes:
+      - type: bind
+        source: ${MANUAL_MCP_CONFIG_FILE:-../.local-data/manual-mcp.json}
+        target: /run/secrets/manual-mcp.json
+        read_only: true
+      - type: bind
+        source: ${MANUAL_MCP_MODEL_PATH:-../.local-data/models/multilingual-e5-small/614241f622f53c4eeff9890bdc4f31cfecc418b3}
+        target: /models/e5
+        read_only: true
+      - type: bind
+        source: ${MANUAL_MCP_DATA_PATH:-../.local-data/storage}
+        target: /manuals
+        read_only: true
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8031/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  wp01_pgdata:

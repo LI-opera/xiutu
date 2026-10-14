@@ -1,0 +1,7 @@
+**
+!backend/
+!backend/**
+!requirements.txt
+!deploy/
+!deploy/manual-mcp.Dockerfile
+**/__pycache__/

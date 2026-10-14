@@ -1,0 +1,67 @@
+# Local credentials and private/runtime state
+.env
+.env.*
+!.env.example
+.local-data/
+private/
+data/
+backups/
+restore*/
+logs/
+*.log
+*.dump
+*.backup
+*.db
+*.db-*
+*.sqlite*
+*.pem
+*.key
+
+# Dependencies and generated output
+.venv/
+.venv-*/
+venv/
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.uv-cache/
+.test-runs/
+.verification/
+dist/
+dist-*/
+*.egg-info/
+.coverage*
+htmlcov/
+coverage/
+*.tsbuildinfo
+
+# Historical local execution evidence, not reproducible source fixtures
+docs/**/evidence/
+docs/**/pytest-*/
+docs/**/tmp/
+docs/**/junit*.xml
+docs/**/*junit.xml
+
+# Raw private manuals and exported archives
+manuals/
+repair_docs/
+attachments/
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.zip
+*.7z
+*.tar
+*.gz
+# Curated UI assets are part of the application
+!frontend/public/workbench-v2-assets/**/*.png
+!frontend/public/workbench-v2-assets/**/*.jpg
+!frontend/public/workbench-v2-assets/**/*.jpeg
+
+# OS/editor local state
+.DS_Store
+Thumbs.db
+.idea/

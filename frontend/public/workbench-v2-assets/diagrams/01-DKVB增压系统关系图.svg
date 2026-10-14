@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="560" viewBox="0 0 1400 560">
+  <style>.t{font:700 28px 'Microsoft YaHei';fill:#12372f}.s{font:18px 'Microsoft YaHei';fill:#365b53}.b{fill:#eef7f3;stroke:#19785f;stroke-width:3}.e{fill:#fff4db;stroke:#c48518;stroke-width:3}.a{stroke:#19785f;stroke-width:6;fill:none;marker-end:url(#m)}.d{stroke:#55736c;stroke-width:3;stroke-dasharray:10 8;fill:none}</style>
+  <defs><marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#19785f"/></marker></defs>
+  <text class="t" x="55" y="55">DKVB 增压空气与控制关系（网页示意，不代替原厂结构图）</text>
+  <rect class="b" x="55" y="150" width="190" height="105" rx="16"/><text class="t" x="82" y="197">空气滤清器</text><text class="s" x="82" y="229">入口限制 / 导管</text>
+  <rect class="b" x="305" y="150" width="190" height="105" rx="16"/><text class="t" x="344" y="197">涡轮压气机</text><text class="s" x="344" y="229">V465 / N249</text>
+  <rect class="b" x="555" y="150" width="190" height="105" rx="16"/><text class="t" x="589" y="197">增压管路</text><text class="s" x="589" y="229">软管 / 接头</text>
+  <rect class="b" x="805" y="150" width="190" height="105" rx="16"/><text class="t" x="849" y="197">中冷器</text><text class="s" x="849" y="229">接口 / 本体</text>
+  <rect class="b" x="1055" y="150" width="240" height="105" rx="16"/><text class="t" x="1091" y="197">节气门与进气歧管</text><text class="s" x="1091" y="229">G71 / G42</text>
+  <path class="a" d="M245 202 H300"/><path class="a" d="M495 202 H550"/><path class="a" d="M745 202 H800"/><path class="a" d="M995 202 H1050"/>
+  <rect class="e" x="610" y="345" width="200" height="92" rx="16"/><text class="t" x="679" y="390">G31</text><text class="s" x="640" y="420">增压压力信号</text>
+  <rect class="e" x="910" y="345" width="200" height="92" rx="16"/><text class="t" x="970" y="390">J623</text><text class="s" x="939" y="420">发动机控制单元</text>
+  <path class="d" d="M710 345 V270"/><path class="d" d="M810 390 H905"/><path class="d" d="M1010 345 V300 H400 V260"/>
+  <text class="s" x="55" y="515">实线：空气路径　虚线：信号/控制关系　详细针脚与连接以包内原厂电路图页面为准</text>
+</svg>
+

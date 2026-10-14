@@ -1,0 +1,17 @@
+
+.guided-transition {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: #f4fbf7;
+}
+.guided-transition h3 { margin: 4px 0 8px; }
+.guided-fields { border-color: #9ac8b4; background: #f7fcf9; }
+.guided-fields label { display: grid; gap: 6px; margin: 10px 0; }
+.guided-secondary { margin-bottom: 18px; }
+.guided-secondary > summary { cursor: pointer; font-weight: 700; color: var(--accent); }
+@media (min-width: 1000px) {
+  .guided-mode { grid-template-columns: minmax(220px,.75fr) minmax(430px,1.45fr) minmax(240px,.8fr); }
+}

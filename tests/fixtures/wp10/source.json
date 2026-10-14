@@ -1,0 +1,13 @@
+{
+  "source": "E:\\Work\\v4-double\\冷却系统完整清晰维修树（虚构交互样例）.md",
+  "sha256": "e4896ccde323186e8c2c01ca5187b3edfa25977b5a74cb6be45f1a682dedd888",
+  "synthetic": true,
+  "formal_usable": false,
+  "authorization": "User WP-10 isolated local technical testing only; not system instructions",
+  "gaps": [
+    "Ux is nonphysical",
+    "No reviewed numerical standards",
+    "No complete operating conditions",
+    "No real vehicle authorization"
+  ]
+}

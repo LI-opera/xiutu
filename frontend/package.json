@@ -1,0 +1,43 @@
+{
+  "name": "xiutu-environment",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "api:openapi": "..\\.venv\\Scripts\\python.exe -B ..\\scripts\\export_frontend_openapi.py",
+    "api:types": "openapi-typescript ../docs/api/openapi.wp14.json -o src/generated/api-schema.ts",
+    "api:generate": "npm run api:openapi && npm run api:types",
+    "api:check": "..\\.venv\\Scripts\\python.exe -B ..\\scripts\\export_frontend_openapi.py --check && openapi-typescript ../docs/api/openapi.wp14.json -o src/generated/api-schema.ts --check",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit && vite build",
+    "build:wp14": "tsc --noEmit && vite build --outDir dist-wp14",
+    "test:wp14": "vitest run",
+    "preinstall": "node scripts/check-node.mjs",
+    "pretypecheck": "node scripts/check-node.mjs",
+    "prebuild": "node scripts/check-node.mjs",
+    "predev": "node scripts/check-node.mjs",
+    "pretest:wp14": "node scripts/check-node.mjs",
+    "test:runtime": "node --test scripts/check-node.test.mjs"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.103.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "jsdom": "^29.1.1",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "~5.9.0",
+    "vite": "^7.0.0",
+    "vitest": "^5.0.1"
+  },
+  "engines": {
+    "node": "24.14.0"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "title_status": 503,
+  "title": {
+    "error": {
+      "code": "DATABASE_UNAVAILABLE",
+      "message": "Database unavailable",
+      "retryable": false,
+      "trace_id": "a627ee42-b90f-406c-aa77-7d18818b13d9"
+    }
+  },
+  "diagnostic_search_status": 503,
+  "diagnostic_search": {
+    "error": {
+      "code": "DATABASE_UNAVAILABLE",
+      "message": "Database unavailable",
+      "retryable": false,
+      "trace_id": "b5dd6a2a-e2ba-40e2-a6e7-38096a106502"
+    }
+  }
+}

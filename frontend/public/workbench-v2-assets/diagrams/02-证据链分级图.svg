@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="520" viewBox="0 0 1400 520">
+  <style>.h{font:700 28px 'Microsoft YaHei';fill:#12372f}.t{font:20px 'Microsoft YaHei';fill:#284b43}.n{fill:#f5faf8;stroke:#2a8069;stroke-width:3}.w{fill:#fff5df;stroke:#cf8b20;stroke-width:3}.r{fill:#fff0ee;stroke:#b84c42;stroke-width:3}.a{stroke:#2a8069;stroke-width:5;marker-end:url(#m)}</style>
+  <defs><marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#2a8069"/></marker></defs>
+  <text class="h" x="55" y="52">从按钮到诊断结果：证据链分级</text>
+  <rect class="n" x="55" y="130" width="250" height="125" rx="18"/><text class="h" x="118" y="180">结构化观察</text><text class="t" x="85" y="220">按钮、数值、位置、工况</text>
+  <rect class="n" x="390" y="130" width="250" height="125" rx="18"/><text class="h" x="464" y="180">有效事实</text><text class="t" x="420" y="220">最新记录且不冲突</text>
+  <rect class="w" x="725" y="130" width="250" height="125" rx="18"/><text class="h" x="786" y="180">方向解释</text><text class="t" x="755" y="220">一项或多项事实支持</text>
+  <rect class="n" x="1060" y="130" width="275" height="125" rx="18"/><text class="h" x="1137" y="180">下一步动作</text><text class="t" x="1090" y="220">复检、补测或专业交接</text>
+  <line class="a" x1="305" y1="192" x2="383" y2="192"/><line class="a" x1="640" y1="192" x2="718" y2="192"/><line class="a" x1="975" y1="192" x2="1053" y2="192"/>
+  <rect class="r" x="390" y="335" width="585" height="105" rx="18"/><text class="h" x="520" y="382">禁止跳跃：单个异常 ≠ 零件损坏</text><text class="t" x="467" y="417">缺少安全条件、工况或独立证据时，输出保守交接</text>
+</svg>
+

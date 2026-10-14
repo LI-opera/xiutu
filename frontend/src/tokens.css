@@ -1,0 +1,18 @@
+:root {
+  --x-space-1: 8px;
+  --x-space-2: 16px;
+  --x-space-3: 24px;
+  --x-space-4: 32px;
+  --x-space-6: 48px;
+  --x-ink: #15211d;
+  --x-muted: #60706a;
+  --x-line: #d7dfdb;
+  --x-canvas: #f2f5f2;
+  --x-surface: #ffffff;
+  --x-accent: #146b4c;
+  --x-accent-strong: #0d523a;
+  --x-warn: #9d5d05;
+  --x-bad: #a7352d;
+  --x-radius: 14px;
+  --x-shadow: 0 14px 40px rgba(26, 48, 39, .08);
+}

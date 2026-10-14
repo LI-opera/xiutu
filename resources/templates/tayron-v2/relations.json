@@ -1,0 +1,48 @@
+{
+  "version": "2",
+  "runtime_importable": true,
+  "package_root": "resources/knowledge/tayron",
+  "boundary": "独立冻结模板；仅适用于明示车型、年款、发动机与故障码，未检查保持未知。",
+  "relations": [
+    {
+      "id": "tayron-2019-dkvb-p0299-v2",
+      "brand": "大众",
+      "model": "探岳",
+      "year_from": 2019,
+      "year_to": 2019,
+      "engine_code": "DKVB",
+      "fault_code": "P0299",
+      "template_id": "tayron-dkvb-p0299",
+      "version": "2",
+      "title": "增压不足初始排查",
+      "area_ids": [
+        "boost-air",
+        "pressure",
+        "actuator",
+        "turbo",
+        "powertrain"
+      ],
+      "source": "02-五区域诊断流程与分支协议.md",
+      "content_file": "tayron-dkvb-p0299-v2.json"
+    },
+    {
+      "id": "tayron-2019-dkvb-p0236-v2",
+      "brand": "大众",
+      "model": "探岳",
+      "year_from": 2019,
+      "year_to": 2019,
+      "engine_code": "DKVB",
+      "fault_code": "P0236",
+      "template_id": "tayron-dkvb-p0236",
+      "version": "2",
+      "title": "增压压力信号可信度初始排查",
+      "area_ids": [
+        "boost-air",
+        "pressure",
+        "actuator"
+      ],
+      "source": "sources-register.md / WEB-P0236-ROSS; https://wiki.ross-tech.com/wiki/index.php/16620/P0236/000566",
+      "content_file": "tayron-dkvb-p0236-v2.json"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+# Preserve raw execution evidence and the exact executed script bytes/hash.
+docs/implementation/phase-01/evidence/** -text -whitespace
+scripts/*.py -text whitespace=cr-at-eol,-blank-at-eof
+
+# Published resources retain exact bytes for content hashes
+resources/** -text
+tests/fixtures/** -text
+frontend/public/** -text

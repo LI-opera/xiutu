@@ -1,0 +1,1019 @@
+{
+  "schemas": {
+    "search_manuals": {
+      "input": {
+        "$defs": {
+          "VehicleScope": {
+            "additionalProperties": false,
+            "properties": {
+              "model": {
+                "anyOf": [
+                  {
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Model"
+              },
+              "year": {
+                "anyOf": [
+                  {
+                    "maximum": 2100,
+                    "minimum": 1886,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Year"
+              },
+              "engine_family": {
+                "anyOf": [
+                  {
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Engine Family"
+              },
+              "engine_code": {
+                "anyOf": [
+                  {
+                    "maxLength": 64,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Engine Code"
+              }
+            },
+            "title": "VehicleScope",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Query",
+            "type": "string"
+          },
+          "vehicle_scope": {
+            "$ref": "#/$defs/VehicleScope"
+          },
+          "top_k": {
+            "default": 5,
+            "maximum": 10,
+            "minimum": 1,
+            "title": "Top K",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "SearchInput",
+        "type": "object"
+      },
+      "output": {
+        "$defs": {
+          "ChunkResult": {
+            "additionalProperties": false,
+            "properties": {
+              "chunk_id": {
+                "format": "uuid",
+                "title": "Chunk Id",
+                "type": "string"
+              },
+              "document_version_id": {
+                "format": "uuid",
+                "title": "Document Version Id",
+                "type": "string"
+              },
+              "index_id": {
+                "format": "uuid",
+                "title": "Index Id",
+                "type": "string"
+              },
+              "text": {
+                "maxLength": 20000,
+                "title": "Text",
+                "type": "string"
+              },
+              "content_hash": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Content Hash",
+                "type": "string"
+              },
+              "locator": {
+                "additionalProperties": true,
+                "title": "Locator",
+                "type": "object"
+              },
+              "applicability": {
+                "additionalProperties": true,
+                "title": "Applicability",
+                "type": "object"
+              }
+            },
+            "required": [
+              "chunk_id",
+              "document_version_id",
+              "index_id",
+              "text",
+              "content_hash",
+              "locator",
+              "applicability"
+            ],
+            "title": "ChunkResult",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "empty": {
+            "title": "Empty",
+            "type": "boolean"
+          },
+          "chunks": {
+            "items": {
+              "$ref": "#/$defs/ChunkResult"
+            },
+            "maxItems": 10,
+            "title": "Chunks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "empty",
+          "chunks"
+        ],
+        "title": "SearchData",
+        "type": "object"
+      },
+      "langchain": {
+        "type": "function",
+        "function": {
+          "name": "search_manuals",
+          "description": "Search reviewed manuals in the trusted case frozen corpus. Scope only narrows. Empty means no eligible matches; never invent repair facts.",
+          "parameters": {
+            "$defs": {
+              "VehicleScope": {
+                "additionalProperties": false,
+                "properties": {
+                  "model": {
+                    "anyOf": [
+                      {
+                        "maxLength": 100,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Model"
+                  },
+                  "year": {
+                    "anyOf": [
+                      {
+                        "maximum": 2100,
+                        "minimum": 1886,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Year"
+                  },
+                  "engine_family": {
+                    "anyOf": [
+                      {
+                        "maxLength": 100,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Engine Family"
+                  },
+                  "engine_code": {
+                    "anyOf": [
+                      {
+                        "maxLength": 64,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Engine Code"
+                  }
+                },
+                "title": "VehicleScope",
+                "type": "object"
+              }
+            },
+            "additionalProperties": false,
+            "properties": {
+              "query": {
+                "maxLength": 2000,
+                "minLength": 1,
+                "title": "Query",
+                "type": "string"
+              },
+              "vehicle_scope": {
+                "$ref": "#/$defs/VehicleScope"
+              },
+              "top_k": {
+                "default": 5,
+                "maximum": 10,
+                "minimum": 1,
+                "title": "Top K",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "title": "SearchInput",
+            "type": "object"
+          }
+        }
+      }
+    },
+    "get_evidence_context": {
+      "input": {
+        "additionalProperties": false,
+        "properties": {
+          "chunk_id": {
+            "format": "uuid",
+            "title": "Chunk Id",
+            "type": "string"
+          },
+          "document_version_id": {
+            "format": "uuid",
+            "title": "Document Version Id",
+            "type": "string"
+          },
+          "neighbors": {
+            "default": 0,
+            "maximum": 2,
+            "minimum": 0,
+            "title": "Neighbors",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "chunk_id",
+          "document_version_id"
+        ],
+        "title": "ContextInput",
+        "type": "object"
+      },
+      "output": {
+        "$defs": {
+          "ChunkResult": {
+            "additionalProperties": false,
+            "properties": {
+              "chunk_id": {
+                "format": "uuid",
+                "title": "Chunk Id",
+                "type": "string"
+              },
+              "document_version_id": {
+                "format": "uuid",
+                "title": "Document Version Id",
+                "type": "string"
+              },
+              "index_id": {
+                "format": "uuid",
+                "title": "Index Id",
+                "type": "string"
+              },
+              "text": {
+                "maxLength": 20000,
+                "title": "Text",
+                "type": "string"
+              },
+              "content_hash": {
+                "pattern": "^[0-9a-f]{64}$",
+                "title": "Content Hash",
+                "type": "string"
+              },
+              "locator": {
+                "additionalProperties": true,
+                "title": "Locator",
+                "type": "object"
+              },
+              "applicability": {
+                "additionalProperties": true,
+                "title": "Applicability",
+                "type": "object"
+              }
+            },
+            "required": [
+              "chunk_id",
+              "document_version_id",
+              "index_id",
+              "text",
+              "content_hash",
+              "locator",
+              "applicability"
+            ],
+            "title": "ChunkResult",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "empty": {
+            "title": "Empty",
+            "type": "boolean"
+          },
+          "chunks": {
+            "items": {
+              "$ref": "#/$defs/ChunkResult"
+            },
+            "maxItems": 5,
+            "title": "Chunks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "empty",
+          "chunks"
+        ],
+        "title": "ContextData",
+        "type": "object"
+      },
+      "langchain": {
+        "type": "function",
+        "function": {
+          "name": "get_evidence_context",
+          "description": "Read a permitted chunk and at most two neighbors each side in the same version. Requires current source authorization, returns locators; chunk ID is not evidence ID.",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "chunk_id": {
+                "format": "uuid",
+                "title": "Chunk Id",
+                "type": "string"
+              },
+              "document_version_id": {
+                "format": "uuid",
+                "title": "Document Version Id",
+                "type": "string"
+              },
+              "neighbors": {
+                "default": 0,
+                "maximum": 2,
+                "minimum": 0,
+                "title": "Neighbors",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "chunk_id",
+              "document_version_id"
+            ],
+            "title": "ContextInput",
+            "type": "object"
+          }
+        }
+      }
+    },
+    "get_measurement_spec": {
+      "input": {
+        "$defs": {
+          "VehicleScope": {
+            "additionalProperties": false,
+            "properties": {
+              "model": {
+                "anyOf": [
+                  {
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Model"
+              },
+              "year": {
+                "anyOf": [
+                  {
+                    "maximum": 2100,
+                    "minimum": 1886,
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Year"
+              },
+              "engine_family": {
+                "anyOf": [
+                  {
+                    "maxLength": 100,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Engine Family"
+              },
+              "engine_code": {
+                "anyOf": [
+                  {
+                    "maxLength": 64,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Engine Code"
+              }
+            },
+            "title": "VehicleScope",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "component_key": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Component Key",
+            "type": "string"
+          },
+          "quantity": {
+            "enum": [
+              "temperature",
+              "pressure",
+              "voltage",
+              "resistance"
+            ],
+            "title": "Quantity",
+            "type": "string"
+          },
+          "vehicle_scope": {
+            "$ref": "#/$defs/VehicleScope"
+          }
+        },
+        "required": [
+          "component_key",
+          "quantity"
+        ],
+        "title": "SpecQuery",
+        "type": "object"
+      },
+      "output": {
+        "$defs": {
+          "SpecResult": {
+            "additionalProperties": false,
+            "properties": {
+              "spec_id": {
+                "format": "uuid",
+                "title": "Spec Id",
+                "type": "string"
+              },
+              "evidence_id": {
+                "format": "uuid",
+                "title": "Evidence Id",
+                "type": "string"
+              },
+              "version": {
+                "title": "Version",
+                "type": "integer"
+              },
+              "definition": {
+                "additionalProperties": true,
+                "title": "Definition",
+                "type": "object"
+              }
+            },
+            "required": [
+              "spec_id",
+              "evidence_id",
+              "version",
+              "definition"
+            ],
+            "title": "SpecResult",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "empty": {
+            "title": "Empty",
+            "type": "boolean"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/$defs/SpecResult"
+            },
+            "maxItems": 20,
+            "title": "Candidates",
+            "type": "array"
+          }
+        },
+        "required": [
+          "empty",
+          "candidates"
+        ],
+        "title": "SpecData",
+        "type": "object"
+      },
+      "langchain": {
+        "type": "function",
+        "function": {
+          "name": "get_measurement_spec",
+          "description": "List approved applicable specifications for this case and component/quantity. Multiple candidates require selection; empty is not a fabricated standard.",
+          "parameters": {
+            "$defs": {
+              "VehicleScope": {
+                "additionalProperties": false,
+                "properties": {
+                  "model": {
+                    "anyOf": [
+                      {
+                        "maxLength": 100,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Model"
+                  },
+                  "year": {
+                    "anyOf": [
+                      {
+                        "maximum": 2100,
+                        "minimum": 1886,
+                        "type": "integer"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Year"
+                  },
+                  "engine_family": {
+                    "anyOf": [
+                      {
+                        "maxLength": 100,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Engine Family"
+                  },
+                  "engine_code": {
+                    "anyOf": [
+                      {
+                        "maxLength": 64,
+                        "minLength": 1,
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null,
+                    "title": "Engine Code"
+                  }
+                },
+                "title": "VehicleScope",
+                "type": "object"
+              }
+            },
+            "additionalProperties": false,
+            "properties": {
+              "component_key": {
+                "maxLength": 100,
+                "minLength": 1,
+                "title": "Component Key",
+                "type": "string"
+              },
+              "quantity": {
+                "enum": [
+                  "temperature",
+                  "pressure",
+                  "voltage",
+                  "resistance"
+                ],
+                "title": "Quantity",
+                "type": "string"
+              },
+              "vehicle_scope": {
+                "$ref": "#/$defs/VehicleScope"
+              }
+            },
+            "required": [
+              "component_key",
+              "quantity"
+            ],
+            "title": "SpecQuery",
+            "type": "object"
+          }
+        }
+      }
+    },
+    "compare_measurement": {
+      "input": {
+        "additionalProperties": false,
+        "properties": {
+          "spec_id": {
+            "format": "uuid",
+            "title": "Spec Id",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Value"
+          },
+          "unit": {
+            "enum": [
+              "C",
+              "F",
+              "Pa",
+              "kPa",
+              "bar",
+              "V",
+              "mV",
+              "ohm",
+              "kohm"
+            ],
+            "title": "Unit",
+            "type": "string"
+          },
+          "conditions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "maxProperties": 20,
+            "title": "Conditions",
+            "type": "object"
+          }
+        },
+        "required": [
+          "spec_id",
+          "unit"
+        ],
+        "title": "MeasurementInput",
+        "type": "object"
+      },
+      "output": {
+        "additionalProperties": false,
+        "properties": {
+          "comparison_id": {
+            "format": "uuid",
+            "title": "Comparison Id",
+            "type": "string"
+          },
+          "spec_id": {
+            "format": "uuid",
+            "title": "Spec Id",
+            "type": "string"
+          },
+          "spec_version": {
+            "title": "Spec Version",
+            "type": "integer"
+          },
+          "outcome": {
+            "title": "Outcome",
+            "type": "string"
+          },
+          "input": {
+            "additionalProperties": true,
+            "title": "Input",
+            "type": "object"
+          },
+          "converted": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Converted"
+          },
+          "converted_exact": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Converted Exact"
+          },
+          "synthetic": {
+            "title": "Synthetic",
+            "type": "boolean"
+          },
+          "diagnosis": {
+            "const": false,
+            "default": false,
+            "title": "Diagnosis",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "comparison_id",
+          "spec_id",
+          "spec_version",
+          "outcome",
+          "input",
+          "converted",
+          "converted_exact",
+          "synthetic"
+        ],
+        "title": "CompareData",
+        "type": "object"
+      },
+      "langchain": {
+        "type": "function",
+        "function": {
+          "name": "compare_measurement",
+          "description": "Compare a measurement using a currently approved case specification and required conditions. Persists one idempotent comparison; within_range is not diagnosis.",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "spec_id": {
+                "format": "uuid",
+                "title": "Spec Id",
+                "type": "string"
+              },
+              "value": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Value"
+              },
+              "unit": {
+                "enum": [
+                  "C",
+                  "F",
+                  "Pa",
+                  "kPa",
+                  "bar",
+                  "V",
+                  "mV",
+                  "ohm",
+                  "kohm"
+                ],
+                "title": "Unit",
+                "type": "string"
+              },
+              "conditions": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "maxProperties": 20,
+                "title": "Conditions",
+                "type": "object"
+              }
+            },
+            "required": [
+              "spec_id",
+              "unit"
+            ],
+            "title": "MeasurementInput",
+            "type": "object"
+          }
+        }
+      }
+    },
+    "get_case_observations": {
+      "input": {
+        "additionalProperties": false,
+        "properties": {
+          "area_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Area Id"
+          },
+          "at_revision": {
+            "minimum": 0,
+            "title": "At Revision",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "at_revision"
+        ],
+        "title": "ObservationInput",
+        "type": "object"
+      },
+      "output": {
+        "$defs": {
+          "ObservationResult": {
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "title": "Id",
+                "type": "string"
+              },
+              "area_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Area Id"
+              },
+              "step_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Step Id"
+              },
+              "kind": {
+                "title": "Kind",
+                "type": "string"
+              },
+              "payload": {
+                "additionalProperties": true,
+                "title": "Payload",
+                "type": "object"
+              },
+              "created_revision": {
+                "title": "Created Revision",
+                "type": "integer"
+              },
+              "supersedes_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Supersedes Id"
+              }
+            },
+            "required": [
+              "id",
+              "area_id",
+              "step_id",
+              "kind",
+              "payload",
+              "created_revision",
+              "supersedes_id"
+            ],
+            "title": "ObservationResult",
+            "type": "object"
+          }
+        },
+        "additionalProperties": false,
+        "properties": {
+          "empty": {
+            "title": "Empty",
+            "type": "boolean"
+          },
+          "observations": {
+            "items": {
+              "$ref": "#/$defs/ObservationResult"
+            },
+            "maxItems": 50,
+            "title": "Observations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "empty",
+          "observations"
+        ],
+        "title": "ObservationData",
+        "type": "object"
+      },
+      "langchain": {
+        "type": "function",
+        "function": {
+          "name": "get_case_observations",
+          "description": "Read real immutable observations at an allowed case revision, optionally area filtered. Empty means no recorded observations; this tool never writes observations.",
+          "parameters": {
+            "additionalProperties": false,
+            "properties": {
+              "area_id": {
+                "anyOf": [
+                  {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Area Id"
+              },
+              "at_revision": {
+                "minimum": 0,
+                "title": "At Revision",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "at_revision"
+            ],
+            "title": "ObservationInput",
+            "type": "object"
+          }
+        }
+      }
+    }
+  },
+  "sha256": "d021233b0daa64b58ab8610349ffb1247fd1cc283cf12fb3e09b552471b84868",
+  "allowlist": [
+    "search_manuals",
+    "get_evidence_context",
+    "get_measurement_spec",
+    "compare_measurement",
+    "get_case_observations"
+  ]
+}

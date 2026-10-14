@@ -1,0 +1,159 @@
+{
+  "package_id": "DKVB-P0299-DEMO-v1",
+  "version": "1.0",
+  "synthetic": true,
+  "formal_usable": false,
+  "manifest_excludes_itself": true,
+  "files": [
+    {
+      "path": "cases/expected.json",
+      "bytes": 2466,
+      "sha256": "577ae8b5061a6508f1abd2996456cbe22d45b6456c2afdc1af064fc0f80cd507"
+    },
+    {
+      "path": "cases/observations.json",
+      "bytes": 25447,
+      "sha256": "922478f4559beeb59527df771caaae7aecd38967cd2507336aeca81a40a53654"
+    },
+    {
+      "path": "figures/S01-1.png",
+      "bytes": 308199,
+      "sha256": "9829692fbd1fa913c7c3f75475c85c256d2efbc20bdbda87e7ba1fec15548172"
+    },
+    {
+      "path": "figures/S02-1.png",
+      "bytes": 230891,
+      "sha256": "d6aa252a56db43a1c743a2bc000d6895068c0ae43e0bab408b23fe341d9f4e4c"
+    },
+    {
+      "path": "figures/S02-2.png",
+      "bytes": 200865,
+      "sha256": "cf13c0280639a07a55971e3df29cd57681bac1b3608c154d9210b63063757734"
+    },
+    {
+      "path": "figures/S02-3.png",
+      "bytes": 197390,
+      "sha256": "cbe8e9cac75b0865c198303900ebeb87cbee01ecffa12985c08d49e4ff701a7f"
+    },
+    {
+      "path": "figures/S02-4.png",
+      "bytes": 221098,
+      "sha256": "e84a764e53de77e1fd5d224d2826b5461fc62d0b857ae35e20a14f110707d48a"
+    },
+    {
+      "path": "figures/S02-5.png",
+      "bytes": 377924,
+      "sha256": "9e264104e5e72cf617b93452b793e3a4ebc31cbeb3af4ee5a7ee700afa9468a8"
+    },
+    {
+      "path": "figures/S02-6.png",
+      "bytes": 29997,
+      "sha256": "39b62d5bfbb999f270ef1c0eaa2b18a4bf31790c3bd41f9459de9648e6839fac"
+    },
+    {
+      "path": "figures/S03-1.png",
+      "bytes": 339191,
+      "sha256": "2bb7654785e8c8099bc5a2a95befa2ff32f9bcb804596180d7b2750b2da19795"
+    },
+    {
+      "path": "figures/S03-2.png",
+      "bytes": 153524,
+      "sha256": "9766468d8780722b0ba8319d00783bdcdab71a28efbaaff829a22b7238c83434"
+    },
+    {
+      "path": "figures/S03-3.png",
+      "bytes": 358771,
+      "sha256": "7888afa40a1cc9c720d1509df3069da7db5555d874d1a0fb563f4f47b9fc212f"
+    },
+    {
+      "path": "figures/S03-4.png",
+      "bytes": 638763,
+      "sha256": "3844855f2ca04928e916ec802fb273cf7a20808b557d2b11406265d9f09c7ce7"
+    },
+    {
+      "path": "figures/S03-5.png",
+      "bytes": 456883,
+      "sha256": "748a8c78546c122cc529afca954498d013bbe1074d677bf24d73a1c5cb668f1e"
+    },
+    {
+      "path": "figures/S03-6.png",
+      "bytes": 618551,
+      "sha256": "ea1ea89bb6ed387f6c735a5d98ea04ea79610b32072924f0e8c3cdb2e91debc0"
+    },
+    {
+      "path": "figures/S03-7.png",
+      "bytes": 268309,
+      "sha256": "a3a22d98c69303684ff6d4effcf8c8d0a9dcc0c6f1fc2704469167dccb06a466"
+    },
+    {
+      "path": "figures/S03-8.png",
+      "bytes": 375330,
+      "sha256": "2e404923ef8da21089aeeb2ca82d19c4b4a12c810f625030f39a3dfb7edc63c2"
+    },
+    {
+      "path": "figures/S03-9.png",
+      "bytes": 243964,
+      "sha256": "1a4dd131363463503e303a268c6489b4dc1b1310e6ea238f938cf48c447a198a"
+    },
+    {
+      "path": "knowledge.json",
+      "bytes": 9333,
+      "sha256": "1be0b837e82366bd9639e615339f0624d2e3a7fbae4705ddd2f3080b18ce6182"
+    },
+    {
+      "path": "originals/S01-identification.pdf",
+      "bytes": 315762,
+      "sha256": "9ef157e68951206135e17bb81cbdc7235cfef8a4d0ca6632f92986d657bd0228"
+    },
+    {
+      "path": "originals/S02-charge-air.pdf",
+      "bytes": 1475397,
+      "sha256": "0cb9ccb8650646779b4056db3614bbf656e48c430d13d30afc5f0dde0f4c4e44"
+    },
+    {
+      "path": "originals/S03-turbocharger.pdf",
+      "bytes": 2302358,
+      "sha256": "fe00f5a652364f29c609a167ce93ee4087f61c391d03af826f72caa6138f15c7"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4200,
+      "sha256": "c2d25466001358e859d388e4d013921b7555d083b7819b54cef310ff1af193ca"
+    },
+    {
+      "path": "制作检查结果.md",
+      "bytes": 2322,
+      "sha256": "f63c6493613e3bcc426a01bd4e23618b04af8bf3a0974c10509fd26773ad4b8e"
+    },
+    {
+      "path": "来源与图纸.md",
+      "bytes": 5197,
+      "sha256": "d86d368f7e37a599fda15b98bfc63961b8369a4585ae065ec4cdfefff05f5dea"
+    },
+    {
+      "path": "演示病例与操作脚本.md",
+      "bytes": 7786,
+      "sha256": "6181ed4dcf8c89ce1529523bc9bcf9f5fcc7c2b3300aef556c08395a451e58ae"
+    },
+    {
+      "path": "系统接入与验收.md",
+      "bytes": 6029,
+      "sha256": "e9153a30f1bdcadd21369991f00e500c6a697ae658c170798db5ccb8a25a2cfe"
+    },
+    {
+      "path": "维修知识手册.md",
+      "bytes": 15853,
+      "sha256": "0ec959cd32a0b30570336e3be04203faf70eba4d76be507aea5bd03dba24e4ec"
+    },
+    {
+      "path": "规格与判断关系.md",
+      "bytes": 5641,
+      "sha256": "de7cff769a61f2bc6c2ffd55790f934fc0bfc0982eca6394a3d7aec0237e35a0"
+    },
+    {
+      "path": "资料整理记录.md",
+      "bytes": 1971,
+      "sha256": "199cac0e1417cc4a3a2c6d4efd92c76d3a416588b141fdbafb18bbff1dd92f2b"
+    }
+  ]
+}

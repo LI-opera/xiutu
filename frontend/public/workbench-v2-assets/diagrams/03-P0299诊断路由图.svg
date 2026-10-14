@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="760" viewBox="0 0 1500 760">
+  <style>.h{font:700 27px 'Microsoft YaHei';fill:#11392f}.t{font:18px 'Microsoft YaHei';fill:#365b53}.n{fill:#edf7f3;stroke:#17785e;stroke-width:3}.q{fill:#fff4d8;stroke:#c58518;stroke-width:3}.x{fill:#fff0ed;stroke:#b44e43;stroke-width:3}.a{stroke:#247c66;stroke-width:4;fill:none;marker-end:url(#m)}.l{font:17px 'Microsoft YaHei';fill:#47665f}</style>
+  <defs><marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#247c66"/></marker></defs>
+  <text class="h" x="50" y="50">探岳 DKVB / P0299 七阶段演示路由</text>
+  <rect class="n" x="50" y="120" width="200" height="90" rx="16"/><text class="h" x="95" y="162">S0 接诊确认</text><text class="t" x="78" y="192">身份 / 主诉 / 风险</text>
+  <rect class="n" x="330" y="120" width="220" height="90" rx="16"/><text class="h" x="365" y="162">S1 空气通路</text><text class="t" x="360" y="192">软管 / 接头 / 中冷器</text>
+  <rect class="n" x="630" y="120" width="220" height="90" rx="16"/><text class="h" x="666" y="162">S2 压力信号</text><text class="t" x="658" y="192">G31 / G71 / 三帧</text>
+  <rect class="n" x="930" y="120" width="220" height="90" rx="16"/><text class="h" x="962" y="162">S3 调节机构</text><text class="t" x="962" y="192">V465 / N249 / 连杆</text>
+  <rect class="q" x="930" y="330" width="220" height="90" rx="16"/><text class="h" x="951" y="372">S4 涡轮本体</text><text class="t" x="958" y="402">外部非拆解线索</text>
+  <rect class="q" x="630" y="530" width="240" height="90" rx="16"/><text class="h" x="655" y="572">S5 其他动力系统</text><text class="t" x="667" y="602">点火 / 燃油 / 排气</text>
+  <rect class="n" x="1180" y="530" width="250" height="90" rx="16"/><text class="h" x="1214" y="572">S6 处理与复检</text><text class="t" x="1215" y="602">新数据 / 症状 / DTC</text>
+  <rect class="x" x="50" y="530" width="250" height="90" rx="16"/><text class="h" x="82" y="572">保守交接 / 停止</text><text class="t" x="83" y="602">工具、资料或安全不足</text>
+  <path class="a" d="M250 165 H323"/><path class="a" d="M550 165 H623"/><path class="a" d="M850 165 H923"/><path class="a" d="M1040 210 V323"/><path class="a" d="M1150 375 H1305 V523"/><path class="a" d="M740 210 V523"/><path class="a" d="M870 575 H1173"/>
+  <path class="a" d="M440 210 V575 H307"/><path class="a" d="M630 165 H590 V575 H307"/>
+  <text class="l" x="1060" y="275">仍低增压</text><text class="l" x="1115" y="465">专业检测/处理</text><text class="l" x="752" y="345">增压恢复但症状仍在</text><text class="l" x="360" y="555">无法安全完成</text>
+</svg>
+

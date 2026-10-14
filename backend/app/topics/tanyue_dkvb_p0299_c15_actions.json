@@ -1,0 +1,34 @@
+{
+  "version": "c15-actions-1",
+  "topic_version": "2.2.1-b02",
+  "boundary": "仅限 synthetic DEMO。接头复位只适用于手册第 2 页所示结构、合规工具及已记录的接头定位证据；不能据模拟数据确诊或宣称处理已实施。",
+  "actions": [
+    {
+      "id": "CHECK_CHARGE_AIR_HOSE_SEATING_LEAK",
+      "kind": "check",
+      "allowed_scopes": ["supplement_or_handoff", "fact_review", "conditional_action"],
+      "required_question_options": {"AIR-07": ["partially_seated", "not_locked"], "AIR-08": ["small_play", "pulls_out"]},
+      "required_excerpt_ids": ["C01-SRC-CHARGE-AIR-P1"],
+      "required_excerpt_text": "进行测试或修理前，检查所有空气软管和管路的座合是否牢固以及是否泄漏。",
+      "action": "检查增压空气软管及管路的座合是否牢固、是否泄漏；仅核对可安全查看的部位。",
+      "prerequisites": "先确认资料适用及现场安全；禁止拆卸、禁止加压、禁止修理、禁止换件。",
+      "retest": "记录实际核查结果；没有实施处理时不创建维修后复检轮次。",
+      "stop_condition": "无法安全核查或资料不适用时停止并交接。"
+    },
+    {
+      "id": "RESEAT_DKVB_CHARGE_AIR_HOSE_COUPLING",
+      "kind": "conditional_action",
+      "allowed_scopes": ["conditional_action"],
+      "allowed_vehicle_years": [2019],
+      "required_question_options": {"AIR-07": ["partially_seated", "not_locked"]},
+      "required_all_question_options": {"AIR-09": ["misaligned"], "AIR-10": ["normal"], "AIR-15": ["connector"], "AIR-16": ["audible_or_bubble", "ultrasonic"]},
+      "required_excerpt_ids": ["C15-SRC-CHARGE-AIR-P2", "C15-SRC-CHARGE-AIR-P5-TEST", "C01-SRC-CHARGE-AIR-P5"],
+      "explanation_excerpt_ids": ["C15-SRC-CHARGE-AIR-P2"],
+      "required_excerpt_text": "安装软管接头：插入软管直至止动位置，增压空气管上的标记箭头 A 必须与增压空气软管上的标记箭头 B 对齐。必须以 5.5 Nm 力矩拧紧增压空气管路上的锁定卡箍 A；力矩过高或过小均可能使车辆运行期间增压空气软管从增压空气管滑落。进行测试或修理前，检查所有空气软管和管路的座合是否牢固以及是否泄漏。安装前，软管活接头及进气管路和软管必须无油脂。",
+      "action": "仅对手册第 2 页所示同型软管接头：将软管插入止挡位置，使管上箭头 A 与软管箭头 B 对齐；对图示锁定卡箍 A 按手册 5.5 Nm 紧固。此为待执行的条件性处理建议，不是已维修事实。",
+      "prerequisites": "先现场核实车型、同型连接结构、接头及密封件完好且接合面无油脂；具备受控紧固工具及合格操作条件。若零件破损或结构不符，不套用此步骤。",
+      "retest": "实际处理后另开维修后复检轮次；按同一手册第 5 页的 V.A.G 1687 及相应转接器流程复查泄漏，压力不得超过 0.5 bar，记录漏点是否消失；再在可比工况记录压力和症状，演示差值不作为厂家通过值。未实施处理前不得写复检通过。",
+      "stop_condition": "无法确认同型结构、密封或卡箍损坏、缺少合规工具、压力无法受控或仍有泄漏时停止并交接；不得据模拟数据宣称已修复。"
+    }
+  ]
+}

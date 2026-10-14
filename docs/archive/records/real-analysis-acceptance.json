@@ -1,0 +1,91 @@
+{
+  "started_at": "2026-10-12T23:22:16.612844",
+  "database": "xiutu_test_current_flow_20261012",
+  "model": "deepseek-flash",
+  "max_model_calls": 1,
+  "max_output_tokens": 8192,
+  "automatic_retry": false,
+  "status": "completed",
+  "case_id": "4a5add7f-0d87-47aa-bd5f-c97d8f4f35f4",
+  "input_revision": 3,
+  "selected": [
+    {
+      "area_id": "boost-air",
+      "question_id": "AIR-01",
+      "option_id": "open_or_misaligned"
+    },
+    {
+      "area_id": "pressure",
+      "question_id": "PRS-05",
+      "option_id": "loose"
+    }
+  ],
+  "documents": [
+    {
+      "id": "tayron-dkvb-boost-air",
+      "version": "3",
+      "content_hash": "83c6e5e31218dd64aa1b566d1ccf0f8684fca4346e9ee9ff5e1b1dbd29059be3"
+    },
+    {
+      "id": "tayron-dkvb-pressure",
+      "version": "3",
+      "content_hash": "5df3eb9e0dd5008fa96f70b1e7487456badf883a7fb5a2b3480a48565f792892"
+    }
+  ],
+  "input_summary_sha256": "20321373e1b6a515700afe324b7c12c737264746c729e3c4eddef7ceff550c58",
+  "duration_seconds": 23.0,
+  "attempt_id": "4b8077e8-425a-4661-85e7-fa55632cfae9",
+  "error_code": null,
+  "usage": {
+    "input_tokens": 34958,
+    "total_tokens": 38269,
+    "output_tokens": 3311,
+    "input_token_details": {
+      "cache_read": 896
+    },
+    "output_token_details": {}
+  },
+  "reread_same_attempt": true,
+  "attempt_count": 1,
+  "case_revision_unchanged": true,
+  "observation_ids_unchanged": true,
+  "repair_rounds_unchanged": true,
+  "frozen_documents_equal": true,
+  "output_summary": {
+    "summary": "本车为2019探岳，故障码P0236，主诉为压力信号间歇变化。当前已保存两条记录：空滤壳上下盖未闭合或错位（AIR-01），G31连接器松动（PRS-05）。这两条都是装配/连接层面的异常，且与“信号间歇变化”方向一致，应优先处理并复测。但两条记录均未标注记录角色，且缺少静态压力数值（PRS-01/02/03）和线束扰动结果（PRS-06），因此目前还不能判断信号不可信是来自连接松动、传感器本体还是管路真实压力波动。建议先并行完成两项低风险动作：恢复空滤壳闭合、按G31连接器结构恢复锁止并做扰动复测；同时补齐静态三路压力读数，用于判断测量链路是否可信。气路检漏（AIR-13～16）和负荷三帧（PRS-07～10）暂不作为当前第一步，待连接与静态数据确认后再决定是否进入。",
+    "uncertainty": "两条已保存记录均未标注记录角色，且缺少静态压力数值和扰动复测结果，因此目前无法判断信号不可信是来自连接松动、传感器本体还是管路真实压力波动。空滤壳未闭合与G31连接器松动同时存在，但两者是否互为因果或共同导致P0236，尚无证据支持。"
+  },
+  "output_steps": [
+    {
+      "title": "空滤壳闭合状态复核与恢复",
+      "question_ids": [
+        "AIR-01",
+        "AIR-02"
+      ],
+      "basis_observation_ids": [
+        "7bdff6b3-a221-4542-bd6e-276c43ccd151"
+      ]
+    },
+    {
+      "title": "G31连接器锁止恢复与扰动复测",
+      "question_ids": [
+        "PRS-05",
+        "PRS-06"
+      ],
+      "basis_observation_ids": [
+        "be73680a-a564-499b-b3c3-e564f0d46c20"
+      ]
+    },
+    {
+      "title": "静态三路压力采集",
+      "question_ids": [
+        "PRS-01",
+        "PRS-02",
+        "PRS-03",
+        "PRS-04"
+      ],
+      "basis_observation_ids": []
+    }
+  ],
+  "finished_at": "2026-10-12T23:22:40.003707"
+}

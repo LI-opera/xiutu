@@ -1,0 +1,842 @@
+{
+  "format": "xiutu-authored-demo-cases/1",
+  "not_for_retrieval": true,
+  "cases": [
+    {
+      "case_id": "A",
+      "title": "复合问题：先局部泄漏，后模拟设置",
+      "synthetic": true,
+      "release_policy": "only_current_observation_after_user_action",
+      "observations": [
+        {
+          "check_id": "CHK-01",
+          "stage": "initial",
+          "data": {
+            "engine_code": "DKVB",
+            "vehicle_family": "TAYRON",
+            "model_year": "2019",
+            "dtc": [
+              "P0299"
+            ],
+            "other_dtc": [],
+            "symptom": "加速或上坡无力，低负荷基本正常，重启后暂时改善",
+            "recent_work": "unknown",
+            "vin": null
+          },
+          "observation_id": "A-OBS-01",
+          "run_id": "A-initial-01",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-02",
+          "stage": "initial",
+          "data": {
+            "condition": "DEMO_STATIC",
+            "ambient_abs_hpa": "1000",
+            "g31_abs_hpa": "1008",
+            "unit": "hPa",
+            "pressure_type": "absolute"
+          },
+          "observation_id": "A-OBS-02",
+          "run_id": "A-initial-02",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-03",
+          "stage": "initial",
+          "data": {
+            "condition": "DEMO_LOAD_STABLE",
+            "unit": "hPa",
+            "pressure_type": "absolute",
+            "frames": [
+              {
+                "t": "0",
+                "target_abs_hpa": "2200",
+                "actual_abs_hpa": "1600"
+              },
+              {
+                "t": "1",
+                "target_abs_hpa": "2250",
+                "actual_abs_hpa": "1640"
+              },
+              {
+                "t": "2",
+                "target_abs_hpa": "2300",
+                "actual_abs_hpa": "1670"
+              }
+            ]
+          },
+          "observation_id": "A-OBS-03",
+          "run_id": "A-initial-03",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-04",
+          "stage": "initial",
+          "data": {
+            "object_id": "OBJ-AIR-J1",
+            "visual_state": "suspected_incomplete_seating",
+            "checked": true,
+            "location_ref": "S02-P2"
+          },
+          "observation_id": "A-OBS-04",
+          "run_id": "A-initial-04",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-05",
+          "stage": "initial",
+          "data": {
+            "leak_result": "localized",
+            "leak_object_id": "OBJ-AIR-J1",
+            "leak_location": "虚拟接头J1",
+            "evidence_kind": "localized_bubbles",
+            "pressure_hold_used": false
+          },
+          "observation_id": "A-OBS-05",
+          "run_id": "A-initial-05",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-06",
+          "stage": "after_air_repair",
+          "data": {
+            "action": "simulate_correct_connection_assembly",
+            "completed": true,
+            "object_id": "OBJ-AIR-J1"
+          },
+          "observation_id": "A-OBS-06",
+          "run_id": "A-after_air_repair-06",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-07",
+          "stage": "after_air_repair",
+          "data": {
+            "condition": "DEMO_LOAD_STABLE",
+            "unit": "hPa",
+            "pressure_type": "absolute",
+            "frames": [
+              {
+                "t": "0",
+                "target_abs_hpa": "2200",
+                "actual_abs_hpa": "1980"
+              },
+              {
+                "t": "1",
+                "target_abs_hpa": "2250",
+                "actual_abs_hpa": "2040"
+              },
+              {
+                "t": "2",
+                "target_abs_hpa": "2300",
+                "actual_abs_hpa": "2080"
+              }
+            ],
+            "leak_result": "not_found",
+            "symptom": "improved_but_present"
+          },
+          "observation_id": "A-OBS-07",
+          "run_id": "A-after_air_repair-07",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-08",
+          "stage": "after_air_repair",
+          "data": {
+            "connector_state": "intact",
+            "linkage_state": "no_visible_issue",
+            "prior_guided_result": "unknown"
+          },
+          "observation_id": "A-OBS-08",
+          "run_id": "A-after_air_repair-08",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-09",
+          "stage": "after_air_repair",
+          "data": {
+            "guided_result": "setup_required",
+            "synthetic_device_result": true
+          },
+          "observation_id": "A-OBS-09",
+          "run_id": "A-after_air_repair-09",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-09",
+          "stage": "after_control_setup",
+          "data": {
+            "guided_result": "completed",
+            "action": "simulate_guided_setup",
+            "synthetic_device_result": true
+          },
+          "observation_id": "A-OBS-10",
+          "run_id": "A-after_control_setup-10",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-11",
+          "stage": "after_control_setup",
+          "data": {
+            "condition": "DEMO_LOAD_STABLE",
+            "unit": "hPa",
+            "pressure_type": "absolute",
+            "frames": [
+              {
+                "t": "0",
+                "target_abs_hpa": "2200",
+                "actual_abs_hpa": "2160"
+              },
+              {
+                "t": "1",
+                "target_abs_hpa": "2250",
+                "actual_abs_hpa": "2210"
+              },
+              {
+                "t": "2",
+                "target_abs_hpa": "2300",
+                "actual_abs_hpa": "2270"
+              }
+            ],
+            "symptom": "absent",
+            "dtc_p0299": "absent",
+            "repairs_rechecked": true,
+            "unresolved_conflict": false
+          },
+          "observation_id": "A-OBS-11",
+          "run_id": "A-after_control_setup-11",
+          "synthetic": true
+        }
+      ]
+    },
+    {
+      "case_id": "B",
+      "title": "仅空气通路问题",
+      "synthetic": true,
+      "release_policy": "only_current_observation_after_user_action",
+      "observations": [
+        {
+          "check_id": "CHK-01",
+          "stage": "initial",
+          "data": {
+            "engine_code": "DKVB",
+            "vehicle_family": "TAYRON",
+            "model_year": "2019",
+            "dtc": [
+              "P0299"
+            ],
+            "other_dtc": [],
+            "symptom": "加速或上坡无力，低负荷基本正常，重启后暂时改善",
+            "recent_work": "unknown",
+            "vin": null
+          },
+          "observation_id": "B-OBS-01",
+          "run_id": "B-initial-01",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-02",
+          "stage": "initial",
+          "data": {
+            "condition": "DEMO_STATIC",
+            "ambient_abs_hpa": "1000",
+            "g31_abs_hpa": "1008",
+            "unit": "hPa",
+            "pressure_type": "absolute"
+          },
+          "observation_id": "B-OBS-02",
+          "run_id": "B-initial-02",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-03",
+          "stage": "initial",
+          "data": {
+            "condition": "DEMO_LOAD_STABLE",
+            "unit": "hPa",
+            "pressure_type": "absolute",
+            "frames": [
+              {
+                "t": "0",
+                "target_abs_hpa": "2200",
+                "actual_abs_hpa": "1600"
+              },
+              {
+                "t": "1",
+                "target_abs_hpa": "2250",
+                "actual_abs_hpa": "1640"
+              },
+              {
+                "t": "2",
+                "target_abs_hpa": "2300",
+                "actual_abs_hpa": "1670"
+              }
+            ]
+          },
+          "observation_id": "B-OBS-03",
+          "run_id": "B-initial-03",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-04",
+          "stage": "initial",
+          "data": {
+            "object_id": "OBJ-AIR-J1",
+            "visual_state": "suspected_incomplete_seating",
+            "checked": true,
+            "location_ref": "S02-P2"
+          },
+          "observation_id": "B-OBS-04",
+          "run_id": "B-initial-04",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-05",
+          "stage": "initial",
+          "data": {
+            "leak_result": "localized",
+            "leak_object_id": "OBJ-AIR-J1",
+            "leak_location": "虚拟接头J1",
+            "evidence_kind": "localized_bubbles",
+            "pressure_hold_used": false
+          },
+          "observation_id": "B-OBS-05",
+          "run_id": "B-initial-05",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-06",
+          "stage": "after_air_repair",
+          "data": {
+            "action": "simulate_correct_connection_assembly",
+            "completed": true,
+            "object_id": "OBJ-AIR-J1"
+          },
+          "observation_id": "B-OBS-06",
+          "run_id": "B-after_air_repair-06",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-07",
+          "stage": "after_air_repair",
+          "data": {
+            "condition": "DEMO_LOAD_STABLE",
+            "unit": "hPa",
+            "pressure_type": "absolute",
+            "frames": [
+              {
+                "t": "0",
+                "target_abs_hpa": "2200",
+                "actual_abs_hpa": "2160"
+              },
+              {
+                "t": "1",
+                "target_abs_hpa": "2250",
+                "actual_abs_hpa": "2210"
+              },
+              {
+                "t": "2",
+                "target_abs_hpa": "2300",
+                "actual_abs_hpa": "2270"
+              }
+            ],
+            "leak_result": "not_found",
+            "symptom": "absent"
+          },
+          "observation_id": "B-OBS-07",
+          "run_id": "B-after_air_repair-07",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-11",
+          "stage": "after_air_repair",
+          "data": {
+            "condition": "DEMO_LOAD_STABLE",
+            "unit": "hPa",
+            "pressure_type": "absolute",
+            "frames": [
+              {
+                "t": "0",
+                "target_abs_hpa": "2200",
+                "actual_abs_hpa": "2160"
+              },
+              {
+                "t": "1",
+                "target_abs_hpa": "2250",
+                "actual_abs_hpa": "2210"
+              },
+              {
+                "t": "2",
+                "target_abs_hpa": "2300",
+                "actual_abs_hpa": "2270"
+              }
+            ],
+            "symptom": "absent",
+            "dtc_p0299": "absent",
+            "repairs_rechecked": true,
+            "unresolved_conflict": false
+          },
+          "observation_id": "B-OBS-08",
+          "run_id": "B-after_air_repair-08",
+          "synthetic": true
+        }
+      ]
+    },
+    {
+      "case_id": "C",
+      "title": "未见泄漏，进入调节方向",
+      "synthetic": true,
+      "release_policy": "only_current_observation_after_user_action",
+      "observations": [
+        {
+          "check_id": "CHK-01",
+          "stage": "initial",
+          "data": {
+            "engine_code": "DKVB",
+            "vehicle_family": "TAYRON",
+            "model_year": "2019",
+            "dtc": [
+              "P0299"
+            ],
+            "other_dtc": [],
+            "symptom": "加速或上坡无力，低负荷基本正常，重启后暂时改善",
+            "recent_work": "unknown",
+            "vin": null
+          },
+          "observation_id": "C-OBS-01",
+          "run_id": "C-initial-01",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-02",
+          "stage": "initial",
+          "data": {
+            "condition": "DEMO_STATIC",
+            "ambient_abs_hpa": "1000",
+            "g31_abs_hpa": "1008",
+            "unit": "hPa",
+            "pressure_type": "absolute"
+          },
+          "observation_id": "C-OBS-02",
+          "run_id": "C-initial-02",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-03",
+          "stage": "initial",
+          "data": {
+            "condition": "DEMO_LOAD_STABLE",
+            "unit": "hPa",
+            "pressure_type": "absolute",
+            "frames": [
+              {
+                "t": "0",
+                "target_abs_hpa": "2200",
+                "actual_abs_hpa": "1600"
+              },
+              {
+                "t": "1",
+                "target_abs_hpa": "2250",
+                "actual_abs_hpa": "1640"
+              },
+              {
+                "t": "2",
+                "target_abs_hpa": "2300",
+                "actual_abs_hpa": "1670"
+              }
+            ]
+          },
+          "observation_id": "C-OBS-03",
+          "run_id": "C-initial-03",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-04",
+          "stage": "initial",
+          "data": {
+            "object_id": "OBJ-AIR",
+            "visual_state": "no_visible_issue",
+            "checked": true,
+            "location_ref": "S02-P2"
+          },
+          "observation_id": "C-OBS-04",
+          "run_id": "C-initial-04",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-05",
+          "stage": "initial",
+          "data": {
+            "leak_result": "not_found",
+            "leak_object_id": null,
+            "leak_location": null,
+            "evidence_kind": "local_check_no_finding",
+            "pressure_hold_used": false
+          },
+          "observation_id": "C-OBS-05",
+          "run_id": "C-initial-05",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-08",
+          "stage": "initial",
+          "data": {
+            "connector_state": "intact",
+            "linkage_state": "no_visible_issue",
+            "prior_guided_result": "unknown"
+          },
+          "observation_id": "C-OBS-06",
+          "run_id": "C-initial-06",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-09",
+          "stage": "initial",
+          "data": {
+            "guided_result": "setup_required",
+            "synthetic_device_result": true
+          },
+          "observation_id": "C-OBS-07",
+          "run_id": "C-initial-07",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-09",
+          "stage": "after_control_setup",
+          "data": {
+            "guided_result": "completed",
+            "action": "simulate_guided_setup",
+            "synthetic_device_result": true
+          },
+          "observation_id": "C-OBS-08",
+          "run_id": "C-after_control_setup-08",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-11",
+          "stage": "after_control_setup",
+          "data": {
+            "condition": "DEMO_LOAD_STABLE",
+            "unit": "hPa",
+            "pressure_type": "absolute",
+            "frames": [
+              {
+                "t": "0",
+                "target_abs_hpa": "2200",
+                "actual_abs_hpa": "2160"
+              },
+              {
+                "t": "1",
+                "target_abs_hpa": "2250",
+                "actual_abs_hpa": "2210"
+              },
+              {
+                "t": "2",
+                "target_abs_hpa": "2300",
+                "actual_abs_hpa": "2270"
+              }
+            ],
+            "symptom": "absent",
+            "dtc_p0299": "absent",
+            "repairs_rechecked": true,
+            "unresolved_conflict": false
+          },
+          "observation_id": "C-OBS-09",
+          "run_id": "C-after_control_setup-09",
+          "synthetic": true
+        }
+      ]
+    },
+    {
+      "case_id": "D",
+      "title": "静态测量可信度不足",
+      "synthetic": true,
+      "release_policy": "only_current_observation_after_user_action",
+      "observations": [
+        {
+          "check_id": "CHK-01",
+          "stage": "initial",
+          "data": {
+            "engine_code": "DKVB",
+            "vehicle_family": "TAYRON",
+            "model_year": "2019",
+            "dtc": [
+              "P0299"
+            ],
+            "other_dtc": [],
+            "symptom": "加速或上坡无力，低负荷基本正常，重启后暂时改善",
+            "recent_work": "unknown",
+            "vin": null
+          },
+          "observation_id": "D-OBS-01",
+          "run_id": "D-initial-01",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-02",
+          "stage": "initial",
+          "data": {
+            "condition": "DEMO_STATIC",
+            "ambient_abs_hpa": "1000",
+            "g31_abs_hpa": "1190",
+            "unit": "hPa",
+            "pressure_type": "absolute"
+          },
+          "observation_id": "D-OBS-02",
+          "run_id": "D-initial-02",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-10",
+          "stage": "initial",
+          "data": {
+            "unresolved": "G31静态显示与参考不相容；需测量链程序，不足以定位本体"
+          },
+          "observation_id": "D-OBS-03",
+          "run_id": "D-initial-03",
+          "synthetic": true
+        }
+      ]
+    },
+    {
+      "case_id": "E",
+      "title": "补问后前进，等待动态输入",
+      "synthetic": true,
+      "release_policy": "only_current_observation_after_user_action",
+      "observations": [
+        {
+          "check_id": "CHK-01",
+          "stage": "initial",
+          "data": {
+            "engine_code": "unknown",
+            "vehicle_family": "TAYRON",
+            "model_year": "2019",
+            "dtc": [
+              "P0299"
+            ],
+            "other_dtc": [],
+            "symptom": "加速或上坡无力，低负荷基本正常，重启后暂时改善",
+            "recent_work": "unknown",
+            "vin": null
+          },
+          "observation_id": "E-OBS-01",
+          "run_id": "E-initial-01",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-01",
+          "stage": "initial",
+          "data": {
+            "engine_code": "DKVB",
+            "vehicle_family": "TAYRON",
+            "model_year": "2019",
+            "dtc": [
+              "P0299"
+            ],
+            "other_dtc": [],
+            "symptom": "加速或上坡无力，低负荷基本正常，重启后暂时改善",
+            "recent_work": "unknown",
+            "vin": null
+          },
+          "observation_id": "E-OBS-02",
+          "run_id": "E-initial-02",
+          "synthetic": true,
+          "supersedes_observation_id": "E-OBS-01"
+        },
+        {
+          "check_id": "CHK-02",
+          "stage": "initial",
+          "data": {
+            "condition": "DEMO_STATIC",
+            "ambient_abs_hpa": "1000",
+            "g31_abs_hpa": "1008",
+            "unit": "hPa",
+            "pressure_type": "unknown"
+          },
+          "observation_id": "E-OBS-03",
+          "run_id": "E-initial-03",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-02",
+          "stage": "initial",
+          "data": {
+            "condition": "DEMO_STATIC",
+            "ambient_abs_hpa": "1000",
+            "g31_abs_hpa": "1008",
+            "unit": "hPa",
+            "pressure_type": "absolute"
+          },
+          "observation_id": "E-OBS-04",
+          "run_id": "E-initial-04",
+          "synthetic": true,
+          "supersedes_observation_id": "E-OBS-03"
+        }
+      ]
+    },
+    {
+      "case_id": "F",
+      "title": "引导完成但仍未定位",
+      "synthetic": true,
+      "release_policy": "only_current_observation_after_user_action",
+      "observations": [
+        {
+          "check_id": "CHK-01",
+          "stage": "initial",
+          "data": {
+            "engine_code": "DKVB",
+            "vehicle_family": "TAYRON",
+            "model_year": "2019",
+            "dtc": [
+              "P0299"
+            ],
+            "other_dtc": [],
+            "symptom": "加速或上坡无力，低负荷基本正常，重启后暂时改善",
+            "recent_work": "unknown",
+            "vin": null
+          },
+          "observation_id": "F-OBS-01",
+          "run_id": "F-initial-01",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-02",
+          "stage": "initial",
+          "data": {
+            "condition": "DEMO_STATIC",
+            "ambient_abs_hpa": "1000",
+            "g31_abs_hpa": "1008",
+            "unit": "hPa",
+            "pressure_type": "absolute"
+          },
+          "observation_id": "F-OBS-02",
+          "run_id": "F-initial-02",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-03",
+          "stage": "initial",
+          "data": {
+            "condition": "DEMO_LOAD_STABLE",
+            "unit": "hPa",
+            "pressure_type": "absolute",
+            "frames": [
+              {
+                "t": "0",
+                "target_abs_hpa": "2200",
+                "actual_abs_hpa": "1600"
+              },
+              {
+                "t": "1",
+                "target_abs_hpa": "2250",
+                "actual_abs_hpa": "1640"
+              },
+              {
+                "t": "2",
+                "target_abs_hpa": "2300",
+                "actual_abs_hpa": "1670"
+              }
+            ]
+          },
+          "observation_id": "F-OBS-03",
+          "run_id": "F-initial-03",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-04",
+          "stage": "initial",
+          "data": {
+            "object_id": "OBJ-AIR",
+            "visual_state": "no_visible_issue",
+            "checked": true,
+            "location_ref": "S02-P2"
+          },
+          "observation_id": "F-OBS-04",
+          "run_id": "F-initial-04",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-05",
+          "stage": "initial",
+          "data": {
+            "leak_result": "not_found",
+            "leak_object_id": null,
+            "leak_location": null,
+            "evidence_kind": "local_check_no_finding",
+            "pressure_hold_used": false
+          },
+          "observation_id": "F-OBS-05",
+          "run_id": "F-initial-05",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-08",
+          "stage": "initial",
+          "data": {
+            "connector_state": "intact",
+            "linkage_state": "no_visible_issue",
+            "prior_guided_result": "unknown"
+          },
+          "observation_id": "F-OBS-06",
+          "run_id": "F-initial-06",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-09",
+          "stage": "after_control_setup",
+          "data": {
+            "guided_result": "completed",
+            "synthetic_device_result": true
+          },
+          "observation_id": "F-OBS-07",
+          "run_id": "F-after_control_setup-07",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-11",
+          "stage": "after_control_setup",
+          "data": {
+            "condition": "DEMO_LOAD_STABLE",
+            "unit": "hPa",
+            "pressure_type": "absolute",
+            "frames": [
+              {
+                "t": "0",
+                "target_abs_hpa": "2200",
+                "actual_abs_hpa": "1980"
+              },
+              {
+                "t": "1",
+                "target_abs_hpa": "2250",
+                "actual_abs_hpa": "2040"
+              },
+              {
+                "t": "2",
+                "target_abs_hpa": "2300",
+                "actual_abs_hpa": "2080"
+              }
+            ],
+            "symptom": "present",
+            "dtc_p0299": "present",
+            "repairs_rechecked": true,
+            "unresolved_conflict": false
+          },
+          "observation_id": "F-OBS-08",
+          "run_id": "F-after_control_setup-08",
+          "synthetic": true
+        },
+        {
+          "check_id": "CHK-10",
+          "stage": "after_control_setup",
+          "data": {
+            "unresolved": "压力仍不足，需要适用的N249、调节机械及其他故障定位资料"
+          },
+          "observation_id": "F-OBS-09",
+          "run_id": "F-after_control_setup-09",
+          "synthetic": true
+        }
+      ]
+    }
+  ]
+}

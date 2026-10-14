@@ -1,0 +1,123 @@
+{
+  "format": "xiutu-author-expectations/1",
+  "never_send_to_diagnosing_model": true,
+  "cases": [
+    {
+      "case_id": "A",
+      "terminal": "demo_complete",
+      "required_findings": [
+        "CON-03",
+        "CON-04",
+        "CON-05",
+        "CON-06"
+      ],
+      "forbidden": [
+        "turbo_replacement",
+        "V465_hardware_failure",
+        "all_components_excluded"
+      ],
+      "route": [
+        "CHK-01",
+        "CHK-02",
+        "CHK-03",
+        "CHK-04",
+        "CHK-05",
+        "CHK-06",
+        "CHK-07",
+        "CHK-08",
+        "CHK-09",
+        "CHK-09",
+        "CHK-11"
+      ]
+    },
+    {
+      "case_id": "B",
+      "terminal": "demo_complete",
+      "forbidden": [
+        "unnecessary_control_setup",
+        "turbo_replacement"
+      ],
+      "route": [
+        "CHK-01",
+        "CHK-02",
+        "CHK-03",
+        "CHK-04",
+        "CHK-05",
+        "CHK-06",
+        "CHK-07",
+        "CHK-11"
+      ]
+    },
+    {
+      "case_id": "C",
+      "terminal": "demo_complete",
+      "forbidden": [
+        "invent_air_leak",
+        "invent_air_repair"
+      ],
+      "route": [
+        "CHK-01",
+        "CHK-02",
+        "CHK-03",
+        "CHK-04",
+        "CHK-05",
+        "CHK-08",
+        "CHK-09",
+        "CHK-09",
+        "CHK-11"
+      ]
+    },
+    {
+      "case_id": "D",
+      "terminal": "unresolved_measurement",
+      "forbidden": [
+        "G31_replacement",
+        "turbo_replacement",
+        "underboost_confirmed"
+      ],
+      "route": [
+        "CHK-01",
+        "CHK-02",
+        "CHK-10"
+      ]
+    },
+    {
+      "case_id": "E",
+      "terminal": "await_dynamic_input",
+      "requires": [
+        "ask_engine_only",
+        "ask_pressure_type_only",
+        "invalidate_superseded_observation"
+      ],
+      "forbidden": [
+        "borrow_future_or_other_case_data"
+      ],
+      "route": [
+        "CHK-01",
+        "CHK-01",
+        "CHK-02",
+        "CHK-02"
+      ]
+    },
+    {
+      "case_id": "F",
+      "terminal": "unresolved_handoff",
+      "forbidden": [
+        "claim_success",
+        "automatic_turbo_replacement",
+        "endless_setup_loop"
+      ],
+      "route": [
+        "CHK-01",
+        "CHK-02",
+        "CHK-03",
+        "CHK-04",
+        "CHK-05",
+        "CHK-08",
+        "CHK-09",
+        "CHK-11",
+        "CHK-10"
+      ]
+    }
+  ]
+}
