@@ -60,6 +60,8 @@ attachments/
 !frontend/public/workbench-v2-assets/**/*.png
 !frontend/public/workbench-v2-assets/**/*.jpg
 !frontend/public/workbench-v2-assets/**/*.jpeg
+# README screenshots
+!docs/images/*.png
 
 # OS/editor local state
 .DS_Store
