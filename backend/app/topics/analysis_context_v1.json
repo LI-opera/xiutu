@@ -1746,6 +1746,1752 @@
           }
         }
       }
+    },
+    {
+      "template_id": "tayron-dkvb-p0299",
+      "version": "2",
+      "content_hash": "4bcf9a91ec1deeecb905841294cc4713d663b240c48b461c32dc7e66dc7eb1f1",
+      "questions": {
+        "AIR-01": {
+          "definition_hash": "f3d9ebbc2887a51c5979a18c5ddf606ce7330281ebc461b99ac32f86a7af7400",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "open_or_misaligned": "observation",
+            "damaged": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s3"
+            ]
+          }
+        },
+        "AIR-02": {
+          "definition_hash": "bc616709e8f61229dfac65c37ab3dbdc76936d8d0a805d073185919d495ad1c3",
+          "role": "observation",
+          "option_roles": {
+            "clean": "observation",
+            "restricted": "observation",
+            "wet": "observation",
+            "misinstalled": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s3"
+            ]
+          }
+        },
+        "AIR-03": {
+          "definition_hash": "50c2412c64f34d90224c9f9c962a2237d57909e086b942a696cfe1b951b59f7f",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "collapsed": "observation",
+            "cracked": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s4"
+            ]
+          }
+        },
+        "AIR-04": {
+          "definition_hash": "55a7d7a993f1a4b836fbd4c503d4c5ce581bbbee8df2e8d59df049c3acef417d",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "crack": "observation",
+            "abrasion": "observation",
+            "bulge": "observation",
+            "collapsed": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s5"
+            ]
+          }
+        },
+        "AIR-05": {
+          "definition_hash": "567380cc7f48dd8093e1d06c51297ae4cfc819dbe1d243be7081801d2fb650ae",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "light_uniform": "observation",
+            "localized_heavy": "observation",
+            "fresh_wet": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s7"
+            ]
+          }
+        },
+        "AIR-06": {
+          "definition_hash": "9fc409da14ed427f008052c0004ecc30fa3f005e0bc84e9d3749d0ccca020baa",
+          "role": "observation",
+          "option_roles": {
+            "clear": "observation",
+            "light_contact": "observation",
+            "rub_mark": "observation",
+            "active_interference": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s5"
+            ]
+          }
+        },
+        "AIR-07": {
+          "definition_hash": "387774515214868db9002470a5a637a371bea5c1885d50a081d76871acb7e522",
+          "role": "observation",
+          "option_roles": {
+            "seated": "observation",
+            "partially_seated": "observation",
+            "not_locked": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s6"
+            ]
+          }
+        },
+        "AIR-08": {
+          "definition_hash": "1349d108a45822623850e6903bc2f141ba1e3029accb4bdebb17204013a6ff24",
+          "role": "observation",
+          "option_roles": {
+            "secure": "observation",
+            "small_play": "observation",
+            "pulls_out": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s6"
+            ]
+          }
+        },
+        "AIR-09": {
+          "definition_hash": "61ff051432556281c843e6d65b8a3f0ebf119457193004d63fc89bde05652c13",
+          "role": "observation",
+          "option_roles": {
+            "aligned": "observation",
+            "misaligned": "observation",
+            "mark_unreadable": "inspection_status",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s6"
+            ]
+          }
+        },
+        "AIR-10": {
+          "definition_hash": "3843fb44d7ee9a710437cfd9d48b0bebbd66d83f9459f3a2fb602212c57467cc",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "twisted": "observation",
+            "pinched": "observation",
+            "missing_or_damaged": "observation",
+            "not_visible": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s6"
+            ]
+          }
+        },
+        "AIR-11": {
+          "definition_hash": "0cfb858fcc0d7cbecc4b616c39d60df1a2ebfdf9a35e0f324af658263085ed7b",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "impact": "observation",
+            "deformed": "observation",
+            "contaminated": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s8"
+            ]
+          }
+        },
+        "AIR-12": {
+          "definition_hash": "051cb73247085572aaac45a885decb0d7342143dee02b1ee56517fb0fdf7d20e",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "left_suspect": "observation",
+            "right_suspect": "observation",
+            "both_suspect": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s7",
+              "s8"
+            ]
+          }
+        },
+        "AIR-13": {
+          "definition_hash": "43daa27208541b82508980c06a60a093295271f1e92ae92e132d21ff07f20c53",
+          "role": "inspection_status",
+          "option_roles": {
+            "available": "inspection_status",
+            "alternative_safe_tool": "inspection_status",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s9"
+            ]
+          }
+        },
+        "AIR-14": {
+          "definition_hash": "0f596fcf28c86f7e52827c10f8f25cf8d1c7c483b4656831e7c84662c0a5bebc",
+          "role": "inspection_status",
+          "option_roles": {
+            "within_limit": "inspection_status",
+            "not_performed": "inspection_status",
+            "unsafe_stop": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s9"
+            ]
+          }
+        },
+        "AIR-15": {
+          "definition_hash": "56d7e5200aaf4f426feece6fafd1e08f198c69dbc079494cbe10d60d27b2950b",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "hose": "observation",
+            "connector": "observation",
+            "intercooler": "observation",
+            "throttle_side": "observation",
+            "multiple": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s5",
+              "s6",
+              "s8",
+              "s9"
+            ]
+          }
+        },
+        "AIR-16": {
+          "definition_hash": "e39361cdb34a60dd1d34e657875b4535796ad9f2f3279d56074a85a0cd5b5510",
+          "role": "human_judgment",
+          "option_roles": {
+            "audible_or_bubble": "observation",
+            "ultrasonic": "observation",
+            "trace_only": "observation",
+            "inconclusive": "inspection_status",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s9"
+            ]
+          }
+        },
+        "PRS-01": {
+          "definition_hash": "0097d0b95a9193d52fda946373d1d0bcba72c055fd075011e271e729010088d6",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s3",
+              "s4"
+            ]
+          }
+        },
+        "PRS-02": {
+          "definition_hash": "1ee09ef2e9a19549fcdbd46f1d7ff14ddb615f0f0a2fc0a48490ec112706c62a",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "signal_missing": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s3",
+              "s4",
+              "s7"
+            ]
+          }
+        },
+        "PRS-03": {
+          "definition_hash": "aaeb8fc93729b952c2b521ac7f2eb2f541c224fdd939c80455e87e5c2a3ed4e9",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "signal_missing": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s3",
+              "s4",
+              "s8"
+            ]
+          }
+        },
+        "PRS-04": {
+          "definition_hash": "1a885ed8716dcaf35a708bd3e8638b307e4cee9777b633ab0c0420716679c2a3",
+          "role": "observation",
+          "option_roles": {
+            "consistent": "observation",
+            "g31_outlier": "observation",
+            "g71_outlier": "observation",
+            "multiple_outliers": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s4"
+            ]
+          }
+        },
+        "PRS-05": {
+          "definition_hash": "f1e5ec56040717064c612275623c28c0ff2eca4c4a113573a8985027fd850950",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "pin_damage": "observation",
+            "moisture": "observation",
+            "harness_damage": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s5",
+              "s6"
+            ]
+          },
+          "option_references": {
+            "loose": {
+              "tayron-dkvb-pressure": [
+                "s6.2",
+                "s6.6",
+                "s6.8"
+              ]
+            },
+            "pin_damage": {
+              "tayron-dkvb-pressure": [
+                "s6.3",
+                "s6.6",
+                "s6.8"
+              ]
+            },
+            "harness_damage": {
+              "tayron-dkvb-pressure": [
+                "s6.4",
+                "s6.6",
+                "s6.8"
+              ]
+            }
+          }
+        },
+        "PRS-06": {
+          "definition_hash": "2cc3872376c34c5c8f9a0b4eed4c6775b324636f65501d7fbb555bfc5af8a10d",
+          "role": "observation",
+          "option_roles": {
+            "stable": "observation",
+            "intermittent": "observation",
+            "signal_lost": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s5",
+              "s6"
+            ]
+          },
+          "option_references": {
+            "intermittent": {
+              "tayron-dkvb-pressure": [
+                "s5.2",
+                "s6.6",
+                "s6.8"
+              ]
+            },
+            "signal_lost": {
+              "tayron-dkvb-pressure": [
+                "s5.2",
+                "s6.6",
+                "s6.8"
+              ]
+            }
+          }
+        },
+        "PRS-07": {
+          "definition_hash": "3f793e630b82446252077367b55ee084f622f3919f64020aeac0ab377eda30db",
+          "role": "observation",
+          "option_roles": {
+            "comparable": "observation",
+            "rpm_varied": "observation",
+            "load_varied": "observation",
+            "throttle_lifted": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s9"
+            ]
+          }
+        },
+        "PRS-08": {
+          "definition_hash": "6e7117fbfebb5596d0c606a61b8e58bda10eb27a078e81bf72d4c34e481b0aeb",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s9"
+            ]
+          }
+        },
+        "PRS-09": {
+          "definition_hash": "aa5e5ef3d54dc2a955a9aba9a145b73807e8a7728dc5338cc8681a29c5034fd9",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s9"
+            ]
+          }
+        },
+        "PRS-10": {
+          "definition_hash": "9defa70b1843871c73b09eba2bb6e6c2a903e1f868ba2797b163cc80050f7f2e",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s9"
+            ]
+          }
+        },
+        "PRS-11": {
+          "definition_hash": "f34309970ffd66299d51721382c4f6bd98f5422287f2f4c6a842a34ddf01966b",
+          "role": "human_judgment",
+          "option_roles": {
+            "tracks_target": "human_judgment",
+            "persistent_underboost": "human_judgment",
+            "intermittent_drop": "human_judgment",
+            "overshoot": "human_judgment",
+            "unreliable": "human_judgment"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s10"
+            ]
+          }
+        },
+        "PRS-12": {
+          "definition_hash": "a048f4045bba6497d8cc53bf426b391dbaa1d28b483bf88951a5cf824d5a279f",
+          "role": "observation",
+          "option_roles": {
+            "request_held": "observation",
+            "request_reduced": "observation",
+            "unknown": "inspection_status",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s9",
+              "s10"
+            ]
+          }
+        },
+        "ACT-01": {
+          "definition_hash": "c473b8ec3ef2fcf60b6a72d3d67ab81763be1fe4bcaf21bced483d2329b9dcfc",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "pin_damage": "observation",
+            "harness_damage": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s3",
+              "s7"
+            ]
+          }
+        },
+        "ACT-02": {
+          "definition_hash": "383fa4dd5683872c5673203b26d6c5081ef66b939caca6382b8842e5dad4e8b5",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "dtc_present": "observation",
+            "feedback_implausible": "observation",
+            "intermittent": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s4",
+              "s7"
+            ]
+          }
+        },
+        "ACT-03": {
+          "definition_hash": "9327c34806b578b39908360bcb76edbd2f425c369feb86fdb655972522189a56",
+          "role": "observation",
+          "option_roles": {
+            "moves_smoothly": "observation",
+            "no_movement": "observation",
+            "jerky": "observation",
+            "test_rejected": "inspection_status",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s5",
+              "s7"
+            ]
+          }
+        },
+        "ACT-04": {
+          "definition_hash": "ed357026e41ed9492b520299d54876d9f47c30479f4c870790d3a6c23beda045",
+          "role": "observation",
+          "option_roles": {
+            "intact": "observation",
+            "loose": "observation",
+            "clip_missing": "observation",
+            "disconnected": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s6",
+              "s7"
+            ]
+          }
+        },
+        "ACT-05": {
+          "definition_hash": "f9d4a0f459b3f104af40e6c54c120ff9e08d9f92955d569c4bf36630a9eed7f5",
+          "role": "observation",
+          "option_roles": {
+            "smooth": "observation",
+            "binding": "observation",
+            "excessive_play": "observation",
+            "not_testable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s6",
+              "s7"
+            ]
+          }
+        },
+        "ACT-06": {
+          "definition_hash": "97d9cd1e87f9b35b41b03999ab164416c955bf4ddd3a8726e2b4165849317da7",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "damaged": "observation",
+            "oil_contaminated": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s8"
+            ]
+          }
+        },
+        "ACT-07": {
+          "definition_hash": "e4256430b36a8b3293da42720242e4cac65558aed8a82ed44d919724107fc613",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "dtc": "observation",
+            "suspected_leak": "observation",
+            "intermittent": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s9"
+            ]
+          }
+        },
+        "ACT-08": {
+          "definition_hash": "1cdce3f17db6fae67fe83075cc7eab44eb6460937c509b779ba51a1ce807c9ee",
+          "role": "inspection_status",
+          "option_roles": {
+            "ready": "inspection_status",
+            "voltage_low": "inspection_status",
+            "temperature_invalid": "inspection_status",
+            "dtc_blocking": "inspection_status",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s10"
+            ]
+          }
+        },
+        "ACT-09": {
+          "definition_hash": "43bba5a4a1199cf0e0f85bd740e048da8670deaa11c6c3c897ff1d1a48d48be1",
+          "role": "inspection_status",
+          "option_roles": {
+            "completed": "inspection_status",
+            "failed": "inspection_status",
+            "aborted": "inspection_status",
+            "not_supported": "inspection_status",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s11"
+            ]
+          },
+          "option_references": {
+            "not_supported": {
+              "tayron-dkvb-actuator": [
+                "s11.3",
+                "s11.4"
+              ]
+            },
+            "failed": {
+              "tayron-dkvb-actuator": [
+                "s11.2",
+                "s11.4"
+              ]
+            },
+            "aborted": {
+              "tayron-dkvb-actuator": [
+                "s11.3"
+              ]
+            }
+          }
+        },
+        "ACT-10": {
+          "definition_hash": "586d9745f263555c2f9f8ecc5fb98a09d49e615f551a60ac562aa5ca92417c3a",
+          "role": "retest",
+          "option_roles": {
+            "recovered": "retest",
+            "still_underboost": "retest",
+            "boost_ok_symptom_remains": "retest",
+            "not_comparable": "retest",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s12"
+            ]
+          }
+        },
+        "TUR-01": {
+          "definition_hash": "e8abd8da5c0d7d5edfb17bc11f0b8ceb38315f5965834ef263252718b885d138",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "crack_clue": "observation",
+            "loose": "observation",
+            "impact": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-turbo": [
+              "s3",
+              "s12"
+            ]
+          }
+        },
+        "TUR-02": {
+          "definition_hash": "d51878919e9602b4af1fd17e48d4e9a523f4e5b4c9788a6153c6b1a8f0df1a48",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "foreign_object": "observation",
+            "excess_oil": "observation",
+            "visible_damage": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-turbo": [
+              "s4",
+              "s12"
+            ]
+          }
+        },
+        "TUR-03": {
+          "definition_hash": "471c6434357731287c4295d108ea65fbe07967b15262d15b4bd8d8cb74888e3d",
+          "role": "observation",
+          "option_roles": {
+            "dry": "observation",
+            "seepage": "observation",
+            "active_leak": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-turbo": [
+              "s5",
+              "s12"
+            ]
+          }
+        },
+        "TUR-04": {
+          "definition_hash": "0a0b330aecb0f60478a8d8c695f85057b83786887ef896ecba771f299b0e43f6",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "trace": "observation",
+            "active_leak": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-turbo": [
+              "s6",
+              "s12"
+            ]
+          }
+        },
+        "TUR-05": {
+          "definition_hash": "e72517e8bc06c31405de90692320b70092decff89df85004d3b6af0f703a92bf",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "exhaust_trace": "observation",
+            "charge_leak_trace": "observation",
+            "loose": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-turbo": [
+              "s7",
+              "s12"
+            ]
+          }
+        },
+        "TUR-06": {
+          "definition_hash": "0bddfbe9d96411a669d6a0e44f5729bc155352a9ee69063ca076bf6aebac7db9",
+          "role": "observation",
+          "option_roles": {
+            "no_clue": "observation",
+            "binding_clue": "observation",
+            "play_clue": "observation",
+            "not_accessible": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-turbo": [
+              "s8",
+              "s12"
+            ]
+          }
+        },
+        "TUR-07": {
+          "definition_hash": "eeb4d417434c96961637b92e1d4b0509edce4a242bdfa17b52b1e35f64831e69",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "whistle": "observation",
+            "scrape": "observation",
+            "rattle": "observation",
+            "load_related_unknown": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-turbo": [
+              "s9"
+            ]
+          }
+        },
+        "TUR-08": {
+          "definition_hash": "5e0e7603ee0e4ee3a2c23d047dfd7e2adba7186747b03e2cfb0a699495046397",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "blue": "observation",
+            "black": "observation",
+            "other": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-turbo": [
+              "s10"
+            ]
+          }
+        },
+        "TUR-09": {
+          "definition_hash": "d8da153ecbe403d6ac82b749c537b040e6343bb1181baf824331bc7069ea8bbc",
+          "role": "human_judgment",
+          "option_roles": {
+            "no_support": "human_judgment",
+            "weak_support": "human_judgment",
+            "multiple_supporting_facts": "human_judgment",
+            "conflict": "human_judgment"
+          },
+          "references": {
+            "tayron-dkvb-turbo": [
+              "s11"
+            ]
+          }
+        },
+        "TUR-10": {
+          "definition_hash": "2a9a2c367ee63e3e77e5c83be484d4e4d83a915437dfc5913d8b080f0e875200",
+          "role": "disposition",
+          "option_roles": {
+            "return_to_controls": "disposition",
+            "professional_test": "disposition",
+            "cross_system": "disposition",
+            "safety_stop": "disposition"
+          },
+          "references": {
+            "tayron-dkvb-turbo": [
+              "s11"
+            ]
+          }
+        },
+        "X-01": {
+          "definition_hash": "01e0693633fa9d1ebaeb9f48fa61762d9f3d9172153d89637ded8ee7c71a1e6c",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "random": "observation",
+            "cyl1": "observation",
+            "cyl2": "observation",
+            "cyl3": "observation",
+            "cyl4": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-powertrain": [
+              "s3"
+            ]
+          }
+        },
+        "X-02": {
+          "definition_hash": "394569b593a02c03d9a5220933ec19a2b9cf3311e15473b4e02dd26f2c0f4cc2",
+          "role": "observation",
+          "option_roles": {
+            "no": "observation",
+            "yes": "observation",
+            "idle_only": "observation",
+            "intermittent": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-powertrain": [
+              "s3"
+            ]
+          }
+        },
+        "X-03": {
+          "definition_hash": "761a7c0103ff4ca228d0079d708c36ad271806a7f7e1217b8f68fb0bc5b041cc",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "coil_damage": "observation",
+            "connector_issue": "observation",
+            "harness_issue": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-powertrain": [
+              "s4"
+            ]
+          }
+        },
+        "X-04": {
+          "definition_hash": "83844ba00d43c595b3f83ac6cae5151235d198b46456c3efedde37677babc408",
+          "role": "observation",
+          "option_roles": {
+            "normal_consistent": "observation",
+            "worn": "observation",
+            "fouled": "observation",
+            "one_cylinder_differs": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-powertrain": [
+              "s5"
+            ]
+          }
+        },
+        "X-05": {
+          "definition_hash": "5a5e1a1e1c7e99260ea5f667adf1a78c03a289b42bed8da6a221fdfc8dbdf03f",
+          "role": "observation",
+          "option_roles": {
+            "not_moved": "observation",
+            "moved_with_coil": "observation",
+            "moved_with_plug": "observation",
+            "not_performed": "inspection_status",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-powertrain": [
+              "s6"
+            ]
+          },
+          "option_references": {
+            "moved_with_coil": {
+              "tayron-dkvb-powertrain": [
+                "s6.1",
+                "s6.3"
+              ]
+            },
+            "moved_with_plug": {
+              "tayron-dkvb-powertrain": [
+                "s6.1",
+                "s6.3"
+              ]
+            },
+            "not_moved": {
+              "tayron-dkvb-powertrain": [
+                "s6.3"
+              ]
+            },
+            "not_performed": {
+              "tayron-dkvb-powertrain": [
+                "s6.1",
+                "s6.2"
+              ]
+            }
+          }
+        },
+        "X-06": {
+          "definition_hash": "397df6464ce3fa4fadbb194c2ec337c4b016889461615e1543e60b50a5954c4b",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "low_pressure": "observation",
+            "high_pressure": "observation",
+            "sensor_or_control": "observation",
+            "multiple": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-powertrain": [
+              "s7"
+            ]
+          }
+        },
+        "X-07": {
+          "definition_hash": "19d787f045f7d4ded946cf7cf80264eb3983488220edbafdda75424241e227ca",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "low": "observation",
+            "unstable": "observation",
+            "signal_unreliable": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-powertrain": [
+              "s8"
+            ]
+          }
+        },
+        "X-08": {
+          "definition_hash": "8a0b6514bf56547b6c79cccaa130ba5bb7d70e1c20b3b10862abfebaea7fbbda",
+          "role": "observation",
+          "option_roles": {
+            "tracks": "observation",
+            "falls_under_load": "observation",
+            "excessive": "observation",
+            "signal_unreliable": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-powertrain": [
+              "s9"
+            ]
+          }
+        },
+        "X-09": {
+          "definition_hash": "172fef0137f0399a17c033125703ec56598fddc3effe75b22a307d1fa6f12fd0",
+          "role": "observation",
+          "option_roles": {
+            "no_clue": "observation",
+            "low_level": "observation",
+            "quality_suspect": "observation",
+            "restriction_suspect": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-powertrain": [
+              "s10"
+            ]
+          }
+        },
+        "X-10": {
+          "definition_hash": "969b0bd19ade48f93c94e089a818b5b92c71f6173a71f5d307feadd9e6a8fb3a",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "restriction_clue": "observation",
+            "overheat_clue": "observation",
+            "rattle": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-powertrain": [
+              "s11"
+            ]
+          }
+        },
+        "X-11": {
+          "definition_hash": "dfc443404885448045096d28cee87bccf06211c77b867f4eb75e0c51ef3ae93d",
+          "role": "observation",
+          "option_roles": {
+            "tracks": "observation",
+            "limited": "observation",
+            "implausible": "observation",
+            "not_available": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-powertrain": [
+              "s12"
+            ]
+          }
+        },
+        "X-12": {
+          "definition_hash": "c01ec68575e8f0d058b78306038836cb76f0ab662a6723b354e11b48d8d2d0c1",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "dtc": "observation",
+            "position_abnormal": "observation",
+            "not_available": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-powertrain": [
+              "s13"
+            ]
+          }
+        },
+        "X-13": {
+          "definition_hash": "f34bee1c0e3a7158a146aba848249248a5236f4b8e5eb1ef0c20a051d20bf3f9",
+          "role": "human_judgment",
+          "option_roles": {
+            "ignition": "human_judgment",
+            "fuel": "human_judgment",
+            "exhaust": "human_judgment",
+            "intake_control": "human_judgment",
+            "none": "human_judgment",
+            "multiple": "human_judgment"
+          },
+          "references": {
+            "tayron-dkvb-powertrain": [
+              "s14"
+            ]
+          }
+        },
+        "X-14": {
+          "definition_hash": "8d57e7ca4f0a986221e64cf9cb226fa19ee020b78d92a5adbd4cb80172831e60",
+          "role": "disposition",
+          "option_roles": {
+            "continue_here": "disposition",
+            "specialist_handoff": "disposition",
+            "data_missing": "disposition",
+            "conflicting_facts": "disposition"
+          },
+          "references": {
+            "tayron-dkvb-powertrain": [
+              "s14"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "template_id": "tayron-dkvb-p0236",
+      "version": "2",
+      "content_hash": "718d2db225564b6a36b481d6e7e2fc013d4fcd1e48152ab08591a4d6525112b9",
+      "questions": {
+        "AIR-01": {
+          "definition_hash": "78610352df6765df5cea857448bbc5f4b2792849bbce3ddb80b196503420bb4c",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "open_or_misaligned": "observation",
+            "damaged": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s3"
+            ]
+          }
+        },
+        "AIR-02": {
+          "definition_hash": "41ceaa9650b90099b8154ea5769349447123034c7a1bfbb0ffc29805d21ce5ec",
+          "role": "observation",
+          "option_roles": {
+            "clean": "observation",
+            "restricted": "observation",
+            "wet": "observation",
+            "misinstalled": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s3"
+            ]
+          }
+        },
+        "AIR-03": {
+          "definition_hash": "fb87c6341a36599bca9e51a386861d357eb5b926294aa5d782535d8de02973ee",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "collapsed": "observation",
+            "cracked": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s4"
+            ]
+          }
+        },
+        "AIR-04": {
+          "definition_hash": "a668ccf99d8861037d76e1185105dd5571a67382883df1304b810d3a8aba2610",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "crack": "observation",
+            "abrasion": "observation",
+            "bulge": "observation",
+            "collapsed": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s5"
+            ]
+          }
+        },
+        "AIR-05": {
+          "definition_hash": "40b1bc2984e6e913997c9cc6eedc3ecc4c1910ee55faae32c6692f8ae8db9c7a",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "light_uniform": "observation",
+            "localized_heavy": "observation",
+            "fresh_wet": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s7"
+            ]
+          }
+        },
+        "AIR-06": {
+          "definition_hash": "e155d2d5139d3d2bf6482caf625ced66e967d410364b5b9944eeb72673d4423b",
+          "role": "observation",
+          "option_roles": {
+            "clear": "observation",
+            "light_contact": "observation",
+            "rub_mark": "observation",
+            "active_interference": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s5"
+            ]
+          }
+        },
+        "AIR-07": {
+          "definition_hash": "94bee492a1976d59b072634cedd90c9d7d2839fc4e54343e680eec0b3e951abd",
+          "role": "observation",
+          "option_roles": {
+            "seated": "observation",
+            "partially_seated": "observation",
+            "not_locked": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s6"
+            ]
+          }
+        },
+        "AIR-08": {
+          "definition_hash": "96b982d6ad8dbd29108a9f8065694542577106a75eaa7a8253358823f88c5a04",
+          "role": "observation",
+          "option_roles": {
+            "secure": "observation",
+            "small_play": "observation",
+            "pulls_out": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s6"
+            ]
+          }
+        },
+        "AIR-09": {
+          "definition_hash": "be0fa015c658c8b0b059bff5701da59881d5d3960574a06988b9610e2425bd39",
+          "role": "observation",
+          "option_roles": {
+            "aligned": "observation",
+            "misaligned": "observation",
+            "mark_unreadable": "inspection_status",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s6"
+            ]
+          }
+        },
+        "AIR-10": {
+          "definition_hash": "a34d54ad613abb0494b22190005b945428a33d6549e9fa4f8adf8101e7798b42",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "twisted": "observation",
+            "pinched": "observation",
+            "missing_or_damaged": "observation",
+            "not_visible": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s6"
+            ]
+          }
+        },
+        "AIR-11": {
+          "definition_hash": "6b225953fbe2e8aeee812c0136625b8ab6b29aa53b0e67f7281e255da96eecc5",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "impact": "observation",
+            "deformed": "observation",
+            "contaminated": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s8"
+            ]
+          }
+        },
+        "AIR-12": {
+          "definition_hash": "2995dace0321f29dfdf06fdc346d6dc29ee359dae75546c7103c198138558a93",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "left_suspect": "observation",
+            "right_suspect": "observation",
+            "both_suspect": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s7",
+              "s8"
+            ]
+          }
+        },
+        "AIR-13": {
+          "definition_hash": "77adbd2c21daabbaf462f6f6af4bccaa1dd58090acbfad851b0882fcda502774",
+          "role": "inspection_status",
+          "option_roles": {
+            "available": "inspection_status",
+            "alternative_safe_tool": "inspection_status",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s9"
+            ]
+          }
+        },
+        "AIR-14": {
+          "definition_hash": "aa618c44601831573829a6f487b31d389357881f686f56d90cb8706749ef7bfd",
+          "role": "inspection_status",
+          "option_roles": {
+            "within_limit": "inspection_status",
+            "not_performed": "inspection_status",
+            "unsafe_stop": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s9"
+            ]
+          }
+        },
+        "AIR-15": {
+          "definition_hash": "de6d22872c741cffb5415af0080d5113d1a85b49e7e95845dc696a65ba418781",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "hose": "observation",
+            "connector": "observation",
+            "intercooler": "observation",
+            "throttle_side": "observation",
+            "multiple": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s5",
+              "s6",
+              "s8",
+              "s9"
+            ]
+          }
+        },
+        "AIR-16": {
+          "definition_hash": "b8ecf5777b488bc2291e6db35fa121af7486099aa2e6842d3a78c136e90eef3f",
+          "role": "human_judgment",
+          "option_roles": {
+            "audible_or_bubble": "observation",
+            "ultrasonic": "observation",
+            "trace_only": "observation",
+            "inconclusive": "inspection_status",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-boost-air": [
+              "s9"
+            ]
+          }
+        },
+        "PRS-01": {
+          "definition_hash": "463c8ead9d9503676d803844aaded08fab89285f328892e0a1a9e6eec9a28562",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s3",
+              "s4"
+            ]
+          }
+        },
+        "PRS-02": {
+          "definition_hash": "501d396c027b6f45f0e0aecb7a9c0c0395ff2836684932aab9242c1fc3c1a4b2",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "signal_missing": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s3",
+              "s4",
+              "s7"
+            ]
+          }
+        },
+        "PRS-03": {
+          "definition_hash": "1bff67550682fd73b9257253b91dcd0d9e0f8193fd07215d6b011d185853c2b3",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "signal_missing": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s3",
+              "s4",
+              "s8"
+            ]
+          }
+        },
+        "PRS-04": {
+          "definition_hash": "9ab2e5ce0e273ba2f732e4cd3e0fe11b12ea2b447522ca6687f0f7b6005e98dc",
+          "role": "observation",
+          "option_roles": {
+            "consistent": "observation",
+            "g31_outlier": "observation",
+            "g71_outlier": "observation",
+            "multiple_outliers": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s4"
+            ]
+          }
+        },
+        "PRS-05": {
+          "definition_hash": "4f6848075788566fc724ed56ac80cb6d9cc839e0c67154e1381f5451079981c4",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "pin_damage": "observation",
+            "moisture": "observation",
+            "harness_damage": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s5",
+              "s6"
+            ]
+          },
+          "option_references": {
+            "loose": {
+              "tayron-dkvb-pressure": [
+                "s6.2",
+                "s6.6",
+                "s6.8"
+              ]
+            },
+            "pin_damage": {
+              "tayron-dkvb-pressure": [
+                "s6.3",
+                "s6.6",
+                "s6.8"
+              ]
+            },
+            "harness_damage": {
+              "tayron-dkvb-pressure": [
+                "s6.4",
+                "s6.6",
+                "s6.8"
+              ]
+            }
+          }
+        },
+        "PRS-06": {
+          "definition_hash": "52329b9e730343166c5b3653dc28d4406671ddec71aad9e2289ad3d5bf1a1e0f",
+          "role": "observation",
+          "option_roles": {
+            "stable": "observation",
+            "intermittent": "observation",
+            "signal_lost": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s5",
+              "s6"
+            ]
+          },
+          "option_references": {
+            "intermittent": {
+              "tayron-dkvb-pressure": [
+                "s5.2",
+                "s6.6",
+                "s6.8"
+              ]
+            },
+            "signal_lost": {
+              "tayron-dkvb-pressure": [
+                "s5.2",
+                "s6.6",
+                "s6.8"
+              ]
+            }
+          }
+        },
+        "PRS-07": {
+          "definition_hash": "8b5307f59402258f4a5d7d428d0ea69d3f3825642533dce0ac437de57b3308f2",
+          "role": "observation",
+          "option_roles": {
+            "comparable": "observation",
+            "rpm_varied": "observation",
+            "load_varied": "observation",
+            "throttle_lifted": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s9"
+            ]
+          }
+        },
+        "PRS-08": {
+          "definition_hash": "03d91cd6c120e780b7e861b253572a81b328e4532a56bc18aa601cc154734e69",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s9"
+            ]
+          }
+        },
+        "PRS-09": {
+          "definition_hash": "4be1379f08a2470b4522043ccc1741eddb1ab363b0b284f34bcd4c6f02d22f22",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s9"
+            ]
+          }
+        },
+        "PRS-10": {
+          "definition_hash": "b93e86c4ecfda39c0ae4a72dd5473377acce088a960c20a589c965de2404fcb4",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s9"
+            ]
+          }
+        },
+        "PRS-11": {
+          "definition_hash": "07427419ab8a4159afbff3d7d1d29bddd28c4512b11ca9e2dc73fe8d6c05f0c9",
+          "role": "human_judgment",
+          "option_roles": {
+            "tracks_target": "human_judgment",
+            "persistent_underboost": "human_judgment",
+            "intermittent_drop": "human_judgment",
+            "overshoot": "human_judgment",
+            "unreliable": "human_judgment"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s10"
+            ]
+          }
+        },
+        "PRS-12": {
+          "definition_hash": "4ee5ea85a674ee4f3c1059abec851494db4bdd39164040641e699966006db4da",
+          "role": "observation",
+          "option_roles": {
+            "request_held": "observation",
+            "request_reduced": "observation",
+            "unknown": "inspection_status",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-pressure": [
+              "s9",
+              "s10"
+            ]
+          }
+        },
+        "ACT-01": {
+          "definition_hash": "3394dfc40a041e827c8b41831b32657fb2b250a1776405f92031cc4ea1d7fe36",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "pin_damage": "observation",
+            "harness_damage": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s3",
+              "s7"
+            ]
+          }
+        },
+        "ACT-02": {
+          "definition_hash": "fca4d63e8eb36ff8651d8ea253799b9687645583d53bd18906c7dab499fe6de3",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "dtc_present": "observation",
+            "feedback_implausible": "observation",
+            "intermittent": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s4",
+              "s7"
+            ]
+          }
+        },
+        "ACT-03": {
+          "definition_hash": "bba163e3dfcd9570d2dea1c7698cc9062a81316a39f9ef616bda27532495786b",
+          "role": "observation",
+          "option_roles": {
+            "moves_smoothly": "observation",
+            "no_movement": "observation",
+            "jerky": "observation",
+            "test_rejected": "inspection_status",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s5",
+              "s7"
+            ]
+          }
+        },
+        "ACT-04": {
+          "definition_hash": "2bc1d52c3f2d50fd28e5f62276d65fc31349ef9bdf86776e1ad74a84e4fa5b23",
+          "role": "observation",
+          "option_roles": {
+            "intact": "observation",
+            "loose": "observation",
+            "clip_missing": "observation",
+            "disconnected": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s6",
+              "s7"
+            ]
+          }
+        },
+        "ACT-05": {
+          "definition_hash": "294d04b646ba5797ca51548a91b901bc73c7163a0655aff2d3dc915bd1a723f6",
+          "role": "observation",
+          "option_roles": {
+            "smooth": "observation",
+            "binding": "observation",
+            "excessive_play": "observation",
+            "not_testable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s6",
+              "s7"
+            ]
+          }
+        },
+        "ACT-06": {
+          "definition_hash": "e7f18c8147b46f7234cc22606b8cd32169953acf8bde8d4b45490a8fbd4d34f8",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "damaged": "observation",
+            "oil_contaminated": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s8"
+            ]
+          }
+        },
+        "ACT-07": {
+          "definition_hash": "b5bf3b1eed3dd785a518b3f8bd411e70005c9ba2bf3bcd9d0726b2486469a958",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "dtc": "observation",
+            "suspected_leak": "observation",
+            "intermittent": "observation",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s9"
+            ]
+          }
+        },
+        "ACT-08": {
+          "definition_hash": "b0d4c9ed1f813572aff77ade037fc3b4e9b9be7f8cb3f5da752521a0e87743ec",
+          "role": "inspection_status",
+          "option_roles": {
+            "ready": "inspection_status",
+            "voltage_low": "inspection_status",
+            "temperature_invalid": "inspection_status",
+            "dtc_blocking": "inspection_status",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s10"
+            ]
+          }
+        },
+        "ACT-09": {
+          "definition_hash": "751fbe5098264512c86235b893f0bfcbd1cfeffd5adc61cf19e141ba909e8da8",
+          "role": "inspection_status",
+          "option_roles": {
+            "completed": "inspection_status",
+            "failed": "inspection_status",
+            "aborted": "inspection_status",
+            "not_supported": "inspection_status",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s11"
+            ]
+          },
+          "option_references": {
+            "not_supported": {
+              "tayron-dkvb-actuator": [
+                "s11.3",
+                "s11.4"
+              ]
+            },
+            "failed": {
+              "tayron-dkvb-actuator": [
+                "s11.2",
+                "s11.4"
+              ]
+            },
+            "aborted": {
+              "tayron-dkvb-actuator": [
+                "s11.3"
+              ]
+            }
+          }
+        },
+        "ACT-10": {
+          "definition_hash": "a644c89bc18b7a658827672557fbe191c18ef6e48097553db1ddf212023e795b",
+          "role": "retest",
+          "option_roles": {
+            "recovered": "retest",
+            "still_underboost": "retest",
+            "boost_ok_symptom_remains": "retest",
+            "not_comparable": "retest",
+            "unavailable": "inspection_status"
+          },
+          "references": {
+            "tayron-dkvb-actuator": [
+              "s12"
+            ]
+          }
+        }
+      }
     }
   ],
   "documents": [
@@ -3118,6 +4864,1770 @@
     {
       "id": "tayron-dkvb-powertrain",
       "version": "3",
+      "content_hash": "eccad19a0fe6c577519c15f82dd8aa06a8c1cd3852f33554737ca7f45fac75c1",
+      "sections": {
+        "s1": {
+          "heading": "## 1. 本区域与增压排查怎样衔接",
+          "start": 1140,
+          "end": 1679
+        },
+        "s2": {
+          "heading": "## 2. 检查前的记录与作业条件",
+          "start": 1679,
+          "end": 2215
+        },
+        "s3": {
+          "heading": "## 3. X-01—X-02：失火分布与负荷关系",
+          "start": 2215,
+          "end": 3291
+        },
+        "s4": {
+          "heading": "## 4. X-03：点火线圈、连接器与线束",
+          "start": 3291,
+          "end": 4051
+        },
+        "s5": {
+          "heading": "## 5. X-04：火花塞状态与四缸一致性",
+          "start": 4051,
+          "end": 4999
+        },
+        "s6": {
+          "heading": "## 6. X-05：线圈或火花塞对调怎样做才有解释力",
+          "start": 4999,
+          "end": 6073
+        },
+        "s7": {
+          "heading": "## 7. X-06：燃油故障码、部件名称与压力方向",
+          "start": 6073,
+          "end": 7252
+        },
+        "s8": {
+          "heading": "## 8. X-07：低压供油偏低、不稳定与信号不可信",
+          "start": 7252,
+          "end": 9107
+        },
+        "s9": {
+          "heading": "## 9. X-08：高压油轨跟随、掉压、过高与反馈异常",
+          "start": 9107,
+          "end": 10404
+        },
+        "s10": {
+          "heading": "## 10. X-09：燃油量、品质和供油限制",
+          "start": 10404,
+          "end": 10884
+        },
+        "s11": {
+          "heading": "## 11. X-10：催化器与排气受阻、过热和异响",
+          "start": 10884,
+          "end": 12404
+        },
+        "s12": {
+          "heading": "## 12. X-11：节气门请求、实际位置与响应受限",
+          "start": 12404,
+          "end": 13832
+        },
+        "s13": {
+          "heading": "## 13. X-12：进气歧管翻板、真空控制与位置反馈",
+          "start": 13832,
+          "end": 15935
+        },
+        "s14": {
+          "heading": "## 14. X-13—X-14：综合方向与跨系统交接",
+          "start": 15935,
+          "end": 16689
+        },
+        "s15": {
+          "heading": "## 15. 根据已经确认的对象组织实际处理",
+          "start": 16689,
+          "end": 17290
+        },
+        "s16": {
+          "heading": "## 16. 处理后的独立复检",
+          "start": 17290,
+          "end": 18171
+        },
+        "s17": {
+          "heading": "## 17. 常见情况组合与针对性指导",
+          "start": 18171,
+          "end": 20225
+        },
+        "s18": {
+          "heading": "## 18. 当前问题与全部选项对应",
+          "start": 20225,
+          "end": 21270
+        },
+        "s19": {
+          "heading": "## 19. 本地结构与参数速查",
+          "start": 21270,
+          "end": 21901
+        },
+        "s20": {
+          "heading": "## 20. 作为分析资料时的使用方式",
+          "start": 21901,
+          "end": 22163
+        },
+        "s21": {
+          "heading": "## 21. 来源与核对范围",
+          "start": 22163,
+          "end": 24151
+        },
+        "s1.1": {
+          "heading": "### 1.1 不是等增压全部排除后才能进入",
+          "start": 1160,
+          "end": 1360
+        },
+        "s1.2": {
+          "heading": "### 1.2 四条主要路线",
+          "start": 1360,
+          "end": 1679
+        },
+        "s2.1": {
+          "heading": "### 2.1 保留原始信息",
+          "start": 1698,
+          "end": 1919
+        },
+        "s2.2": {
+          "heading": "### 2.2 先处理影响安全和测试有效性的异常",
+          "start": 1919,
+          "end": 2215
+        },
+        "s3.1": {
+          "heading": "### 3.1 失火不只由点火件引起",
+          "start": 2242,
+          "end": 2464
+        },
+        "s3.2": {
+          "heading": "### 3.2 怎样形成可用记录",
+          "start": 2464,
+          "end": 2676
+        },
+        "s3.3": {
+          "heading": "### 3.3 当前选项的解释",
+          "start": 2676,
+          "end": 3138
+        },
+        "s3.4": {
+          "heading": "### 3.4 何时扩大到喷油和机械检查",
+          "start": 3138,
+          "end": 3291
+        },
+        "s4.1": {
+          "heading": "### 4.1 外观检查路径",
+          "start": 3315,
+          "end": 3472
+        },
+        "s4.2": {
+          "heading": "### 4.2 按选项处理",
+          "start": 3472,
+          "end": 3769
+        },
+        "s4.3": {
+          "heading": "### 4.3 电气检查与更换条件",
+          "start": 3769,
+          "end": 4051
+        },
+        "s5.1": {
+          "heading": "### 5.1 拆检与比较",
+          "start": 4075,
+          "end": 4235
+        },
+        "s5.2": {
+          "heading": "### 5.2 四类结果怎样处理",
+          "start": 4235,
+          "end": 4751
+        },
+        "s5.3": {
+          "heading": "### 5.3 安装与修后检查",
+          "start": 4751,
+          "end": 4999
+        },
+        "s6.1": {
+          "heading": "### 6.1 开始前确认是否适合对调",
+          "start": 5028,
+          "end": 5124
+        },
+        "s6.2": {
+          "heading": "### 6.2 一次改变一个因素",
+          "start": 5124,
+          "end": 5627
+        },
+        "s6.3": {
+          "heading": "### 6.3 对调已经给出结果后，怎样继续处理",
+          "start": 5627,
+          "end": 6073
+        },
+        "s7.1": {
+          "heading": "### 7.1 先澄清页面简称",
+          "start": 6101,
+          "end": 6450
+        },
+        "s7.2": {
+          "heading": "### 7.2 本地资料中的命名差异",
+          "start": 6450,
+          "end": 6652
+        },
+        "s7.3": {
+          "heading": "### 7.3 燃油路线怎样分层",
+          "start": 6652,
+          "end": 7252
+        },
+        "s8.1": {
+          "heading": "### 8.1 先确认看的数据",
+          "start": 7281,
+          "end": 7389
+        },
+        "s8.2": {
+          "heading": "### 8.2 检查顺序",
+          "start": 7389,
+          "end": 7616
+        },
+        "s8.3": {
+          "heading": "### 8.3 按选项给出下一步",
+          "start": 7616,
+          "end": 7960
+        },
+        "s8.4": {
+          "heading": "### 8.4 低压供油的实测位置与电气区分",
+          "start": 7960,
+          "end": 8837
+        },
+        "s8.5": {
+          "heading": "### 8.5 压力正常但仍怀疑供给量不足",
+          "start": 8837,
+          "end": 9107
+        },
+        "s9.1": {
+          "heading": "### 9.1 同步看请求与响应",
+          "start": 9137,
+          "end": 9248
+        },
+        "s9.2": {
+          "heading": "### 9.2 分支处理",
+          "start": 9248,
+          "end": 9543
+        },
+        "s9.3": {
+          "heading": "### 9.3 高压泵及相关维修的组织",
+          "start": 9543,
+          "end": 9856
+        },
+        "s9.4": {
+          "heading": "### 9.4 不确定时怎样交接",
+          "start": 9856,
+          "end": 9979
+        },
+        "s9.5": {
+          "heading": "### 9.5 已确认高压落后目标时的检查次序",
+          "start": 9979,
+          "end": 10404
+        },
+        "s10.1": {
+          "heading": "### 10.1 燃油量不足",
+          "start": 10429,
+          "end": 10523
+        },
+        "s10.2": {
+          "heading": "### 10.2 燃油品质可疑",
+          "start": 10523,
+          "end": 10687
+        },
+        "s10.3": {
+          "heading": "### 10.3 供油限制线索",
+          "start": 10687,
+          "end": 10795
+        },
+        "s10.4": {
+          "heading": "### 10.4 未见线索与未知的区别",
+          "start": 10795,
+          "end": 10884
+        },
+        "s11.1": {
+          "heading": "### 11.1 三类问题分开",
+          "start": 10912,
+          "end": 11199
+        },
+        "s11.2": {
+          "heading": "### 11.2 怎样检查受阻",
+          "start": 11199,
+          "end": 11518
+        },
+        "s11.3": {
+          "heading": "### 11.3 过热要同时处理原因和后果",
+          "start": 11518,
+          "end": 11832
+        },
+        "s11.4": {
+          "heading": "### 11.4 异响处理",
+          "start": 11832,
+          "end": 11938
+        },
+        "s11.5": {
+          "heading": "### 11.5 排气受阻如何定位到区段",
+          "start": 11938,
+          "end": 12404
+        },
+        "s12.1": {
+          "heading": "### 12.1 驾驶请求不是直接开度命令",
+          "start": 12433,
+          "end": 12610
+        },
+        "s12.2": {
+          "heading": "### 12.2 当前选项怎样使用",
+          "start": 12610,
+          "end": 12854
+        },
+        "s12.3": {
+          "heading": "### 12.3 检查和维修顺序",
+          "start": 12854,
+          "end": 13282
+        },
+        "s12.4": {
+          "heading": "### 12.4 节气门受限：分清目标受限与实际跟不上",
+          "start": 13282,
+          "end": 13832
+        },
+        "s13.1": {
+          "heading": "### 13.1 先识别实际结构",
+          "start": 13862,
+          "end": 14233
+        },
+        "s13.2": {
+          "heading": "### 13.2 检查顺序",
+          "start": 14233,
+          "end": 14467
+        },
+        "s13.3": {
+          "heading": "### 13.3 按选项继续",
+          "start": 14467,
+          "end": 14711
+        },
+        "s13.4": {
+          "heading": "### 13.4 实际处理分支",
+          "start": 14711,
+          "end": 15029
+        },
+        "s13.5": {
+          "heading": "### 13.5 翻板真空链路：按源头、控制、执行、反馈四段检查",
+          "start": 15029,
+          "end": 15935
+        },
+        "s14.1": {
+          "heading": "### 14.1 X-13 是已有事实的综合状态",
+          "start": 15964,
+          "end": 16392
+        },
+        "s14.2": {
+          "heading": "### 14.2 X-14 的四种去向",
+          "start": 16392,
+          "end": 16689
+        },
+        "s16.1": {
+          "heading": "### 16.1 先做装配和运行条件复核",
+          "start": 17307,
+          "end": 17418
+        },
+        "s16.2": {
+          "heading": "### 16.2 新采集的复检内容",
+          "start": 17418,
+          "end": 17754
+        },
+        "s16.3": {
+          "heading": "### 16.3 合理结局",
+          "start": 17754,
+          "end": 18027
+        },
+        "s16.4": {
+          "heading": "### 16.4 建议记录模板",
+          "start": 18027,
+          "end": 18171
+        },
+        "s21.1": {
+          "heading": "### 21.1 本地来源",
+          "start": 22179,
+          "end": 22802
+        },
+        "s21.2": {
+          "heading": "### 21.2 联网补充",
+          "start": 22802,
+          "end": 24151
+        }
+      },
+      "always_include": [
+        "s1",
+        "s2",
+        "s15",
+        "s16"
+      ]
+    },
+    {
+      "id": "tayron-dkvb-boost-air",
+      "version": "3",
+      "content_hash": "83c6e5e31218dd64aa1b566d1ccf0f8684fca4346e9ee9ff5e1b1dbd29059be3",
+      "sections": {
+        "s1": {
+          "heading": "## 1. 本区域处理什么问题",
+          "start": 1247,
+          "end": 2373
+        },
+        "s2": {
+          "heading": "## 2. 开始检查前，先把记录整理好",
+          "start": 2373,
+          "end": 3169
+        },
+        "s3": {
+          "heading": "## 3. 空气滤清器壳体、滤芯与进气口",
+          "start": 3169,
+          "end": 4801
+        },
+        "s4": {
+          "heading": "## 4. 空气滤清器至涡轮入口导管",
+          "start": 4801,
+          "end": 5495
+        },
+        "s5": {
+          "heading": "## 5. 增压软管裂纹、擦伤、鼓包与干涉",
+          "start": 5495,
+          "end": 6476
+        },
+        "s6": {
+          "heading": "## 6. 接头座合、卡箍与密封件：本专题主维修路径",
+          "start": 6476,
+          "end": 9613
+        },
+        "s7": {
+          "heading": "## 7. 油雾、湿痕和积油：不要把线索当结论",
+          "start": 9613,
+          "end": 10265
+        },
+        "s8": {
+          "heading": "## 8. 中冷器、两侧接口、支撑及外部污染",
+          "start": 10265,
+          "end": 11601
+        },
+        "s9": {
+          "heading": "## 9. 增压空气系统检漏：连接、加压、定位与结束",
+          "start": 11601,
+          "end": 14478
+        },
+        "s10": {
+          "heading": "## 10. 处理完成后，怎样证明有效",
+          "start": 14478,
+          "end": 15816
+        },
+        "s11": {
+          "heading": "## 11. 气路与其他区域怎样联合判断",
+          "start": 15816,
+          "end": 16767
+        },
+        "s12": {
+          "heading": "## 12. 八个完整情况示例：让 AI 学会有主次地回答",
+          "start": 16767,
+          "end": 19016
+        },
+        "s13": {
+          "heading": "## 13. 与现有 AIR 问题的对应关系",
+          "start": 19016,
+          "end": 19809
+        },
+        "s14": {
+          "heading": "## 14. 可核对数值与适用位置",
+          "start": 19809,
+          "end": 20356
+        },
+        "s15": {
+          "heading": "## 15. 提供给 AI 时怎样使用这份资料",
+          "start": 20356,
+          "end": 21128
+        },
+        "s16": {
+          "heading": "## 16. 来源、补充内容与本次已知缺口",
+          "start": 21128,
+          "end": 22363
+        },
+        "s1.1": {
+          "heading": "### 1.1 空气从哪里来，经过哪里",
+          "start": 1264,
+          "end": 1565
+        },
+        "s1.2": {
+          "heading": "### 1.2 为什么不能看见 P0299 就换涡轮",
+          "start": 1565,
+          "end": 1960
+        },
+        "s1.3": {
+          "heading": "### 1.3 什么算足够具体的故障描述",
+          "start": 1960,
+          "end": 2110
+        },
+        "s1.4": {
+          "heading": "### 1.4 总览图的实际读法",
+          "start": 2110,
+          "end": 2373
+        },
+        "s2.1": {
+          "heading": "### 2.1 最少需要的背景",
+          "start": 2394,
+          "end": 2668
+        },
+        "s2.2": {
+          "heading": "### 2.2 先查哪一处",
+          "start": 2668,
+          "end": 2887
+        },
+        "s2.3": {
+          "heading": "### 2.3 检查准备与停止条件",
+          "start": 2887,
+          "end": 3169
+        },
+        "s3.1": {
+          "heading": "### 3.1 如何区分几类问题",
+          "start": 3252,
+          "end": 3641
+        },
+        "s3.2": {
+          "heading": "### 3.2 检查与恢复装配",
+          "start": 3641,
+          "end": 4017
+        },
+        "s3.3": {
+          "heading": "### 3.3 潮湿滤芯要处理到哪一步",
+          "start": 4017,
+          "end": 4202
+        },
+        "s3.4": {
+          "heading": "### 3.4 需要拆下整个壳体时的步骤",
+          "start": 4202,
+          "end": 4698
+        },
+        "s3.5": {
+          "heading": "### 3.5 完成后验证",
+          "start": 4698,
+          "end": 4801
+        },
+        "s4.1": {
+          "heading": "### 4.1 检查重点",
+          "start": 4882,
+          "end": 5065
+        },
+        "s4.2": {
+          "heading": "### 4.2 分情况处理",
+          "start": 5065,
+          "end": 5405
+        },
+        "s4.3": {
+          "heading": "### 4.3 复核内容",
+          "start": 5405,
+          "end": 5495
+        },
+        "s5.1": {
+          "heading": "### 5.1 先分清损伤在哪里",
+          "start": 5599,
+          "end": 5958
+        },
+        "s5.2": {
+          "heading": "### 5.2 软管处理顺序",
+          "start": 5958,
+          "end": 6369
+        },
+        "s5.3": {
+          "heading": "### 5.3 只换软管为什么可能复发",
+          "start": 6369,
+          "end": 6476
+        },
+        "s6.1": {
+          "heading": "### 6.1 先识别结构，纠正旧题库中的混称",
+          "start": 6561,
+          "end": 6988
+        },
+        "s6.2": {
+          "heading": "### 6.2 不拆开前，怎样确认异常",
+          "start": 6988,
+          "end": 7330
+        },
+        "s6.3": {
+          "heading": "### 6.3 A 类连接：恢复座合与卡箍固定",
+          "start": 7330,
+          "end": 7982
+        },
+        "s6.4": {
+          "heading": "### 6.4 B 类连接及密封圈：一般处理分支",
+          "start": 7982,
+          "end": 8381
+        },
+        "s6.5": {
+          "heading": "### 6.5 怎样判断需要复位，还是需要换件",
+          "start": 8381,
+          "end": 8730
+        },
+        "s6.6": {
+          "heading": "### 6.6 已经知道接头异常，但不知道从哪里下手",
+          "start": 8730,
+          "end": 9613
+        },
+        "s7.1": {
+          "heading": "### 7.1 四类记录应如何使用",
+          "start": 9696,
+          "end": 9887
+        },
+        "s7.2": {
+          "heading": "### 7.2 实际检查与处理",
+          "start": 9887,
+          "end": 10148
+        },
+        "s7.3": {
+          "heading": "### 7.3 哪些情况不应继续普通气路运行测试",
+          "start": 10148,
+          "end": 10265
+        },
+        "s8.1": {
+          "heading": "### 8.1 把四个问题分开",
+          "start": 10366,
+          "end": 10584
+        },
+        "s8.2": {
+          "heading": "### 8.2 检查顺序",
+          "start": 10584,
+          "end": 10758
+        },
+        "s8.3": {
+          "heading": "### 8.3 清理还是更换",
+          "start": 10758,
+          "end": 11015
+        },
+        "s8.4": {
+          "heading": "### 8.4 中冷器拆卸与恢复的已知流程",
+          "start": 11015,
+          "end": 11601
+        },
+        "s9.1": {
+          "heading": "### 9.1 工具和参数究竟代表什么",
+          "start": 11727,
+          "end": 12072
+        },
+        "s9.2": {
+          "heading": "### 9.2 准备与连接",
+          "start": 12072,
+          "end": 12346
+        },
+        "s9.3": {
+          "heading": "### 9.3 仪器调节顺序",
+          "start": 12346,
+          "end": 12742
+        },
+        "s9.4": {
+          "heading": "### 9.4 怎么找漏点",
+          "start": 12742,
+          "end": 13069
+        },
+        "s9.5": {
+          "heading": "### 9.5 重要：本流程不能用保压试验判漏",
+          "start": 13069,
+          "end": 13246
+        },
+        "s9.6": {
+          "heading": "### 9.6 卸压与恢复",
+          "start": 13246,
+          "end": 13487
+        },
+        "s9.7": {
+          "heading": "### 9.7 怎样记录结果，才有利于 AI 判断",
+          "start": 13487,
+          "end": 13798
+        },
+        "s9.8": {
+          "heading": "### 9.8 检漏出现矛盾时的排查顺序",
+          "start": 13798,
+          "end": 14478
+        },
+        "s10.1": {
+          "heading": "### 10.1 第一步：静态恢复检查",
+          "start": 14569,
+          "end": 14673
+        },
+        "s10.2": {
+          "heading": "### 10.2 第二步：同位置重新定位检漏",
+          "start": 14673,
+          "end": 14789
+        },
+        "s10.3": {
+          "heading": "### 10.3 第三步：验证原工况和压力表现",
+          "start": 14789,
+          "end": 15038
+        },
+        "s10.4": {
+          "heading": "### 10.4 第四步：比较主诉与故障码",
+          "start": 15038,
+          "end": 15387
+        },
+        "s10.5": {
+          "heading": "### 10.5 压力数字示例：只说明数据怎么读",
+          "start": 15387,
+          "end": 15816
+        },
+        "s11.1": {
+          "heading": "### 11.1 哪些缺项需要补，哪些不必强求",
+          "start": 16383,
+          "end": 16611
+        },
+        "s11.2": {
+          "heading": "### 11.2 条件不足时也应给出有用的建议",
+          "start": 16611,
+          "end": 16767
+        },
+        "s16.1": {
+          "heading": "### 16.1 本地来源",
+          "start": 21151,
+          "end": 21740
+        },
+        "s16.2": {
+          "heading": "### 16.2 网络补充",
+          "start": 21740,
+          "end": 22031
+        },
+        "s16.3": {
+          "heading": "### 16.3 明确没有补造的内容",
+          "start": 22031,
+          "end": 22239
+        },
+        "s16.4": {
+          "heading": "### 16.4 正文修订与平台版本",
+          "start": 22239,
+          "end": 22363
+        }
+      },
+      "always_include": [
+        "s1",
+        "s2",
+        "s10",
+        "s11"
+      ]
+    },
+    {
+      "id": "tayron-dkvb-pressure",
+      "version": "3",
+      "content_hash": "5df3eb9e0dd5008fa96f70b1e7487456badf883a7fb5a2b3480a48565f792892",
+      "sections": {
+        "s1": {
+          "heading": "## 1. 这个区域检查什么，不检查什么",
+          "start": 900,
+          "end": 1706
+        },
+        "s2": {
+          "heading": "## 2. 开始前：把数据的含义统一",
+          "start": 1706,
+          "end": 2738
+        },
+        "s3": {
+          "heading": "## 3. PRS-01—PRS-03：采集静态压力",
+          "start": 2738,
+          "end": 3255
+        },
+        "s4": {
+          "heading": "## 4. PRS-04：静态不一致怎样定位",
+          "start": 3255,
+          "end": 4058
+        },
+        "s5": {
+          "heading": "## 5. PRS-05—PRS-06：插头、端子与线束检查",
+          "start": 4058,
+          "end": 5058
+        },
+        "s6": {
+          "heading": "## 6. 电路故障的具体处理",
+          "start": 5058,
+          "end": 8123
+        },
+        "s7": {
+          "heading": "## 7. G31 的拆卸、安装与处理后核对",
+          "start": 8123,
+          "end": 8995
+        },
+        "s8": {
+          "heading": "## 8. G71/G42 所在 GX9 的拆卸与安装",
+          "start": 8995,
+          "end": 9672
+        },
+        "s9": {
+          "heading": "## 9. PRS-07—PRS-10：采集可比较的负荷压力",
+          "start": 9672,
+          "end": 10894
+        },
+        "s10": {
+          "heading": "## 10. PRS-11—PRS-12：怎样解释趋势",
+          "start": 10894,
+          "end": 12004
+        },
+        "s11": {
+          "heading": "## 11. 常见情况组合与针对性处理",
+          "start": 12004,
+          "end": 13216
+        },
+        "s12": {
+          "heading": "## 12. 修复后怎样确认结果",
+          "start": 13216,
+          "end": 13838
+        },
+        "s13": {
+          "heading": "## 13. 与其他排查区域怎样配合",
+          "start": 13838,
+          "end": 14300
+        },
+        "s14": {
+          "heading": "## 14. 页面问题、选项与本文对应关系",
+          "start": 14300,
+          "end": 15402
+        },
+        "s15": {
+          "heading": "## 15. 如何把这份资料与当前区域一起用于分析",
+          "start": 15402,
+          "end": 16223
+        },
+        "s16": {
+          "heading": "## 16. 参数速查与资料来源",
+          "start": 16223,
+          "end": 18357
+        },
+        "s1.1": {
+          "heading": "### 1.1 三种压力来源不能混为一谈",
+          "start": 922,
+          "end": 1453
+        },
+        "s1.2": {
+          "heading": "### 1.2 本区域能形成的结论",
+          "start": 1453,
+          "end": 1706
+        },
+        "s2.1": {
+          "heading": "### 2.1 先保存故障发生时的信息",
+          "start": 1726,
+          "end": 1964
+        },
+        "s2.2": {
+          "heading": "### 2.2 统一绝对压力、相对压力和单位",
+          "start": 1964,
+          "end": 2360
+        },
+        "s2.3": {
+          "heading": "### 2.3 环境压力参考本身也要核对",
+          "start": 2360,
+          "end": 2562
+        },
+        "s2.4": {
+          "heading": "### 2.4 没有数据与传感器坏了是两回事",
+          "start": 2562,
+          "end": 2738
+        },
+        "s3.1": {
+          "heading": "### 3.1 操作顺序",
+          "start": 2766,
+          "end": 3103
+        },
+        "s3.2": {
+          "heading": "### 3.2 记录示例的正确形式",
+          "start": 3103,
+          "end": 3255
+        },
+        "s4.1": {
+          "heading": "### 4.1 三者接近，且重复读取稳定",
+          "start": 3279,
+          "end": 3395
+        },
+        "s4.2": {
+          "heading": "### 4.2 G31 离群，G71 与可靠环境参考接近",
+          "start": 3395,
+          "end": 3709
+        },
+        "s4.3": {
+          "heading": "### 4.3 G71 离群，G31 与可靠环境参考接近",
+          "start": 3709,
+          "end": 3885
+        },
+        "s4.4": {
+          "heading": "### 4.4 两路都偏离，或三个数互相矛盾",
+          "start": 3885,
+          "end": 4058
+        },
+        "s5.1": {
+          "heading": "### 5.1 外观检查不是只看插头在不在",
+          "start": 4090,
+          "end": 4509
+        },
+        "s5.2": {
+          "heading": "### 5.2 摇动线束时怎样判断信号变化",
+          "start": 4509,
+          "end": 5058
+        },
+        "s6.1": {
+          "heading": "### 6.1 先确定电路类型，再决定怎么测",
+          "start": 5075,
+          "end": 5508
+        },
+        "s6.2": {
+          "heading": "### 6.2 插头松动或锁扣损坏",
+          "start": 5508,
+          "end": 5659
+        },
+        "s6.3": {
+          "heading": "### 6.3 针脚损伤、端子夹持不良或腐蚀",
+          "start": 5659,
+          "end": 5813
+        },
+        "s6.4": {
+          "heading": "### 6.4 线束磨损、断续或短路",
+          "start": 5813,
+          "end": 5983
+        },
+        "s6.5": {
+          "heading": "### 6.5 什么情况下才考虑传感器本体",
+          "start": 5983,
+          "end": 6190
+        },
+        "s6.6": {
+          "heading": "### 6.6 从“检查电路”展开到可执行测量",
+          "start": 6190,
+          "end": 7754
+        },
+        "s6.7": {
+          "heading": "### 6.7 没有精确阈值时仍能做什么",
+          "start": 7754,
+          "end": 7968
+        },
+        "s6.8": {
+          "heading": "### 6.8 修完插头或线束后怎样确认没有只恢复一时",
+          "start": 7968,
+          "end": 8123
+        },
+        "s7.1": {
+          "heading": "### 7.1 适用结构与紧固值",
+          "start": 8147,
+          "end": 8373
+        },
+        "s7.2": {
+          "heading": "### 7.2 操作顺序",
+          "start": 8373,
+          "end": 8825
+        },
+        "s7.3": {
+          "heading": "### 7.3 传感器密封漏气与电气故障要分开",
+          "start": 8825,
+          "end": 8995
+        },
+        "s8.1": {
+          "heading": "### 8.1 结构与位置",
+          "start": 9024,
+          "end": 9189
+        },
+        "s8.2": {
+          "heading": "### 8.2 操作顺序",
+          "start": 9189,
+          "end": 9672
+        },
+        "s9.1": {
+          "heading": "### 9.1 什么时候可以开始",
+          "start": 9704,
+          "end": 9856
+        },
+        "s9.2": {
+          "heading": "### 9.2 怎样选数据项",
+          "start": 9856,
+          "end": 10075
+        },
+        "s9.3": {
+          "heading": "### 9.3 采集步骤",
+          "start": 10075,
+          "end": 10412
+        },
+        "s9.4": {
+          "heading": "### 9.4 每帧怎样填写",
+          "start": 10412,
+          "end": 10666
+        },
+        "s9.5": {
+          "heading": "### 9.5 PRS-07 不可比较时怎样处理",
+          "start": 10666,
+          "end": 10894
+        },
+        "s10.1": {
+          "heading": "### 10.1 持续跟随目标",
+          "start": 10923,
+          "end": 11061
+        },
+        "s10.2": {
+          "heading": "### 10.2 连续增压不足",
+          "start": 11061,
+          "end": 11328
+        },
+        "s10.3": {
+          "heading": "### 10.3 间歇掉压",
+          "start": 11328,
+          "end": 11543
+        },
+        "s10.4": {
+          "heading": "### 10.4 压力过冲",
+          "start": 11543,
+          "end": 11687
+        },
+        "s10.5": {
+          "heading": "### 10.5 数据不可信",
+          "start": 11687,
+          "end": 11779
+        },
+        "s10.6": {
+          "heading": "### 10.6 数值算例：用差值说明现象，不把算例当标准",
+          "start": 11779,
+          "end": 12004
+        },
+        "s12.1": {
+          "heading": "### 12.1 测量链路修复后的顺序",
+          "start": 13234,
+          "end": 13473
+        },
+        "s12.2": {
+          "heading": "### 12.2 应记录哪些实际处理",
+          "start": 13473,
+          "end": 13629
+        },
+        "s12.3": {
+          "heading": "### 12.3 什么时候可以结束这个区域",
+          "start": 13629,
+          "end": 13838
+        },
+        "s15.1": {
+          "heading": "### 15.1 输入应包含什么",
+          "start": 15429,
+          "end": 15711
+        },
+        "s15.2": {
+          "heading": "### 15.2 分析结果应该回答的四个问题",
+          "start": 15711,
+          "end": 16048
+        },
+        "s15.3": {
+          "heading": "### 15.3 分析引用资料的方式",
+          "start": 16048,
+          "end": 16223
+        },
+        "s16.1": {
+          "heading": "### 16.1 可以明确引用的数值与边界",
+          "start": 16241,
+          "end": 16735
+        },
+        "s16.2": {
+          "heading": "### 16.2 本地车型资料",
+          "start": 16735,
+          "end": 17308
+        },
+        "s16.3": {
+          "heading": "### 16.3 联网补充资料",
+          "start": 17308,
+          "end": 18168
+        },
+        "s16.4": {
+          "heading": "### 16.4 本文仍未提供的车型专用内容",
+          "start": 18168,
+          "end": 18357
+        }
+      },
+      "always_include": [
+        "s1",
+        "s2",
+        "s12",
+        "s13"
+      ]
+    },
+    {
+      "id": "tayron-dkvb-actuator",
+      "version": "4",
+      "content_hash": "3a44db5296b23a8fb6cf2b1867974f56a391a721f58684d76794c755bb7410c3",
+      "sections": {
+        "s1": {
+          "heading": "## 1. 先分清两个不同的控制对象",
+          "start": 957,
+          "end": 1881
+        },
+        "s2": {
+          "heading": "## 2. 开始前：保留故障背景并选择检查顺序",
+          "start": 1881,
+          "end": 2450
+        },
+        "s3": {
+          "heading": "## 3. ACT-01：V465 连接器、针脚与线束",
+          "start": 2450,
+          "end": 3526
+        },
+        "s4": {
+          "heading": "## 4. ACT-02：故障码与位置反馈怎样解释",
+          "start": 3526,
+          "end": 4387
+        },
+        "s5": {
+          "heading": "## 5. ACT-03：输出测试与动作响应",
+          "start": 4387,
+          "end": 6445
+        },
+        "s6": {
+          "heading": "## 6. ACT-04—ACT-05：推杆、卡簧和可见活动",
+          "start": 6445,
+          "end": 7259
+        },
+        "s7": {
+          "heading": "## 7. V465 与连接机构的维修分支",
+          "start": 7259,
+          "end": 9028
+        },
+        "s8": {
+          "heading": "## 8. ACT-06：N249 连接、安装与密封",
+          "start": 9028,
+          "end": 9949
+        },
+        "s9": {
+          "heading": "## 9. ACT-07：P2261 与疑似异常泄压",
+          "start": 9949,
+          "end": 10573
+        },
+        "s10": {
+          "heading": "## 10. ACT-08：基本设置前提",
+          "start": 10573,
+          "end": 11128
+        },
+        "s11": {
+          "heading": "## 11. ACT-09：设置完成、失败、中止与不支持",
+          "start": 11128,
+          "end": 12593
+        },
+        "s12": {
+          "heading": "## 12. ACT-10：设置后相同工况增压表现",
+          "start": 12593,
+          "end": 13460
+        },
+        "s13": {
+          "heading": "## 13. 常见情况组合与针对性处理",
+          "start": 13460,
+          "end": 14690
+        },
+        "s14": {
+          "heading": "## 14. 与其他排查区域怎样配合",
+          "start": 14690,
+          "end": 15090
+        },
+        "s15": {
+          "heading": "## 15. 页面问题、选项与记录要求",
+          "start": 15090,
+          "end": 16485
+        },
+        "s16": {
+          "heading": "## 16. 参数速查与资料来源",
+          "start": 16485,
+          "end": 18678
+        },
+        "s1.1": {
+          "heading": "### 1.1 V465 与 N249 各管什么",
+          "start": 977,
+          "end": 1498
+        },
+        "s1.2": {
+          "heading": "### 1.2 不把其他结构的检查方法直接搬过来",
+          "start": 1498,
+          "end": 1680
+        },
+        "s1.3": {
+          "heading": "### 1.3 能得出什么结论",
+          "start": 1680,
+          "end": 1881
+        },
+        "s2.1": {
+          "heading": "### 2.1 先保存信息，再清码或设置",
+          "start": 1906,
+          "end": 2078
+        },
+        "s2.2": {
+          "heading": "### 2.2 按最明确的线索开始",
+          "start": 2078,
+          "end": 2262
+        },
+        "s2.3": {
+          "heading": "### 2.3 作业条件",
+          "start": 2262,
+          "end": 2450
+        },
+        "s3.1": {
+          "heading": "### 3.1 检查步骤",
+          "start": 2479,
+          "end": 2759
+        },
+        "s3.2": {
+          "heading": "### 3.2 选项对应的处理",
+          "start": 2759,
+          "end": 3164
+        },
+        "s3.3": {
+          "heading": "### 3.3 电路测量的边界",
+          "start": 3164,
+          "end": 3526
+        },
+        "s4.1": {
+          "heading": "### 4.1 先问“报码对应哪一层”",
+          "start": 3553,
+          "end": 3937
+        },
+        "s4.2": {
+          "heading": "### 4.2 反馈的三种常见矛盾",
+          "start": 3937,
+          "end": 4178
+        },
+        "s4.3": {
+          "heading": "### 4.3 当前选项的含义",
+          "start": 4178,
+          "end": 4387
+        },
+        "s5.1": {
+          "heading": "### 5.1 怎样执行和记录",
+          "start": 4411,
+          "end": 4820
+        },
+        "s5.2": {
+          "heading": "### 5.2 根据结果继续",
+          "start": 4820,
+          "end": 5129
+        },
+        "s5.3": {
+          "heading": "### 5.3 “无动作”怎样逐步缩小范围",
+          "start": 5129,
+          "end": 5290
+        },
+        "s5.4": {
+          "heading": "### 5.4 无动作、卡顿、反馈不变：按实际结果区分",
+          "start": 5290,
+          "end": 6054
+        },
+        "s5.5": {
+          "heading": "### 5.5 回路检查怎样落到测点",
+          "start": 6054,
+          "end": 6445
+        },
+        "s6.1": {
+          "heading": "### 6.1 先检查连接完整性",
+          "start": 6477,
+          "end": 6833
+        },
+        "s6.2": {
+          "heading": "### 6.2 看活动，不盲目施力",
+          "start": 6833,
+          "end": 7091
+        },
+        "s6.3": {
+          "heading": "### 6.3 为什么不能随意调短推杆",
+          "start": 7091,
+          "end": 7259
+        },
+        "s7.1": {
+          "heading": "### 7.1 明确连接器或线束问题",
+          "start": 7282,
+          "end": 7393
+        },
+        "s7.2": {
+          "heading": "### 7.2 明确保持件或连接点问题",
+          "start": 7393,
+          "end": 7518
+        },
+        "s7.3": {
+          "heading": "### 7.3 怀疑执行器内部故障",
+          "start": 7518,
+          "end": 7880
+        },
+        "s7.4": {
+          "heading": "### 7.4 怀疑涡轮侧机构卡滞或磨损",
+          "start": 7880,
+          "end": 7998
+        },
+        "s7.5": {
+          "heading": "### 7.5 拆装后的核对顺序",
+          "start": 7998,
+          "end": 8145
+        },
+        "s7.6": {
+          "heading": "### 7.6 需要分开执行器和机械负载时，实际要回答什么",
+          "start": 8145,
+          "end": 9028
+        },
+        "s8.1": {
+          "heading": "### 8.1 外部检查",
+          "start": 9056,
+          "end": 9424
+        },
+        "s8.2": {
+          "heading": "### 8.2 装配关系与拆装核对",
+          "start": 9424,
+          "end": 9949
+        },
+        "s9.1": {
+          "heading": "### 9.1 有 P2261 时",
+          "start": 9977,
+          "end": 10177
+        },
+        "s9.2": {
+          "heading": "### 9.2 没有码，但听到泄压声或松油后压力变化",
+          "start": 10177,
+          "end": 10371
+        },
+        "s9.3": {
+          "heading": "### 9.3 有动作声音但仍怀疑漏气",
+          "start": 10371,
+          "end": 10478
+        },
+        "s9.4": {
+          "heading": "### 9.4 间歇异常的记录方法",
+          "start": 10478,
+          "end": 10573
+        },
+        "s11.1": {
+          "heading": "### 11.1 执行与结束",
+          "start": 11158,
+          "end": 11455
+        },
+        "s11.2": {
+          "heading": "### 11.2 失败发生在哪个阶段",
+          "start": 11455,
+          "end": 11662
+        },
+        "s11.3": {
+          "heading": "### 11.3 当前选项怎样保存",
+          "start": 11662,
+          "end": 11932
+        },
+        "s11.4": {
+          "heading": "### 11.4 从诊断仪进入匹配并定位失败阶段",
+          "start": 11932,
+          "end": 12593
+        },
+        "s12.1": {
+          "heading": "### 12.1 复检按什么顺序",
+          "start": 12620,
+          "end": 12964
+        },
+        "s12.2": {
+          "heading": "### 12.2 各选项后续怎么走",
+          "start": 12964,
+          "end": 13260
+        },
+        "s12.3": {
+          "heading": "### 12.3 “设置完成，仍低增压”的分支",
+          "start": 13260,
+          "end": 13460
+        },
+        "s15.1": {
+          "heading": "### 15.1 实际处理与独立复检怎样写",
+          "start": 16008,
+          "end": 16281
+        },
+        "s15.2": {
+          "heading": "### 15.2 与本资料一起分析时应回答什么",
+          "start": 16281,
+          "end": 16485
+        },
+        "s16.1": {
+          "heading": "### 16.1 参数及适用范围",
+          "start": 16503,
+          "end": 16924
+        },
+        "s16.2": {
+          "heading": "### 16.2 本地资料与本次核对范围",
+          "start": 16924,
+          "end": 17430
+        },
+        "s16.3": {
+          "heading": "### 16.3 联网补充资料",
+          "start": 17430,
+          "end": 18544
+        },
+        "s16.4": {
+          "heading": "### 16.4 需要另行核对的精确内容",
+          "start": 18544,
+          "end": 18678
+        }
+      },
+      "always_include": [
+        "s1",
+        "s2",
+        "s14"
+      ]
+    },
+    {
+      "id": "tayron-dkvb-turbo",
+      "version": "4",
+      "content_hash": "94f79c64a802afa5e978cf67ade4ed650060e10cc923594f8ad59048cfaeb4b5",
+      "sections": {
+        "s1": {
+          "heading": "## 1. 本体区域检查什么",
+          "start": 1065,
+          "end": 2157
+        },
+        "s2": {
+          "heading": "## 2. 检查前的准备与分流",
+          "start": 2157,
+          "end": 2962
+        },
+        "s3": {
+          "heading": "## 3. TUR-01：壳体、固定位置、裂纹与碰撞",
+          "start": 2962,
+          "end": 3674
+        },
+        "s4": {
+          "heading": "## 4. TUR-02：入口异物、异常油液和可见叶轮损伤",
+          "start": 3674,
+          "end": 4813
+        },
+        "s5": {
+          "heading": "## 5. TUR-03：供油、回油连接与润滑原因",
+          "start": 4813,
+          "end": 6692
+        },
+        "s6": {
+          "heading": "## 6. TUR-04：冷却液结晶、湿痕与明显泄漏",
+          "start": 6692,
+          "end": 7310
+        },
+        "s7": {
+          "heading": "## 7. TUR-05：排气侧、增压侧与连接松动",
+          "start": 7310,
+          "end": 8135
+        },
+        "s8": {
+          "heading": "## 8. TUR-06：卡滞与异常间隙线索",
+          "start": 8135,
+          "end": 9315
+        },
+        "s9": {
+          "heading": "## 9. TUR-07：啸叫、刮擦声与负荷相关异响",
+          "start": 9315,
+          "end": 9944
+        },
+        "s10": {
+          "heading": "## 10. TUR-08：蓝烟、黑烟与其他烟雾",
+          "start": 9944,
+          "end": 10575
+        },
+        "s11": {
+          "heading": "## 11. TUR-09—TUR-10：证据合并与本轮收尾",
+          "start": 10575,
+          "end": 11328
+        },
+        "s12": {
+          "heading": "## 12. 维修路径：从外部处理到总成更换",
+          "start": 11328,
+          "end": 13922
+        },
+        "s13": {
+          "heading": "## 13. 处理后的独立复检",
+          "start": 13922,
+          "end": 14995
+        },
+        "s14": {
+          "heading": "## 14. 常见情况组合与处理顺序",
+          "start": 14995,
+          "end": 16965
+        },
+        "s15": {
+          "heading": "## 15. 当前问题与选项的完整对应",
+          "start": 16965,
+          "end": 17898
+        },
+        "s16": {
+          "heading": "## 16. 图中可核对数据与适用范围",
+          "start": 17898,
+          "end": 18335
+        },
+        "s17": {
+          "heading": "## 17. 与其他区域联合分析时怎样使用",
+          "start": 18335,
+          "end": 18836
+        },
+        "s18": {
+          "heading": "## 18. 资料来源与核对范围",
+          "start": 18836,
+          "end": 20678
+        },
+        "s1.1": {
+          "heading": "### 1.1 本体、外围连接和控制机构的区别",
+          "start": 1081,
+          "end": 1587
+        },
+        "s1.2": {
+          "heading": "### 1.2 P0299、异响和烟雾都不是单独的换件结论",
+          "start": 1587,
+          "end": 1914
+        },
+        "s1.3": {
+          "heading": "### 1.3 装配图怎样看",
+          "start": 1914,
+          "end": 2157
+        },
+        "s2.1": {
+          "heading": "### 2.1 继承已有信息，补充真正会改变判断的内容",
+          "start": 2174,
+          "end": 2459
+        },
+        "s2.2": {
+          "heading": "### 2.2 先看原貌，再清理",
+          "start": 2459,
+          "end": 2609
+        },
+        "s2.3": {
+          "heading": "### 2.3 可继续检查与应停止运行的情况",
+          "start": 2609,
+          "end": 2962
+        },
+        "s3.1": {
+          "heading": "### 3.1 检查路径",
+          "start": 2990,
+          "end": 3181
+        },
+        "s3.2": {
+          "heading": "### 3.2 对应选项怎样处理",
+          "start": 3181,
+          "end": 3508
+        },
+        "s3.3": {
+          "heading": "### 3.3 外部固定问题的维修组织",
+          "start": 3508,
+          "end": 3674
+        },
+        "s4.1": {
+          "heading": "### 4.1 安全观察入口",
+          "start": 3705,
+          "end": 3875
+        },
+        "s4.2": {
+          "heading": "### 4.2 可见异物",
+          "start": 3875,
+          "end": 4234
+        },
+        "s4.3": {
+          "heading": "### 4.3 可见损伤",
+          "start": 4234,
+          "end": 4407
+        },
+        "s4.4": {
+          "heading": "### 4.4 异常油液",
+          "start": 4407,
+          "end": 4813
+        },
+        "s5.1": {
+          "heading": "### 5.1 外部干燥不等于供油正常",
+          "start": 4840,
+          "end": 4927
+        },
+        "s5.2": {
+          "heading": "### 5.2 渗漏与明显泄漏怎样定位",
+          "start": 4927,
+          "end": 5126
+        },
+        "s5.3": {
+          "heading": "### 5.3 处理分支",
+          "start": 5126,
+          "end": 5429
+        },
+        "s5.4": {
+          "heading": "### 5.4 本地密封要求与使用边界",
+          "start": 5429,
+          "end": 5760
+        },
+        "s5.5": {
+          "heading": "### 5.5 涡轮损伤后为什么还要查油路",
+          "start": 5760,
+          "end": 5870
+        },
+        "s5.6": {
+          "heading": "### 5.6 渗漏、积油与烟雾同时存在时怎样分开定位",
+          "start": 5870,
+          "end": 6692
+        },
+        "s6.1": {
+          "heading": "### 6.1 先区分旧残留和正在泄漏",
+          "start": 6720,
+          "end": 6884
+        },
+        "s6.2": {
+          "heading": "### 6.2 具体检查与处理",
+          "start": 6884,
+          "end": 7185
+        },
+        "s6.3": {
+          "heading": "### 6.3 对应选项的含义",
+          "start": 7185,
+          "end": 7310
+        },
+        "s7.1": {
+          "heading": "### 7.1 先写清连接位于哪里",
+          "start": 7337,
+          "end": 7606
+        },
+        "s7.2": {
+          "heading": "### 7.2 排气侧泄漏痕迹",
+          "start": 7606,
+          "end": 7848
+        },
+        "s7.3": {
+          "heading": "### 7.3 增压侧泄漏痕迹",
+          "start": 7848,
+          "end": 8022
+        },
+        "s7.4": {
+          "heading": "### 7.4 同时选择不了多种情况时怎样记录",
+          "start": 8022,
+          "end": 8135
+        },
+        "s8.1": {
+          "heading": "### 8.1 先明确检查的是哪种活动",
+          "start": 8159,
+          "end": 8303
+        },
+        "s8.2": {
+          "heading": "### 8.2 为什么手感不能代替间隙判定",
+          "start": 8303,
+          "end": 8687
+        },
+        "s8.3": {
+          "heading": "### 8.3 选项与下一步",
+          "start": 8687,
+          "end": 9003
+        },
+        "s8.4": {
+          "heading": "### 8.4 需要内部测量时，怎样交出可执行的检测任务",
+          "start": 9003,
+          "end": 9315
+        },
+        "s9.1": {
+          "heading": "### 9.1 先记录声音条件",
+          "start": 9343,
+          "end": 9440
+        },
+        "s9.2": {
+          "heading": "### 9.2 不同声音怎样分流",
+          "start": 9440,
+          "end": 9789
+        },
+        "s9.3": {
+          "heading": "### 9.3 处理及验证",
+          "start": 9789,
+          "end": 9944
+        },
+        "s10.1": {
+          "heading": "### 10.1 先确定烟雾从哪里出来",
+          "start": 9970,
+          "end": 10078
+        },
+        "s10.2": {
+          "heading": "### 10.2 蓝烟方向",
+          "start": 10078,
+          "end": 10254
+        },
+        "s10.3": {
+          "heading": "### 10.3 黑烟方向",
+          "start": 10254,
+          "end": 10360
+        },
+        "s10.4": {
+          "heading": "### 10.4 其他烟雾或类型不明",
+          "start": 10360,
+          "end": 10449
+        },
+        "s10.5": {
+          "heading": "### 10.5 处理后的烟雾复核",
+          "start": 10449,
+          "end": 10575
+        },
+        "s11.1": {
+          "heading": "### 11.1 TUR-09 是综合状态，不是新增测量",
+          "start": 10607,
+          "end": 11027
+        },
+        "s11.2": {
+          "heading": "### 11.2 TUR-10 收尾选择",
+          "start": 11027,
+          "end": 11328
+        },
+        "s12.1": {
+          "heading": "### 12.1 可以明确到对象的外部处理",
+          "start": 11352,
+          "end": 11698
+        },
+        "s12.2": {
+          "heading": "### 12.2 何时进入总成或内部专业处理",
+          "start": 11698,
+          "end": 11893
+        },
+        "s12.3": {
+          "heading": "### 12.3 总成处理的工作顺序",
+          "start": 11893,
+          "end": 12756
+        },
+        "s12.4": {
+          "heading": "### 12.4 本资料不提供的内部修复动作",
+          "start": 12756,
+          "end": 12960
+        },
+        "s12.5": {
+          "heading": "### 12.5 总成处理前后的现场工作清单",
+          "start": 12960,
+          "end": 13764
+        },
+        "s12.6": {
+          "heading": "### 12.6 换后不改善时先回查什么",
+          "start": 13764,
+          "end": 13922
+        },
+        "s13.1": {
+          "heading": "### 13.1 装配与静态检查",
+          "start": 13939,
+          "end": 14040
+        },
+        "s13.2": {
+          "heading": "### 13.2 运行与泄漏检查",
+          "start": 14040,
+          "end": 14205
+        },
+        "s13.3": {
+          "heading": "### 13.3 原工况与压力复检",
+          "start": 14205,
+          "end": 14402
+        },
+        "s13.4": {
+          "heading": "### 13.4 结论怎样写",
+          "start": 14402,
+          "end": 14773
+        },
+        "s13.5": {
+          "heading": "### 13.5 推荐记录格式",
+          "start": 14773,
+          "end": 14995
+        },
+        "s18.1": {
+          "heading": "### 18.1 本地资料",
+          "start": 18854,
+          "end": 19347
+        },
+        "s18.2": {
+          "heading": "### 18.2 联网补充资料",
+          "start": 19347,
+          "end": 20556
+        },
+        "s18.3": {
+          "heading": "### 18.3 需要按具体车辆补齐的内容",
+          "start": 20556,
+          "end": 20678
+        }
+      },
+      "always_include": [
+        "s1",
+        "s2",
+        "s13",
+        "s17"
+      ]
+    },
+    {
+      "id": "tayron-dkvb-powertrain",
+      "version": "4",
       "content_hash": "eccad19a0fe6c577519c15f82dd8aa06a8c1cd3852f33554737ca7f45fac75c1",
       "sections": {
         "s1": {
