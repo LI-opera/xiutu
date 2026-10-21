@@ -1,0 +1,91 @@
+# 每次开 PR、合并到 main 时自动检查：后端单元/契约测试、仓库资源检查、
+# 接口文档一致性、前端类型检查和测试。不连数据库，不调用付费模型。
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# 同一分支连续推送时，只保留最新一次运行，节省额度
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: 后端测试与接口一致性
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # 旧 B01/B02 模板的内容哈希按 Windows 换行计算（B02 记录了 B01 文件的哈希）。
+      # 拉代码前改成 Windows 换行，让文件字节与开发机一致。清理旧代码后可去掉这一步。
+      - name: 使用 Windows 换行签出
+        run: git config --global core.autocrlf true
+
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: 安装 Python 依赖
+        run: uv sync --frozen --python 3.12
+
+      - name: 单元测试与契约测试
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: >-
+          uv run --frozen python -B -m pytest tests/unit tests/contract
+          -p no:cacheprovider -q --basetemp "$RUNNER_TEMP/pytest"
+
+      - name: 仓库资源检查
+        run: uv run --frozen python -B scripts/check_repository.py
+
+      - name: 接口文档与代码一致（后端部分）
+        run: uv run --frozen python -B scripts/export_frontend_openapi.py --check
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 接口文档与前端类型一致
+        working-directory: frontend
+        run: |
+          npm ci
+          npx openapi-typescript ../docs/api/openapi.wp14.json -o src/generated/api-schema.ts --check
+
+  frontend:
+    name: 前端类型检查与测试
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: 使用 Windows 换行签出
+        run: git config --global core.autocrlf true
+        working-directory: .
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 类型检查
+        run: npm run typecheck
+
+      - name: 前端测试
+        run: npm run test:wp14
