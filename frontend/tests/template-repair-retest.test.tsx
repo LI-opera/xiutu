@@ -20,14 +20,16 @@ function wrapper() {
 it('changes question groups with upstream area and discards the previous unsaved draft without writing', async () => {
   const request = vi.spyOn(apiClient, 'request').mockResolvedValue(snapshot);
   const ui = render(<TemplateRepairRetest {...props} />, { wrapper: wrapper() });
-  await screen.findByRole('checkbox', { name: '甲的检查' });
+  await screen.findByRole('button', { name: /本轮对区域甲做了什么处理/ });
+  // Before a repair is saved there is nothing to re-check, so step 2 shows no candidates.
+  expect(screen.queryByRole('checkbox', { name: '甲的检查' })).toBeNull();
   expect(screen.queryByRole('heading', { name: '部件甲 · 处理后重新记录' })).toBeNull();
   expect(screen.queryByRole('button', { name: /未检查项/ })).toBeNull();
   expect(screen.queryByLabelText('实际处理动作')).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: /本轮对区域甲做了什么处理/ }));
   fireEvent.change(screen.getByLabelText('实际处理动作'), { target: { value: '尚未保存的甲动作' } });
   ui.rerender(<TemplateRepairRetest {...props} areaId="beta" />);
-  await screen.findByRole('checkbox', { name: '乙的检查' });
+  await screen.findByRole('button', { name: /本轮对区域乙做了什么处理/ });
   expect(screen.queryByRole('heading', { name: '部件甲 · 处理后重新记录' })).toBeNull();
   expect(screen.queryByLabelText('实际处理动作')).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: /本轮对区域乙做了什么处理/ }));
@@ -110,7 +112,7 @@ it('excludes deselected drafts and preserves selected but unverified items in sa
 });
 
 it('regroups effective answers without selecting facts and keeps normal candidates folded', async () => {
-  vi.spyOn(apiClient, 'request').mockResolvedValue(snapshot);
+  vi.spyOn(apiClient, 'request').mockResolvedValue({ ...snapshot, rounds: [{ id: 'round', area_id: 'alpha', repair_action: '处理', repair_note: '', created_at: '2026-09-26T00:00:00Z', retested_at: null }] });
   const questions = [
     { ...props.questions[0], options: [{id:'bad',label:'连接松动',outcome:'abnormal'}, {id:'ok',label:'未见异常',outcome:'normal'}] },
     { ...props.questions[1], options: [{id:'unknown',label:'无法取得',outcome:'unavailable'}] },
@@ -148,4 +150,18 @@ it('refreshes round state on revision changes and clears drafts only when the ro
   fireEvent.click(screen.getByRole('button',{name:/甲的检查处理前/}));
   expect((screen.getByLabelText('甲的检查：补充说明') as HTMLTextAreaElement).value).toBe('');
   expect(request.mock.calls.every(([,options])=>options?.method!=='POST')).toBe(true);
+});
+
+it('shows the saved conclusion instead of disabled inputs once the round is retested', async () => {
+  const done = { id: 'round', area_id: 'alpha', repair_action: '复紧卡扣', repair_note: '', pre_repair_revision: 3,
+    retest_condition: 'same', retest_outcome: 'resolved', retest_evidence: '甲的检查\n处理前：连接松动\n处理后：未见异常',
+    next_area_id: null, created_at: '2026-09-26T00:00:00Z', retested_at: '2026-09-26T01:00:00Z' };
+  vi.spyOn(apiClient, 'request').mockResolvedValue({ ...snapshot, rounds: [done] });
+  render(<TemplateRepairRetest {...props} />, { wrapper: wrapper() });
+  const conclusion = await screen.findByRole('region', { name: '本轮复检结论' });
+  expect(within(conclusion).getByText('与故障发生时可比 · 原问题未再出现')).toBeTruthy();
+  expect(within(conclusion).getByText(/本轮可以结束/)).toBeTruthy();
+  expect(screen.queryByRole('checkbox')).toBeNull();
+  expect(screen.queryByRole('button', { name: /本轮处理后，原问题是否仍存在/ })).toBeNull();
+  expect(screen.queryByRole('heading', { name: '结果与转区' })).toBeNull();
 });

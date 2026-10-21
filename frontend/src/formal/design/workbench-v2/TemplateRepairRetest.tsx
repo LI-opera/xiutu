@@ -152,8 +152,15 @@ function RepairArea({ caseId, areaId, revision, questions, cards, observations, 
       </article>
       <article className="formal-retest-step" aria-label="第 2 步 · 独立复检"><h3>第 2 步 · 独立复检</h3>
         <p>{pending ? '按顺序填写：复检工况 → 重新检查的项目 → 原问题是否仍存在，最后一起保存。' : latest?.retested_at ? '本轮复检已保存；如再次处理，请先在第 1 步建立新轮次。' : '先在第 1 步保存实际处理，再填写复检。'}</p>
+        {!pending && latest?.retested_at && <section className="formal-retest-conclusion" aria-label="本轮复检结论">
+          <p><b>{conditions[latest.retest_condition as keyof typeof conditions]} · {outcomes[latest.retest_outcome as keyof typeof outcomes]}</b></p>
+          <p>{latest.retest_outcome === 'resolved' && latest.retest_condition === 'same' ? '可比工况下原问题未再出现，本轮可以结束；这不等于最终维修报告。如需 AI 根据处理结果给出下一步，请在 AI 分析中重新发起。' : '尚未在可比工况下确认解决，可继续排查或重新发起 AI 分析。'}</p>
+          <p className="formal-template-retest-evidence">{latest.retest_evidence}</p>
+          {latest.next_area_id && <button type="button" className="prototype-button subtle" onClick={() => onArea(latest.next_area_id!)}>前往{data.areas[latest.next_area_id]}</button>}
+        </section>}
+        {pending && <>
         {row('condition', '① 处理后工况与故障发生时是否可比', '根据本次实际复检选择，不预填答案。', condition ? '待保存' : retestStatus, '确认处理前后的结果能否比较。', '间歇性故障需在原故障工况下复检，结果才能说明是否解决。',
-          <><Choices label="复检工况" items={conditions} value={condition} onChange={setCondition} disabled={!canRetest} />{!pending && latest?.retested_at && <p>最近一次：{conditions[latest.retest_condition as keyof typeof conditions]}</p>}</>)}
+          <><Choices label="复检工况" items={conditions} value={condition} onChange={setCondition} disabled={!canRetest} /></>)}
         <div className="formal-retest-scope"><h4>② 选择本轮复检项目</h4>
           <p>选择与本次处理有关的检查项，重新回答原问题；保存后会成为新的检查记录，处理前的结果仍保留在历史中。</p>
           {candidateGroups.filter(group => group.items.length).map(group => {
@@ -167,7 +174,7 @@ function RepairArea({ caseId, areaId, revision, questions, cards, observations, 
           })}
           {!availableTargets.length && <p>本区域暂无可重新记录的检查项，可在下方直接记录新证据。</p>}
           {batchOnly.length > 0 && <small>成组采集的读数（{batchOnly.map(shortTitle).join('、')}）需整组重新采集，暂不支持单项重录，请写入下方新证据。</small>}
-          <p>{pending ? `已选择 ${targets.length} 项。` : '保存实际处理后，选择需要复查的项目。'}</p>
+          <p>已选择 {targets.length} 项。</p>
         </div>
         {groups.map(group => <div key={group.id} className="formal-retest-group"><h4>{group.title} · 处理后重新记录</h4>
           {group.questions.map(q => {
@@ -194,13 +201,9 @@ function RepairArea({ caseId, areaId, revision, questions, cards, observations, 
             <button type="button" className="prototype-button" disabled={!canRetest || !condition || !outcome || !evidenceText || evidenceText.length > 4000} onClick={() => void saveRetest()}>保存本轮独立复检</button>
             {canRetest && (!condition || !outcome || !evidenceText) && <small>请选择复检工况、结果，并至少重新记录一项或填写新证据。</small>}
           </div>)}
+        </>}
       </article>
-      {latest?.retested_at && <article><h3>结果与转区</h3>{row('decision', '查看本轮已保存结果', '根据实际保存的复检结果继续。', '已保存', '保留本轮判断依据。', '转向另一区域只改变浏览位置。', <>
-        <p>{conditions[latest.retest_condition as keyof typeof conditions]} · {outcomes[latest.retest_outcome as keyof typeof outcomes]}</p>
-        <p className="formal-template-retest-evidence">{latest.retest_evidence}</p>
-        <p>{latest.retest_outcome === 'resolved' && latest.retest_condition === 'same' ? '本轮记录为可比工况下原问题未再出现，可结束本轮；不等于最终维修报告。' : '尚未在可比工况下确认解决，可继续排查。'}</p>
-        {latest.next_area_id && <button type="button" className="prototype-button subtle" onClick={() => onArea(latest.next_area_id!)}>前往{data.areas[latest.next_area_id]}</button>}</>)}</article>}
-      {rounds.length > 0 && <article><h3>本区历史轮次</h3>{rounds.map((item, index) => row(`history:${item.id}`, `第 ${rounds.length - index} 轮 · ${data.areas[areaId]}`, new Date(item.created_at).toLocaleString('zh-CN'), item.retested_at ? '已复检' : '待复检', '保留每次实际处理与独立复检。', '历史只读，不覆盖处理前观察。', <>
+      {rounds.length > 0 && <article className="formal-retest-step"><h3>本区历史轮次</h3>{rounds.map((item, index) => row(`history:${item.id}`, `第 ${rounds.length - index} 轮 · ${data.areas[areaId]}`, new Date(item.created_at).toLocaleString('zh-CN'), item.retested_at ? '已复检' : '待复检', '保留每次实际处理与独立复检。', '历史只读，不覆盖处理前观察。', <>
         <p>实际处理：{item.repair_action}</p>{item.repair_note && <p>{item.repair_note}</p>}
         {item.retested_at ? <><p>{conditions[item.retest_condition as keyof typeof conditions]} · {outcomes[item.retest_outcome as keyof typeof outcomes]}</p><p className="formal-template-retest-evidence">{item.retest_evidence}</p></> : <p>等待本轮独立复检。</p>}</>))}</article>}
     </div>}

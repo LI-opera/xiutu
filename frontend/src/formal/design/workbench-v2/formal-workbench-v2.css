@@ -208,3 +208,6 @@
 .formal-retest-step > p { margin:0; }
 .formal-retest-step h4 { margin:4px 0 6px; }
 .formal-retest-group { display:grid; gap:10px; }
+.formal-retest-conclusion { display:grid; gap:8px; padding:14px 16px; background:#f0f7f3; border:1px solid #dceae4; border-radius:12px; }
+.formal-retest-conclusion p { margin:0; }
+.formal-retest-conclusion > .prototype-button { justify-self:start; }
