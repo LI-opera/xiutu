@@ -84,7 +84,7 @@ function RepairArea({ caseId, areaId, revision, questions, cards, observations, 
     if (!option || option.outcome === 'unavailable') return [];
     return (q.fields ?? []).filter(field => !field.allowed_when_options || field.allowed_when_options.includes(option.id));
   };
-  const update = (id: string, change: Partial<Recheck>) => setRechecks(previous => ({ ...previous, [id]: { option: '', fields: {}, note: '', ...previous[id], ...change } }));
+  const update = (id: string, change: Partial<Recheck>) => setRechecks(previous => ({ ...previous, [id]: { ...(previous[id] ?? { option: '', fields: {}, note: '' }), ...change } }));
   const written = targets.filter(q => rechecks[q.id]?.option);
   const unverified = targets.filter(q => !rechecks[q.id]?.option);
   const describe = (q: Question) => {
