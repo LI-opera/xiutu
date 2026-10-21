@@ -113,6 +113,8 @@ def test_two_templates_save_correct_analysis_input_repair_retest_and_reload(
         "retest_condition": "same", "retest_outcome": "uncertain",
         "retest_evidence": "隔离回归：复检结果仍需后续确认",
         "next_area_id": second["id"],
+        "observations": [{"question_id": question["id"],
+                          "option_ids": [question["options"][0]["id"]]}],
     })
     assert retested["rounds"][0]["next_area_id"] == second["id"]
     assert retested["rounds"][0]["retest_outcome"] == "uncertain"
@@ -120,7 +122,17 @@ def test_two_templates_save_correct_analysis_input_repair_retest_and_reload(
     reloaded = get(docrig, base + "/workbench-v2")
     history = get(docrig, base + "/topic-observations/history")
     assert reloaded["case"]["revision"] == retested["revision"]
-    assert {o["id"] for o in reloaded["observations"] if o["effective"]} >= {new_id}
-    assert {o["id"] for o in history["items"]} >= {old_id, new_id}
+    # The re-check supersedes the pre-repair answer instead of hiding in free text.
+    recheck = next(o for o in reloaded["observations"]
+                   if o["effective"] and o["question_id"] == question["id"])
+    assert recheck["id"] not in {old_id, new_id}
+    assert recheck["supersedes_id"] == new_id
+    assert recheck["payload"]["repair_round_id"] == round_id
+    assert recheck["payload"]["option_ids"] == [question["options"][0]["id"]]
+    assert {o["id"] for o in history["items"]} >= {old_id, new_id, recheck["id"]}
+    sent = next(o for o in get(docrig, base + "/matched-areas/analysis")["observations"]
+                if o["question_id"] == question["id"])
+    assert sent["after_repair_round_id"] == round_id
+    assert sent["before_repair"]["id"] == new_id
     assert get(docrig, base + "/template-repairs")["rounds"][0]["id"] == round_id
     assert get(docrig, base + "/matched-areas/analysis")["recorded"] == 2

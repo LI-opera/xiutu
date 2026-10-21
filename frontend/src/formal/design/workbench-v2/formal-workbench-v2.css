@@ -203,3 +203,11 @@
 .formal-retest-candidates { margin:16px 0; }
 .formal-retest-candidates h4, .formal-retest-candidates summary { margin:0 0 10px; color:#166c52; }
 .formal-retest-targets label small { display:block; margin-top:4px; color:#637971; font-weight:400; }
+/* Repair and retest read as two ordered steps; everything in step 2 is saved together. */
+.formal-retest-step { grid-column:1 / -1; display:grid; gap:12px; }
+.formal-retest-step > p { margin:0; }
+.formal-retest-step h4 { margin:4px 0 6px; }
+.formal-retest-group { display:grid; gap:10px; }
+.formal-retest-conclusion { display:grid; gap:8px; padding:14px 16px; background:#f0f7f3; border:1px solid #dceae4; border-radius:12px; }
+.formal-retest-conclusion p { margin:0; }
+.formal-retest-conclusion > .prototype-button { justify-self:start; }

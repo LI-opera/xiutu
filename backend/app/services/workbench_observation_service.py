@@ -143,6 +143,76 @@ class TopicService:
         from app.topics import dkvb_b01
         return workflow_for(dkvb_b01.catalog()[0]).begin_round(plan, existing, option_ids, original_id)
 
+    def _write(self, conn, actor, row, module, body, original_id=None, extra_payload=None):
+        """Validate one answer and append it as a record; the caller owns locking and revision checks.
+
+        Returns (observation_id, new_revision). Shared by single saves and post-repair retests.
+        """
+        from app.services.workbench_templates import is_template
+        case_id = row["id"]
+        topic, _ = module.catalog()
+        rows = self._rows(conn, case_id, module.TOPIC_VERSION)
+        snap = deepcopy(row["intake_snapshot"])
+        plan = snap["topic_plan"]
+        q = next((q for q in topic["questions"] if q["id"] == body.question_id), None)
+        if not q:
+            raise DomainError("QUESTION_UNKNOWN", "问题不存在", 422)
+        workflow = workflow_for(topic, template_bound=is_template(row))
+        if body.related_analysis_id:
+            if q["id"] != workflow.repair_id:
+                raise DomainError("ANALYSIS_LINK_SCOPE", "仅实际处理可关联病例建议", 422)
+            linked = conn.execute(select(case_analyses.c.id).where(
+                case_analyses.c.id == body.related_analysis_id,
+                case_analyses.c.case_id == case_id,
+                case_analyses.c.owner_id == actor,
+                case_analyses.c.status == "current")).scalar_one_or_none()
+            if linked is None:
+                raise DomainError("ANALYSIS_LINK_INVALID", "关联建议不存在或尚未完成", 422)
+        round_id = workflow.initial_round(q, plan, body)
+        existing = workflow.effective(rows, body.question_id, round_id if workflow.round_scoped(q) else None)
+        if original_id:
+            if not existing or existing["id"] != original_id:
+                raise DomainError("CORRECTION_CONFLICT", "当前有效记录已变化，请同步后重试", 409)
+        elif existing:
+            workflow.allow_new_record(q, existing, plan, body)
+        if q["id"] == workflow.repair_id:
+            round_id = workflow.begin_round(plan, existing, body.option_ids, original_id)
+        if workflow.round_scoped(q) and body.round_id and q["id"] != workflow.repair_id and body.round_id != round_id:
+            raise DomainError("ROUND_MISMATCH", "复检轮次已经变化", 409)
+        q, fields, unavailable = validate_answer(
+            topic, plan, rows, body, existing, effective=workflow.effective)
+        workflow.after_answer(q, body, plan)
+        missing = workflow.prerequisites(q, plan, rows, body)
+        if missing:
+            raise DomainError("PREREQUISITE_MISSING", "执行此操作尚缺少前置条件", 422, details={"missing": missing})
+        # Recording an optional observation does not make the whole
+        # area, or even that question, required for first advice.
+        plan["version"] += 1
+        snap["topic_plan"] = plan
+        revision = row["revision"] + 1
+        conn.execute(update(cases).where(cases.c.id == case_id).values(
+            revision=revision, intake_snapshot=snap, updated_at=text("clock_timestamp()")))
+        identifier = uuid4()
+        option_changed = bool(existing and existing["payload"].get("option_ids", []) != body.option_ids)
+        payload = {"topic_id": topic["topic_id"], "topic_version": topic["version"],
+                   "topic_content_hash": module.binding()["content_hash"],
+                   "question_id": q["id"], "option_ids": body.option_ids,
+                   "fields": fields, "note": body.note.strip(),
+                   "retest_frames": workflow.retest_frames(q, body),
+                   "unavailable_reason": (body.unavailable_reason.strip() or "原因未提供") if unavailable else "",
+                   "batch_id": body.batch_id, "round_id": round_id,
+                   "source_refs": q["source_refs"], "source": "USER_OBSERVATION",
+                   "related_analysis_id": str(body.related_analysis_id) if body.related_analysis_id else None,
+                   "operation_type": ("user_reselection" if option_changed else "user_record_update") if original_id else "user_selection",
+                   "instance_id": f"{q['id']}:{round_id or 'before-repair'}", **(extra_payload or {})}
+        conn.execute(observations.insert().values(
+            id=identifier, case_id=case_id, area_id=None, step_id=None,
+            kind="unavailable" if unavailable else "measurement" if q["answer_kind"] == "numeric_with_choice" else "choice",
+            payload=payload, created_revision=revision, supersedes_id=original_id,
+            correction_reason=((body.correction_reason or "").strip() or ("用户改选选项" if option_changed else "用户更新观测字段")) if original_id else None,
+            actor_id=actor))
+        return identifier, revision
+
     def save(self, actor, case_id, body, key, original_id=None):
         with UnitOfWork(self.engine) as uow:
             conn = uow.connection
@@ -157,67 +227,7 @@ class TopicService:
                 check_revision(row["revision"], body.expected_revision)
                 from app.services.template_case_history import require_open
                 require_open(row)
-                topic, _ = module.catalog()
-                rows = self._rows(conn, case_id, module.TOPIC_VERSION)
-                snap = deepcopy(row["intake_snapshot"])
-                plan = snap["topic_plan"]
-                q = next((q for q in topic["questions"] if q["id"] == body.question_id), None)
-                if not q:
-                    raise DomainError("QUESTION_UNKNOWN", "问题不存在", 422)
-                workflow = workflow_for(topic, template_bound=is_template(row))
-                if body.related_analysis_id:
-                    if q["id"] != workflow.repair_id:
-                        raise DomainError("ANALYSIS_LINK_SCOPE", "仅实际处理可关联病例建议", 422)
-                    linked = conn.execute(select(case_analyses.c.id).where(
-                        case_analyses.c.id == body.related_analysis_id,
-                        case_analyses.c.case_id == case_id,
-                        case_analyses.c.owner_id == actor,
-                        case_analyses.c.status == "current")).scalar_one_or_none()
-                    if linked is None:
-                        raise DomainError("ANALYSIS_LINK_INVALID", "关联建议不存在或尚未完成", 422)
-                round_id = workflow.initial_round(q, plan, body)
-                existing = workflow.effective(rows, body.question_id, round_id if workflow.round_scoped(q) else None)
-                if original_id:
-                    if not existing or existing["id"] != original_id:
-                        raise DomainError("CORRECTION_CONFLICT", "当前有效记录已变化，请同步后重试", 409)
-                elif existing:
-                    workflow.allow_new_record(q, existing, plan, body)
-                if q["id"] == workflow.repair_id:
-                    round_id = workflow.begin_round(plan, existing, body.option_ids, original_id)
-                if workflow.round_scoped(q) and body.round_id and q["id"] != workflow.repair_id and body.round_id != round_id:
-                    raise DomainError("ROUND_MISMATCH", "复检轮次已经变化", 409)
-                q, fields, unavailable = validate_answer(
-                    topic, plan, rows, body, existing, effective=workflow.effective)
-                workflow.after_answer(q, body, plan)
-                missing = workflow.prerequisites(q, plan, rows, body)
-                if missing:
-                    raise DomainError("PREREQUISITE_MISSING", "执行此操作尚缺少前置条件", 422, details={"missing": missing})
-                # Recording an optional observation does not make the whole
-                # area, or even that question, required for first advice.
-                plan["version"] += 1
-                snap["topic_plan"] = plan
-                revision = row["revision"] + 1
-                conn.execute(update(cases).where(cases.c.id == case_id).values(
-                    revision=revision, intake_snapshot=snap, updated_at=text("clock_timestamp()")))
-                identifier = uuid4()
-                option_changed = bool(existing and existing["payload"].get("option_ids", []) != body.option_ids)
-                payload = {"topic_id": topic["topic_id"], "topic_version": topic["version"],
-                           "topic_content_hash": module.binding()["content_hash"],
-                           "question_id": q["id"], "option_ids": body.option_ids,
-                           "fields": fields, "note": body.note.strip(),
-                           "retest_frames": workflow.retest_frames(q, body),
-                           "unavailable_reason": (body.unavailable_reason.strip() or "原因未提供") if unavailable else "",
-                           "batch_id": body.batch_id, "round_id": round_id,
-                           "source_refs": q["source_refs"], "source": "USER_OBSERVATION",
-                           "related_analysis_id": str(body.related_analysis_id) if body.related_analysis_id else None,
-                           "operation_type": ("user_reselection" if option_changed else "user_record_update") if original_id else "user_selection",
-                           "instance_id": f"{q['id']}:{round_id or 'before-repair'}"}
-                conn.execute(observations.insert().values(
-                    id=identifier, case_id=case_id, area_id=None, step_id=None,
-                    kind="unavailable" if unavailable else "measurement" if q["answer_kind"] == "numeric_with_choice" else "choice",
-                    payload=payload, created_revision=revision, supersedes_id=original_id,
-                    correction_reason=((body.correction_reason or "").strip() or ("用户改选选项" if option_changed else "用户更新观测字段")) if original_id else None,
-                    actor_id=actor))
+                identifier, revision = self._write(conn, actor, row, module, body, original_id)
                 fresh = conn.execute(select(cases).where(cases.c.id == case_id)).mappings().one()
                 return 200, {"observation_id": str(identifier), "revision": revision,
                              "view": self._view(conn, fresh)}
