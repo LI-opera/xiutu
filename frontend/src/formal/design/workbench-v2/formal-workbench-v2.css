@@ -211,3 +211,4 @@
 .formal-retest-conclusion { display:grid; gap:8px; padding:14px 16px; background:#f0f7f3; border:1px solid #dceae4; border-radius:12px; }
 .formal-retest-conclusion p { margin:0; }
 .formal-retest-conclusion > .prototype-button { justify-self:start; }
+.formal-advice-followup-note { margin:0 0 10px; color:#4c6158; }
