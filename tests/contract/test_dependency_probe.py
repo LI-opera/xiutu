@@ -1,5 +1,6 @@
 import importlib
 import socket
+import sys
 
 import pytest
 from app.config import Settings
@@ -66,7 +67,14 @@ def test_settings_redaction(tmp_path):
 
 
 @pytest.mark.parametrize(
-    "kwargs", [{"app_mode": "unknown"}, {"data_path": r"E:\Work\v4-double\data"}]
+    "kwargs",
+    [
+        {"app_mode": "unknown"},
+        pytest.param(
+            {"data_path": r"E:\Work\v4-double\data"},
+            marks=pytest.mark.skipif(sys.platform != "win32", reason="legacy path guard is a Windows path"),
+        ),
+    ],
 )
 def test_settings_reject_invalid(kwargs):
     with pytest.raises(ValidationError):

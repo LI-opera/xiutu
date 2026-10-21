@@ -15,7 +15,7 @@ describe('formal workbench user-facing presentation', () => {
     expect(flowPresentation({ caseStatus: 'needs_review', currentStep: false, latestRun: { status: 'waiting_input' }, areas: [{ conclusion: { assessment: 'unknown' } } as never] }).title).toBe('资料不足');
     expect(flowPresentation({ caseStatus: 'needs_review', currentStep: false, latestRun: { status: 'failed', error_code: 'MODEL_PRICE_UNVERIFIED' }, areas: [] })).toEqual(expect.objectContaining({ title: '本次运行无法继续', description: expect.stringContaining('模型配置') }));
     expect(flowPresentation({ caseStatus: 'needs_review', currentStep: false, latestRun: { status: 'failed', error_code: 'AREA_NEEDS_INPUT' }, areas: [] })).toEqual(expect.objectContaining({ title: '资料不足，暂时无法继续', action: expect.stringContaining('进度报告') }));
-    expect(flowPresentation({ caseStatus: 'needs_review', currentStep: false, latestRun: null, areas: [], terminal: { decision: 'area_summary', terminal_code: 'AREA_SUMMARY_DEMO_PASS' } }).title).toBe('演示诊断路径已完成');
+    expect(flowPresentation({ caseStatus: 'needs_review', currentStep: false, latestRun: null, areas: [], terminal: { decision: 'area_summary', terminal_code: 'AREA_SUMMARY_DEMO_PASS' } }).title).toBe('本次增压空气系统演示复检已完成');
     expect(flowPresentation({ caseStatus: 'needs_review', currentStep: false, latestRun: null, areas: [], terminal: { decision: 'handoff', terminal_code: 'HANDOFF_UNAVAILABLE' } }).title).toContain('已暂停');
   });
 

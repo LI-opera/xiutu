@@ -9,3 +9,9 @@ frontend/public/** -text
 
 # Tokenizer assets are integrity-checked byte resources
 backend/app/retrieval/assets/** -text
+
+# Files whose recorded content hashes were computed on CRLF bytes
+# (B01 catalog hash in the B02 rules; skill body hash in its manifest).
+# Check them out with CRLF on every platform so the hashes match.
+backend/app/topics/tanyue_dkvb_p0299_b01.json text eol=crlf
+skills/cooling-system-diagnosis/SKILL.md text eol=crlf
