@@ -42,6 +42,13 @@ def cost(usage):
     return usage["input_tokens"] * INPUT_CNY + usage["output_tokens"] * OUTPUT_CNY
 
 
+def ledger_rows(turn_id):
+    """What the budget ledger recorded for this call: no row means nothing was sent."""
+    from app.infrastructure.model_budget import LIVE_LEDGER, BudgetLedger
+    calls = BudgetLedger(LIVE_LEDGER).read()["calls"]
+    return [row for key, row in calls.items() if key.startswith(turn_id + ":")]
+
+
 def call_model(settings, payload, turn_id):
     from app.domain.case_analysis import AreaAdviceV3
     from app.infrastructure.model_gateway import DeepSeekGateway, ModelError
@@ -90,14 +97,14 @@ def write_report(folder, meta, cases, runs):
             lines.append(f"| {case['id']} | {label} | {passed}/{len(rows)} |")
         failed = sum(1 for r in rows if r["error"])
         if failed:
-            lines.append(f"| {case['id']} | 调用失败 | {failed}/{len(rows)} |")
+            lines.append(f"| {case['id']} | 调用失败（次数） | {failed}/{len(rows)} |")
     for case in cases:
         lines += ["", f"## {case['id']}　{case['title']}", "", f"**考什么**：{case['purpose']}", "",
                   f"**标准答案**：{case['expected']}"]
         for r in (r for r in runs if r["case"] == case["id"]):
             lines += ["", f"### 第 {r['run']} 次（{r['seconds']} 秒，约 {r['cost_cny']} 元）", ""]
             if r["error"]:
-                lines.append(f"调用失败：`{r['error']}`")
+                lines.append(f"调用失败：`{r['error']}`" + ("" if r.get("sent") else "（请求未发出，未计费）"))
                 continue
             lines += [f"**summary**：{r['result'].get('summary', '')}", "", "**步骤**：", steps_md(r["result"]), "",
                       "**程序检查**："]
@@ -130,6 +137,9 @@ def main():
         settings = load_settings(project_env=True)
         if not settings.deepseek_api_key:
             sys.exit("没有配置模型连接（DEEPSEEK_API_KEY），未调用。")
+        if settings.deepseek_model != "deepseek-flash":
+            sys.exit(f"当前模型设置是 {settings.deepseek_model!r}，项目账本只核实过 deepseek-flash 的价格，"
+                     "调用会被拒绝。请检查 .env 里的 DEEPSEEK_MODEL，以及是否设置了同名环境变量。未调用。")
         max_output = settings.area_analysis_max_output_tokens
 
     topic = ev.load_topic(spec["template"])
@@ -163,14 +173,18 @@ def main():
                 print(f"已花约 {spent:.3f} 元，下一次预计约 {next_cost:.3f} 元，会超过上限 {args.max_cny} 元，停止。")
                 break
             print(f"调用 {case['id']} 第 {n} 次…", flush=True)
-            result, error, meta, seconds = call_model(settings, payload, f"area-eval-{stamp}-{case['id']}-{n}")
-            usage = meta.get("usage")
-            spent_now = cost(usage) if usage else upper[case["id"]]
+            turn_id = f"area-eval-{stamp}-{case['id']}-{n}"
+            result, error, meta, seconds = call_model(settings, payload, turn_id)
+            recorded = ledger_rows(turn_id)
+            sent = any(row.get("status") != "not_sent" for row in recorded)
+            usage = meta.get("usage") or next((row["usage"] for row in recorded if row.get("usage")), None)
+            # Not in the ledger = refused before sending: costs nothing. Sent without usage: assume the upper bound.
+            spent_now = cost(usage) if usage else (upper[case["id"]] if sent else Decimal(0))
             spent += spent_now
             if usage:
                 observed.append(spent_now)
             graded = ev.grade(case, payload, result) if result else None
-            row = {"case": case["id"], "run": n, "seconds": seconds, "error": error, "usage": usage,
+            row = {"case": case["id"], "run": n, "seconds": seconds, "error": error, "sent": sent, "usage": usage,
                    "cost_cny": f"{spent_now:.4f}", "result": result, "graded": graded,
                    "raw_response": meta.get("raw_response")}
             runs.append(row)
@@ -178,6 +192,9 @@ def main():
                 json.dumps(row, ensure_ascii=False, indent=2), encoding="utf-8")
             status = error or "、".join(f"{g['id']}{'✓' if g['passed'] else '✗'}" for g in graded)
             print(f"  {seconds} 秒，约 {spent_now:.4f} 元：{status}")
+            if error and not sent:
+                print("请求在发出前被拒绝（配置或账本问题），后面的调用也会同样失败，停止。")
+                break
         else:
             continue
         break
@@ -186,7 +203,7 @@ def main():
             "prompt_version": sorted({p["prompt_version"] for p in payloads.values()}),
             "cases_version": spec["version"], "runs": args.runs, "calls": len(runs),
             "cost_cny": f"{spent:.3f}"}
-    summary = {**meta, "results": [{k: r[k] for k in ("case", "run", "error", "usage", "cost_cny", "graded")}
+    summary = {**meta, "results": [{k: r[k] for k in ("case", "run", "error", "sent", "usage", "cost_cny", "graded")}
                                    for r in runs]}
     (folder / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     write_report(folder, meta, cases, runs)
