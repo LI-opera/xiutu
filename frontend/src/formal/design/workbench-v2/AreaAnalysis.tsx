@@ -106,13 +106,8 @@ export function AreaAnalysis({ caseId, areaId, revision, onQuestion }: { caseId:
   const query = useQuery({ queryKey: ['area-analysis', caseId, areaId ?? 'matched', revision],
     queryFn: ({ signal }) => apiClient.request<Analysis>(endpoint, { signal }),
     refetchInterval: q => q.state.data?.history.some(h => h.status === 'running') ? 2500 : false });
-  const repairQuery = useQuery({ queryKey: ['template-repairs', caseId],
-    queryFn: ({ signal }) => apiClient.request<{ rounds: Array<{ created_at: string; retested_at: string | null }> }>(`/cases/${caseId}/template-repairs`, { signal }) });
   const data = query.data;
   const current = data?.history.find(item => !item.stale);
-  const postAdviceTreatment = Boolean(data?.history[0] && repairQuery.data?.rounds.some(item =>
-    new Date(item.created_at).getTime() > new Date(data.history[0].created_at).getTime() ||
-    Boolean(item.retested_at && new Date(item.retested_at).getTime() > new Date(data.history[0].created_at).getTime())));
   const retryableFailure = current?.status === 'failed';
   const blockedByAttempt = Boolean(current && !retryableFailure);
   const submit = async () => {
@@ -133,7 +128,6 @@ export function AreaAnalysis({ caseId, areaId, revision, onQuestion }: { caseId:
       {combined && !data.areas?.length && <p>尚无已保存检查记录的区域，请先记录至少一项检查结果。</p>}
       {(data.areas?.some(area => !area.document_ids.length) || (!combined && !data.documents.length)) && <p>参与分析的区域尚未关联资料。</p>}
       {!data.available && <p>当前未配置真实模型连接，尚未发起请求。</p>}
-      {postAdviceTreatment && <p className="formal-v2-advice-stale">下方建议生成后又记录了实际处理或复检；这些新记录未发送给本次 AI，原建议不能视为处理后的新判断。</p>}
       <button type="button" className="prototype-button" disabled={busy || blockedByAttempt || !data.available || !data.documents.length || (combined && !data.areas?.length) || Boolean(data.areas?.some(area => !area.document_ids.length))} onClick={() => void submit()}>
         {busy ? '正在请求真实 AI…' : retryableFailure ? '重新分析（上次失败，需手动点击）' : current?.status === 'completed' ? '分析已完成' : current?.status === 'running' ? '正在生成分析…' : current ? '请求结果待确认' : combined ? `综合分析 ${data.areas?.length ?? 0} 个有记录区域（真实 AI）` : '分析本区域（真实 AI）'}</button>
       {error && <p role="alert">{error}</p>}
