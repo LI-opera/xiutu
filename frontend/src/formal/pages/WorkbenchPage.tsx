@@ -3,8 +3,8 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { apiClient } from '../api-client';
 import { ErrorState, LoadingState } from '../components/States';
 import type { CaseSnapshot } from '../types';
-import { FormalWorkbenchB01Page } from '../design/workbench-v2/FormalWorkbenchB01Page';
-import { FormalWorkbenchV2Page } from '../design/workbench-v2/FormalWorkbenchV2Page';
+import { TemplateWorkbenchPage } from '../design/workbench-v2/TemplateWorkbenchPage';
+import { LegacyDemoWorkbenchPage } from '../design/workbench-v2/LegacyDemoWorkbenchPage';
 import { FormalWorkbenchV2IntakePage } from '../design/workbench-v2/FormalVehicleProfile';
 import { formalTopicIdentity } from '../design/workbench-v2/topicIdentity';
 import { RegionalCaseWorkbench } from './RegionalCaseWorkbench';
@@ -16,10 +16,10 @@ function FormalCaseRoute({ caseId }: { caseId: string }) {
   if (snapshot.error || !snapshot.data) return <ErrorState error={snapshot.error ?? new Error('病例不存在')} onRetry={() => snapshot.refetch()} />;
   const binding = (snapshot.data.intake_snapshot as { topic_binding?: { topic_id?: string; version?: string; content_hash?: string } } | undefined)?.topic_binding;
   if ((snapshot.data.intake_snapshot as { workbench_flow?: string } | undefined)?.workbench_flow === 'template-match-v1') {
-    return <FormalWorkbenchB01Page key={caseId} caseId={caseId} />;
+    return <TemplateWorkbenchPage key={caseId} caseId={caseId} />;
   }
   if (binding?.topic_id === 'tanyue-dkvb-p0299-demo-v2' && ['2.2.0-b01', '2.2.1-b02'].includes(binding.version ?? '')) {
-    return <FormalWorkbenchB01Page key={caseId} caseId={caseId} />;
+    return <TemplateWorkbenchPage key={caseId} caseId={caseId} />;
   }
   const vehicle = snapshot.data.vehicle;
   const eligible = snapshot.data.diagnosis_mode === 'conservative' &&
@@ -28,7 +28,7 @@ function FormalCaseRoute({ caseId }: { caseId: string }) {
     vehicle.engine_family === 'EA888 Gen3B DEMO' && vehicle.engine_code === 'DKVB-DEMO' &&
     snapshot.data.fault_codes.includes('P0299');
   // Browser-verified synthetic DKVB path only; ?legacy=1 remains the explicit rollback.
-  return eligible && params.get('legacy') !== '1' ? <FormalWorkbenchV2Page caseId={caseId} /> : <RegionalCaseWorkbench caseId={caseId} />;
+  return eligible && params.get('legacy') !== '1' ? <LegacyDemoWorkbenchPage caseId={caseId} /> : <RegionalCaseWorkbench caseId={caseId} />;
 }
 
 export function WorkbenchPage() { const { caseId } = useParams(); return caseId ? <FormalCaseRoute caseId={caseId} /> : <FormalWorkbenchV2IntakePage />; }

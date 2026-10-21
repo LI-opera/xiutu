@@ -33,7 +33,7 @@ flowchart TD
 
 ## 2. 第一个文件：前端如何处理答案
 
-打开：[FormalWorkbenchB01Page.tsx](../../frontend/src/formal/design/workbench-v2/FormalWorkbenchB01Page.tsx)。重点先读 `AnswerForm`，再读 `useAnswerSaving`。
+打开：[TemplateWorkbenchPage.tsx](../../frontend/src/formal/design/workbench-v2/TemplateWorkbenchPage.tsx)。重点先读 `AnswerForm`，再读 `useAnswerSaving`。
 
 虽然文件名带 B01，它也是当前模板工作台的主体；不能只看名字认为这是已经不用的历史代码。
 
@@ -54,7 +54,7 @@ type Draft = {
 
 ### 2.2 AnswerForm 决定自动还是手动
 
-源码：[AnswerForm](../../frontend/src/formal/design/workbench-v2/FormalWorkbenchB01Page.tsx#L216)。
+源码：[AnswerForm](../../frontend/src/formal/design/workbench-v2/TemplateWorkbenchPage.tsx#L216)。
 
 点选调用 `autosave.change`，其自动保存条件为 `!needsManualSave(question, after)`。
 
@@ -107,7 +107,7 @@ type Draft = {
 
 ## 3. 保存队列：为什么不能所有题同时提交
 
-源码：[useAnswerSaving](../../frontend/src/formal/design/workbench-v2/FormalWorkbenchB01Page.tsx#L86)。
+源码：[useAnswerSaving](../../frontend/src/formal/design/workbench-v2/TemplateWorkbenchPage.tsx#L86)。
 
 ### 3.1 同一页面按顺序保存
 

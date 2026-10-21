@@ -65,7 +65,7 @@
 
 数字与单位保存为结构化 fields；如果需要参与计算，服务根据模板指定字段读取。模型不是凭页面文字找一个数字就直接判断。
 
-源码定位：[检查保存与更正](../../backend/app/services/workbench_observation_service.py#L146)、[页面与保存队列](../../frontend/src/formal/design/workbench-v2/FormalWorkbenchB01Page.tsx)。
+源码定位：[检查保存与更正](../../backend/app/services/workbench_observation_service.py#L146)、[页面与保存队列](../../frontend/src/formal/design/workbench-v2/TemplateWorkbenchPage.tsx)。
 
 ## 4. 更正：为什么旧答案还能在历史里看到
 

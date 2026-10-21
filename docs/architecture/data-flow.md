@@ -202,7 +202,7 @@ React Query 管理查询缓存。当前全局查询不自动重试，窗口获�
 
 ### 5.1 第一次分流
 
-`WorkbenchPage` 请求 `GET /cases/{id}`，检查快照。当前模板进入 `FormalWorkbenchB01Page`；历史病例进入对应只读兼容页面。
+`WorkbenchPage` 请求 `GET /cases/{id}`，检查快照。当前模板进入 `TemplateWorkbenchPage`；历史病例进入对应只读兼容页面。
 
 ### 5.2 工作台读取请求
 

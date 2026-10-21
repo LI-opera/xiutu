@@ -356,7 +356,7 @@ export function SynthesisGrid({ data, label, questionMap, templateBound = false,
   </div></>;
 }
 
-export function FormalWorkbenchB01Page({ caseId }: { caseId: string }) {
+export function TemplateWorkbenchPage({ caseId }: { caseId: string }) {
   const [areaId, setAreaId] = useState('boost-air');
   const [cardId, setCardId] = useState('air-intake');
   const [openQuestion, setOpenQuestion] = useState<string | null>(null);
