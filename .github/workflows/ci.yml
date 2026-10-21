@@ -27,7 +27,7 @@ jobs:
       - name: 使用 Windows 换行签出
         run: git config --global core.autocrlf true
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: astral-sh/setup-uv@v6
         with:
@@ -42,6 +42,19 @@ jobs:
         run: >-
           uv run --frozen python -B -m pytest tests/unit tests/contract
           -p no:cacheprovider -q --basetemp "$RUNNER_TEMP/pytest"
+          --junitxml "$RUNNER_TEMP/pytest.xml"
+
+      # 把失败的测试名写成 PR 页面上的注释，不用翻日志也能看到哪里挂了
+      - name: 列出失败的测试
+        if: failure()
+        run: |
+          python3 - "$RUNNER_TEMP/pytest.xml" <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          for case in ET.parse(sys.argv[1]).iter("testcase"):
+              for bad in list(case.iter("failure")) + list(case.iter("error")):
+                  msg = (bad.get("message") or "").splitlines()[0][:300] if bad.get("message") else ""
+                  print(f"::error title={case.get('classname')}.{case.get('name')}::{msg}")
+          PY
 
       - name: 仓库资源检查
         run: uv run --frozen python -B scripts/check_repository.py
@@ -49,7 +62,7 @@ jobs:
       - name: 接口文档与代码一致（后端部分）
         run: uv run --frozen python -B scripts/export_frontend_openapi.py --check
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version-file: .node-version
           cache: npm
@@ -73,9 +86,9 @@ jobs:
         run: git config --global core.autocrlf true
         working-directory: .
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version-file: .node-version
           cache: npm
