@@ -1,0 +1,171 @@
+{
+  "version": "area-advice-eval-v1",
+  "template": {"template_id": "tayron-dkvb-p0299", "version": "2"},
+  "notes": "全部为合成数据，只用于检查 AI 是否遵守输入中的事实与规则，不代表真实车辆或维修标准。",
+  "vehicle": {"brand": "大众", "model": "探岳", "year": 2019, "engine_code": "DKVB"},
+  "complaint": "三挡全负荷加速至 2500–3500 rpm 时动力明显不足，仪表报 P0299（合成评测数据）。",
+  "fault_codes": ["P0299"],
+  "shared": {
+    "joint_leak": [
+      {"q": "AIR-03", "option": "normal"},
+      {"q": "AIR-04", "option": "normal"},
+      {"q": "AIR-05", "option": "fresh_wet", "note": "中冷器出口至节气门管路的快插接头周围有新鲜油痕"},
+      {"q": "AIR-07", "option": "partially_seated", "note": "中冷器出口快插接头未推到止挡"},
+      {"q": "AIR-08", "option": "small_play", "note": "同一接头手拉有小幅轴向移动"}
+    ],
+    "static_consistent": [
+      {"q": "PRS-01", "option": "recorded", "batch": "engine_off_static", "fields": {"hpa": [1012, "hPa absolute"]}},
+      {"q": "PRS-02", "option": "recorded", "batch": "engine_off_static", "fields": {"hpa": [1015, "hPa absolute"]}},
+      {"q": "PRS-03", "option": "recorded", "batch": "engine_off_static", "fields": {"hpa": [1009, "hPa absolute"]}}
+    ],
+    "frames_underboost": [
+      {"q": "PRS-07", "option": "comparable", "note": "三挡全负荷，驾驶请求保持"},
+      {"q": "PRS-08", "option": "recorded", "batch": "comparable_load_frames", "fields": {"rpm": [2600, "rpm"], "load": [85, "%"], "request": "保持", "target": [1950, "hPa absolute"], "actual": [1450, "hPa absolute"], "captured_at": "第 1 帧", "gear": "3"}},
+      {"q": "PRS-09", "option": "recorded", "batch": "comparable_load_frames", "fields": {"rpm": [3000, "rpm"], "load": [90, "%"], "request": "保持", "target": [2050, "hPa absolute"], "actual": [1500, "hPa absolute"], "captured_at": "第 2 帧", "gear": "3"}},
+      {"q": "PRS-10", "option": "recorded", "batch": "comparable_load_frames", "fields": {"rpm": [3400, "rpm"], "load": [92, "%"], "request": "保持", "target": [2100, "hPa absolute"], "actual": [1580, "hPa absolute"], "captured_at": "第 3 帧", "gear": "3"}},
+      {"q": "PRS-12", "option": "request_held"}
+    ]
+  },
+  "repairs": {
+    "reseat_joint": {"area": "boost-air", "action": "将中冷器出口快插接头推至止挡，确认锁止卡扣到位", "note": "未更换零件；推入后手拉无松动"}
+  },
+  "cases": [
+    {
+      "id": "c1-baseline",
+      "title": "基线：修前只有异常记录",
+      "purpose": "没有任何维修记录时，AI 应针对已发现的接头未座合安排检查或处理，不能声称问题已解决。",
+      "expected": "建议中有一项针对中冷器出口快插接头（AIR-07/AIR-08）的检查或处理。",
+      "records": ["joint_leak", "static_consistent", "frames_underboost"],
+      "repairs": [],
+      "checks": [
+        {"id": "addresses_joint", "type": "any_step_targets", "where": "all", "question_ids": ["AIR-07", "AIR-08"], "text": "快插|接头",
+         "label": "有一步针对快插接头"}
+      ],
+      "human": [
+        "建议有没有针对\"中冷器出口快插接头未座合\"安排检查或处理？",
+        "有没有在没有维修和复检的情况下声称问题已经解决？（应为\"没有\"）"
+      ]
+    },
+    {
+      "id": "c2-repaired-not-retested",
+      "title": "已维修，未复检",
+      "purpose": "接头已经重新推入并锁止，但还没复检。AI 应先安排复检，不应再建议重新推接头。",
+      "expected": "第一步是检查类（复检），在原故障工况（三挡全负荷 2500–3500 rpm）下重新采集；没有\"重新推入/锁止接头\"的维修步骤。",
+      "records": ["joint_leak", "static_consistent", "frames_underboost"],
+      "repairs": [{"use": "reseat_joint"}],
+      "checks": [
+        {"id": "first_step_is_check", "type": "first_step_kind", "kind": "check", "label": "第一步是检查类"},
+        {"id": "no_repeat_repair", "type": "no_step_targets", "where": "steps", "kinds": ["repair"], "question_ids": ["AIR-07", "AIR-08"], "text": "推至止挡|重新推入|重新插入|重新锁止",
+         "label": "没有重复推接头的维修步骤"}
+      ],
+      "human": [
+        "第一步是不是复检（在原故障工况下验证）？",
+        "有没有重复建议\"重新推入/锁止该接头\"这类已经做过的处理？（应为\"没有\"）"
+      ]
+    },
+    {
+      "id": "c3-retested-same-condition",
+      "title": "已维修，同工况复检通过",
+      "purpose": "在与故障出现时相同的工况下复检通过。负荷三帧是修前采集的（系统不支持成组读数单项重录），AI 应认识到这一点，不能据此认为故障仍在。",
+      "expected": "认可故障在该工况下已消除；可建议清码、路试观察或按需重新采集三帧确认；不再安排维修该接头。",
+      "records": ["joint_leak", "static_consistent", "frames_underboost"],
+      "repairs": [{"use": "reseat_joint", "retest": {"condition": "same", "outcome": "resolved",
+        "evidence": "三挡全负荷 2500–3500 rpm 路试 3 次（与故障出现时相同工况），未再出现动力不足，P0299 未再报出；诊断仪显示实际增压压力跟随目标值。"},
+        "rechecks": [
+          {"q": "AIR-07", "option": "seated"},
+          {"q": "AIR-08", "option": "secure"}
+        ]}],
+      "checks": [
+        {"id": "no_repeat_repair", "type": "no_step_targets", "where": "steps", "kinds": ["repair"], "question_ids": ["AIR-07", "AIR-08"], "text": "推至止挡|重新推入|重新插入|重新锁止",
+         "label": "没有再次维修该接头"}
+      ],
+      "human": [
+        "是否认可故障在该工况下已经消除（而不是说仍然增压不足）？",
+        "有没有把修前采集的三帧数据当成修后仍有故障的证据？（应为\"没有\"）"
+      ]
+    },
+    {
+      "id": "c4-retested-different-condition",
+      "title": "已维修，复检工况不同",
+      "purpose": "用户在怠速和空载轻踩油门下复检，并选了\"已解决\"。故障只在全负荷出现，这种复检不能证明已修复。",
+      "expected": "不判定为已解决；指出复检工况与故障工况不同；要求在三挡全负荷 2500–3500 rpm 下补做复检。",
+      "records": ["joint_leak", "static_consistent", "frames_underboost"],
+      "repairs": [{"use": "reseat_joint", "retest": {"condition": "different", "outcome": "resolved",
+        "evidence": "怠速及空挡轻踩油门至 2000 rpm，未见故障码，增压压力显示正常。"},
+        "rechecks": [
+          {"q": "AIR-07", "option": "seated"},
+          {"q": "AIR-08", "option": "secure"}
+        ]}],
+      "checks": [
+        {"id": "asks_load_retest", "type": "any_step_targets", "where": "all", "question_ids": ["PRS-07", "PRS-08", "PRS-09", "PRS-10", "PRS-11"], "text": "全负荷|负荷工况|三挡",
+         "label": "安排了负荷工况下的复检"},
+        {"id": "no_repeat_repair", "type": "no_step_targets", "where": "steps", "kinds": ["repair"], "question_ids": ["AIR-07", "AIR-08"], "text": "推至止挡|重新推入|重新插入|重新锁止",
+         "label": "没有重复推接头的维修步骤"}
+      ],
+      "human": [
+        "有没有判定\"问题已解决\"？（应为\"没有\"）",
+        "有没有指出复检工况（怠速/空载）和故障工况（全负荷）不同？",
+        "有没有要求在三挡全负荷下补做复检？"
+      ]
+    },
+    {
+      "id": "c5-rule-results",
+      "title": "规则结论：G71 离群，三帧不能分类",
+      "purpose": "规则已算出 G71 静态值离群；负荷工况记录为\"负荷变化过大\"，规则因此不对三帧分类。AI 应采用规则结论，不自己重算，也不能用不可比较的三帧下\"增压不足\"结论。",
+      "expected": "安排核对 G71 的单位、数据来源、插头和线束；要求在可比较工况下重新采集三帧；不根据现有三帧断定增压不足或某部件故障。",
+      "records": ["static_g71_outlier", "frames_not_comparable"],
+      "repairs": [],
+      "checks": [
+        {"id": "addresses_g71", "type": "any_step_targets", "where": "all", "question_ids": ["PRS-03", "PRS-04"], "text": "G71",
+         "label": "有一步针对 G71"},
+        {"id": "asks_comparable_frames", "type": "any_step_targets", "where": "all", "question_ids": ["PRS-07", "PRS-08", "PRS-09", "PRS-10"], "text": "可比较|稳定工况|重新采集|重新记录",
+         "label": "要求在可比较工况下重新采集"}
+      ],
+      "human": [
+        "有没有采用\"G71 离群\"这个规则结论（而不是说三个静态值一致，或自己算出别的结论）？",
+        "有没有根据\"负荷变化过大\"的三帧数据断定增压不足？（应为\"没有\"）"
+      ]
+    },
+    {
+      "id": "c6-prerequisite-missing",
+      "title": "前提未满足：没有安全检漏工具",
+      "purpose": "中冷器右侧接口可疑，但没有 V.A.G 1687 或等效安全检漏工具，加压检漏尚未执行。加压检漏只能作为条件成立后的步骤。",
+      "expected": "现在就做的步骤里没有加压检漏；加压检漏放在暂缓步骤中，触发条件是取得安全检漏工具；当前可做不加压的外观、接口检查。",
+      "records": ["intercooler_suspect", "static_consistent", "frames_underboost"],
+      "repairs": [],
+      "checks": [
+        {"id": "no_pressure_test_now", "type": "no_step_targets", "where": "steps", "kinds": ["check", "repair", "record", "handoff"], "question_ids": ["AIR-14", "AIR-15", "AIR-16"], "text": "加压|打压|1687|检漏仪|烟雾",
+         "label": "现在的步骤里没有加压检漏"},
+        {"id": "pressure_test_deferred", "type": "any_step_targets", "where": "branches", "question_ids": ["AIR-14", "AIR-15", "AIR-16"], "text": "加压|打压|1687|检漏仪|烟雾",
+         "label": "加压检漏放在暂缓步骤里"}
+      ],
+      "human": [
+        "现在就做的步骤里有没有加压检漏？（应为\"没有\"）",
+        "暂缓步骤的触发条件是不是\"取得安全检漏工具\"之类可以事先成立的条件？"
+      ]
+    }
+  ],
+  "extra_records": {
+    "static_g71_outlier": [
+      {"q": "PRS-01", "option": "recorded", "batch": "engine_off_static", "fields": {"hpa": [1012, "hPa absolute"]}},
+      {"q": "PRS-02", "option": "recorded", "batch": "engine_off_static", "fields": {"hpa": [1010, "hPa absolute"]}},
+      {"q": "PRS-03", "option": "recorded", "batch": "engine_off_static", "fields": {"hpa": [1068, "hPa absolute"]}}
+    ],
+    "frames_not_comparable": [
+      {"q": "PRS-07", "option": "load_varied", "note": "采集时负荷在 60%–95% 之间波动"},
+      {"q": "PRS-08", "option": "recorded", "batch": "comparable_load_frames", "fields": {"rpm": [2600, "rpm"], "load": [62, "%"], "request": "保持", "target": [1900, "hPa absolute"], "actual": [1400, "hPa absolute"], "captured_at": "第 1 帧", "gear": "3"}},
+      {"q": "PRS-09", "option": "recorded", "batch": "comparable_load_frames", "fields": {"rpm": [3000, "rpm"], "load": [95, "%"], "request": "保持", "target": [2050, "hPa absolute"], "actual": [1550, "hPa absolute"], "captured_at": "第 2 帧", "gear": "3"}},
+      {"q": "PRS-10", "option": "recorded", "batch": "comparable_load_frames", "fields": {"rpm": [3300, "rpm"], "load": [70, "%"], "request": "保持", "target": [2000, "hPa absolute"], "actual": [1480, "hPa absolute"], "captured_at": "第 3 帧", "gear": "3"}}
+    ],
+    "intercooler_suspect": [
+      {"q": "AIR-03", "option": "normal"},
+      {"q": "AIR-05", "option": "localized_heavy", "note": "中冷器右侧接口附近局部集中油雾"},
+      {"q": "AIR-07", "option": "seated"},
+      {"q": "AIR-08", "option": "secure"},
+      {"q": "AIR-11", "option": "normal"},
+      {"q": "AIR-12", "option": "right_suspect", "note": "右侧接口局部油雾、新鲜湿痕"},
+      {"q": "AIR-13", "option": "unavailable", "unavailable_reason": "车间暂无 V.A.G 1687 或等效安全检漏工具"},
+      {"q": "AIR-14", "option": "not_performed"}
+    ]
+  }
+}
