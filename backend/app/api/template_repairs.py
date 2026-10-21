@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.api.dependencies import authenticated, writing
 
@@ -9,6 +9,7 @@ router = APIRouter(prefix="/api/v2/cases", tags=["template-repairs"])
 
 
 class LifecycleInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     expected_revision: int = Field(ge=0)
     closed: bool
 
@@ -20,6 +21,7 @@ def lifecycle(case_id: UUID, body: LifecycleInput, request: Request, principal=D
 
 
 class RepairInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     expected_revision: int = Field(ge=0)
     area_id: str = Field(min_length=1, max_length=80)
     repair_action: str = Field(min_length=1, max_length=4000)
@@ -28,6 +30,7 @@ class RepairInput(BaseModel):
 
 # One question re-answered after the repair; saved as an ordinary record.
 class RecheckInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     question_id: str = Field(min_length=1, max_length=80)
     option_ids: list[str] = Field(min_length=1, max_length=20)
     fields: dict[str, object] = Field(default_factory=dict)
@@ -36,6 +39,7 @@ class RecheckInput(BaseModel):
 
 
 class RetestInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     expected_revision: int = Field(ge=0)
     retest_condition: str = Field(pattern="^(same|different|unavailable)$")
     retest_outcome: str = Field(pattern="^(resolved|persists|uncertain)$")

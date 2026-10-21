@@ -81,7 +81,9 @@ def test_selected_result_is_bound_to_record_and_transport_is_nonmutating():
     sent=model_payload(result)
     focus=sent['reference_reading_guide']['documents'][0]['result_methods']
     assert focus[0]['selected_by']==[{'observation_id':'record','option_id':'missing'}]
-    assert focus[0]['text']=='## Method\nmethod and alternatives\n'
+    assert focus[0]['heading']=='## Method' and 'text' not in focus[0]
+    # The method itself is sent once, inside the extracted body.
+    assert sent['documents'][0]['body'].count('method and alternatives')==1
     assert result==before
     assert 'analysis_extracts' not in sent['documents'][0]
     assert sent['documents'][0]['full_content_hash']==result['documents'][0]['content_hash']

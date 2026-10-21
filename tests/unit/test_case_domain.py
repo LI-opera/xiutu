@@ -25,12 +25,17 @@ def test_extra_forbidden(extra):
         {"model": "x", "year": True},
         {"model": "x", "year": "2020"},
         {"model": "x", "vin": "INVALID"},
-        {"model": "x", "engine_code": ""},
     ],
 )
 def test_nested_validation(vehicle):
     with pytest.raises(ValidationError):
         CreateCase.model_validate(VALID | {"vehicle": vehicle})
+
+
+def test_blank_engine_code_means_not_provided():
+    # Template intake allows a vehicle without an engine code; blank is stored as unknown.
+    case = CreateCase.model_validate(VALID | {"vehicle": {"model": "x", "engine_code": "  "}})
+    assert case.vehicle.engine_code is None
 
 
 def test_normalization():

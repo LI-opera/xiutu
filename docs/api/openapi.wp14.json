@@ -130,6 +130,7 @@
         "type": "object"
       },
       "AreaAnalysisRequest": {
+        "additionalProperties": false,
         "properties": {
           "expected_revision": {
             "minimum": 0.0,
@@ -1904,6 +1905,7 @@
         "type": "object"
       },
       "LifecycleInput": {
+        "additionalProperties": false,
         "properties": {
           "closed": {
             "title": "Closed",
@@ -2147,6 +2149,7 @@
         "type": "object"
       },
       "PlanExpand": {
+        "additionalProperties": false,
         "properties": {
           "area_id": {
             "title": "Area Id",
@@ -2166,6 +2169,7 @@
         "type": "object"
       },
       "RankRequest": {
+        "additionalProperties": false,
         "properties": {
           "expected_revision": {
             "minimum": 0.0,
@@ -2180,6 +2184,7 @@
         "type": "object"
       },
       "RecheckInput": {
+        "additionalProperties": false,
         "properties": {
           "fields": {
             "additionalProperties": true,
@@ -2269,6 +2274,7 @@
         "type": "object"
       },
       "RepairInput": {
+        "additionalProperties": false,
         "properties": {
           "area_id": {
             "maxLength": 80,
@@ -2509,6 +2515,7 @@
         "type": "object"
       },
       "RetestInput": {
+        "additionalProperties": false,
         "properties": {
           "expected_revision": {
             "minimum": 0.0,
@@ -3231,6 +3238,7 @@
         "type": "object"
       },
       "TopicAnswer": {
+        "additionalProperties": false,
         "properties": {
           "batch_id": {
             "anyOf": [

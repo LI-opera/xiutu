@@ -3,7 +3,7 @@ from copy import deepcopy
 from uuid import UUID, uuid4
 
 from fastapi.encoders import jsonable_encoder
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select, text, update
 
 from app.domain.policies import DomainError, check_revision
@@ -16,6 +16,7 @@ from app.services.workbench_topic_workflow import workflow_for
 
 
 class TopicAnswer(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     expected_revision: int = Field(ge=0)
     topic_version: str
     question_id: str
@@ -31,6 +32,7 @@ class TopicAnswer(BaseModel):
 
 
 class PlanExpand(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     expected_revision: int = Field(ge=0)
     area_id: str
 
