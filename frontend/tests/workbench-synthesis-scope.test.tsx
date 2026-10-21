@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, expect, it } from 'vitest';
-import { SynthesisGrid } from '../src/formal/design/workbench-v2/FormalWorkbenchB01Page';
+import { SynthesisGrid } from '../src/formal/design/workbench-v2/TemplateWorkbenchPage';
 
 afterEach(cleanup);
 

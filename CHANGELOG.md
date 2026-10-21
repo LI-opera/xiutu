@@ -1,5 +1,12 @@
 # 变更记录
 
+## 2026-10-22 — 保守清理（不改变行为）
+
+- 删除 16 个开发阶段一次性脚本（C 系列重放/审计、WP-00 基线与备份、R1 播种等）和 2 个没有任何引用的后端模块（`report_service.py`、`publish_workbench_b01_topic.py`）。
+- `docs/implementation/` 开发证据移出仓库目录（git 历史保留，见 `docs/archive/implementation-evidence.md`）；写入该目录的旧预览工具改写到 `.local-data/evidence/`。
+- 前端改名：`FormalWorkbenchB01Page` → `TemplateWorkbenchPage`（当前模板工作台），`FormalWorkbenchV2Page` → `LegacyDemoWorkbenchPage`（旧演示台架只读页）。
+- 旧流程（B01/B02 演示专题、C 系列分析、早期诊断流程）及资料中心、MCP 保持不变，旧病例仍可查看。
+
 ## 2026-09-21 — WP-15 完整诊断工作台（已实施，待审核）
 
 - 正式工作台接入病例快照、区域/当前检查/证据、四类观察、任务 SSE、保守区域卡、观察更正及报告门禁；服务端事实由查询缓存持有，迟到事件受病例/epoch 上下文保护。

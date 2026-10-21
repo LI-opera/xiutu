@@ -210,12 +210,12 @@ Vite 通过代理转发 `/api`；浏览器通常只需要知道网页地址。�
 | 文件 | 页面上的作用 | 实现要点 |
 | --- | --- | --- |
 | `MatchedVehicleIntake.tsx` | 车辆基础信息和主诉表单 | 必填校验、故障码规范化、发动机代码选填、带幂等键创建病例 |
-| `FormalWorkbenchB01Page.tsx` | 区域、分组、检查问题和综合摘要 | 从后端 topic/view 动态生成问题；保存队列；刷新服务端投影 |
+| `TemplateWorkbenchPage.tsx` | 区域、分组、检查问题和综合摘要 | 从后端 topic/view 动态生成问题；保存队列；刷新服务端投影 |
 | `AreaAnalysis.tsx` | 当前 AI 综合分析 | 读取资料与尝试状态；点击才 POST；展示结果与过期提示 |
 | `TemplateRepairRetest.tsx` | 实际处理和独立复检 | 跟随所选区域；建立轮次；生成复检候选；保存新证据 |
 | `TemplateCaseLifecycle.tsx` | 结束本次工作、继续病例 | 控制用户工作状态，不自动判定车辆已修好 |
 
-`FormalWorkbenchB01Page` 的文件名保留历史命名，但它也是当前模板工作台主体。`prototype-*` CSS 类名也仍用于当前样式。不能仅凭 B01、prototype 字样认定文件无用。
+`TemplateWorkbenchPage` 是当前模板工作台主体（原名 `FormalWorkbenchB01Page`，2026-10 改名；旧 B01/B02 演示病例也由它显示）。`LegacyDemoWorkbenchPage`（原名 `FormalWorkbenchV2Page`）只用于更早的 v2 演示台架病例的只读查看。`prototype-*` CSS 类名仍用于当前样式，不能仅凭 prototype 字样认定文件无用。
 
 ### 5.4 动态页面从哪些数据生成
 
@@ -557,7 +557,7 @@ MCP 是暴露工具的一种接口方式。当前综合分析没有自动执行�
 | 3 | `MatchedVehicleIntake.tsx` | 表单怎样变成创建请求？ |
 | 4 | `backend/app/api/cases.py` | 请求进入哪个后端入口？ |
 | 5 | `case_service.py`、`workbench_templates.py` | 怎样匹配并冻结病例？ |
-| 6 | `FormalWorkbenchB01Page.tsx` | 区域和问题从哪里来，怎样保存？ |
+| 6 | `TemplateWorkbenchPage.tsx` | 区域和问题从哪里来，怎样保存？ |
 | 7 | `workbench_observation_service.py` | 答案和更正怎样进库？ |
 | 8 | `template_projection.py` | 保存记录怎样变成页面摘要？ |
 | 9 | `AreaAnalysis.tsx`、`area_analysis_service.py` | AI 按钮送什么、结果存哪里？ |
@@ -607,7 +607,7 @@ MCP 是暴露工具的一种接口方式。当前综合分析没有自动执行�
 - [应用与路由](../../frontend/src/formal/FormalApp.tsx)
 - [病例工作台分流](../../frontend/src/formal/pages/WorkbenchPage.tsx)
 - [接诊表单](../../frontend/src/formal/design/workbench-v2/MatchedVehicleIntake.tsx)
-- [当前工作台与答案保存队列](../../frontend/src/formal/design/workbench-v2/FormalWorkbenchB01Page.tsx)
+- [当前工作台与答案保存队列](../../frontend/src/formal/design/workbench-v2/TemplateWorkbenchPage.tsx)
 - [AI 分析界面](../../frontend/src/formal/design/workbench-v2/AreaAnalysis.tsx)
 - [处理复检界面](../../frontend/src/formal/design/workbench-v2/TemplateRepairRetest.tsx)
 - [后端应用入口](../../backend/app/main.py)

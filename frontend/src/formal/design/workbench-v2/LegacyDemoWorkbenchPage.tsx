@@ -52,7 +52,7 @@ function Question({ view, question, open, onToggle, onAsset }: { view: View; que
   </article>;
 }
 
-export function FormalWorkbenchV2Page({ caseId }: { caseId: string }) {
+export function LegacyDemoWorkbenchPage({ caseId }: { caseId: string }) {
   const initialSelectionRef = useRef<string | null>(null);
   const [selectedArea, setSelectedArea] = useState('boost-air');
   const [selectedCard, setSelectedCard] = useState('air-connector');

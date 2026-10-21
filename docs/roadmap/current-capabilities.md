@@ -165,4 +165,4 @@ v2 并不会因此无法分析：配置不匹配时仍保留完整正文回退�
 - [分析输入与身份](../../backend/app/services/area_analysis_service.py)
 - [历史进度汇总](../../backend/app/services/template_case_history.py)
 - [模板区域投影](../../backend/app/services/template_projection.py)
-- [前端答案与题号特例](../../frontend/src/formal/design/workbench-v2/FormalWorkbenchB01Page.tsx)
+- [前端答案与题号特例](../../frontend/src/formal/design/workbench-v2/TemplateWorkbenchPage.tsx)

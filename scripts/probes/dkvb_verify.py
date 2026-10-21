@@ -8,7 +8,7 @@ from dkvb_topic import BASE,STATE,client,checked,envfor,MANUALS,PDFS
 import httpx
 from sqlalchemy import create_engine,text
 from app.infrastructure.db_target import validate_target
-out=ROOT/'docs/implementation/product-preview/evidence/dkvb-topic'/('http-'+uuid4().hex[:8]);out.mkdir()
+out=ROOT/'.local-data/evidence/product-preview/dkvb-topic'/('http-'+uuid4().hex[:8]);out.mkdir(parents=True)
 d=json.loads(STATE.read_text(encoding='utf8'));reg=json.loads((BASE/'registry.json').read_text(encoding='utf8'))
 start=time.time();results=[]
 with closing(client(d)) as c:

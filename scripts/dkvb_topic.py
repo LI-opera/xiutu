@@ -10,7 +10,7 @@ import httpx
 BASE=ROOT/'.local-data/dkvb-topic'
 STATE=BASE/'runtime.json'
 PACKAGE=Path(r'E:\Work\v4-double\docs\参考\专题资料包\探岳DKVB-P0299演示资料-v1')
-EVIDENCE=ROOT/'docs/implementation/product-preview/evidence/dkvb-topic'
+EVIDENCE=ROOT/'.local-data/evidence/product-preview/dkvb-topic'
 
 def save(path,d):
     p=path.with_suffix('.new');p.write_text(json.dumps(d,ensure_ascii=False,indent=2),encoding='utf8');p.replace(path)
@@ -75,7 +75,7 @@ def main():
     manifest=verify_package(PACKAGE);digest=hashlib.sha256((PACKAGE/'manifest.json').read_bytes()).hexdigest()
     regpath=BASE/'registry.json';reg=json.loads(regpath.read_text(encoding='utf8')) if regpath.exists() else dict(actor=d['actor'],package_hash=digest,documents={},assets=str(BASE/'assets'),figures={},ready=False)
     assert reg['actor']==d['actor'] and reg['package_hash']==digest
-    run_evidence=EVIDENCE/('import-'+uuid4().hex[:8]);run_evidence.mkdir()
+    run_evidence=EVIDENCE/('import-'+uuid4().hex[:8]);run_evidence.mkdir(parents=True)
     save(run_evidence/'package-verification.json',dict(manifest_sha256=digest,verified=manifest['files'],retrieval_whitelist=list(MANUALS)))
     with closing(client(d)) as c:
         for name in [*MANUALS,*[x[0] for x in PDFS.values()]]:
