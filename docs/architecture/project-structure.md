@@ -352,9 +352,9 @@ UnitOfWork：提交或回滚同一组数据库操作
 
 - 模板适用关系与内容：独立包 `模板候选-v2/relations.json` 和相应模板 JSON。
 - 区域资料清单：`area_reference_manifest_v2.json` 等版本清单。
-- 资料阅读组织：`backend/app/topics/analysis_context_v1.json`。
-
-阅读组织配置包含问题角色、资料章节与选项关联，且核对模板和正文哈希。配置不匹配时不会继续相信旧章节偏移，而是保留完整正文回退。
+- 记录角色：`backend/app/topics/record_roles_v1.json`（每题记录属于观察、检查状态、人工判断等哪类信息；按模板版本和题目定义哈希绑定，没有条目的模板记录为 unclassified）。
+- 每份资料的必带章节：`backend/app/topics/reading_documents_v1.json`（按章节标题，只对写定时的正文哈希生效）。
+- 发送哪些资料章节：分析时由 `backend/app/services/retrieval_reading.py` 检索资料原文选出（精准查找 + BM25 + 本地向量，RRF 融合，每题取前 3 个 `##` 章节），不再使用题目→章节对照表；原对照表移到 `evals/section-retrieval/reference_table_v1.json`，只作检索评测的标准答案。检索不可用时发送完整正文。
 
 ## 8. 数据库中有哪些数据
 

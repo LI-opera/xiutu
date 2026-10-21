@@ -3,7 +3,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 from uuid import uuid4
 
-from app.services.area_analysis_service import build_matched_input
+from app.services.area_analysis_service import MATCHED_RULES_PROMPT_VERSION, build_matched_input
 from app.services.template_projection import build_plan, project_template
 from app.services.workbench_topic_workflow import ObservationWorkflow
 
@@ -51,7 +51,7 @@ def test_focus_conflict_and_gate_are_consistent_in_saved_view_and_ai_preview():
         "plan": case["intake_snapshot"]["topic_plan"],
         "observations": [{"id": str(row["id"]), "question_id": row["payload"]["question_id"],
                           "payload": row["payload"], "effective": True} for row in records]}
-    with patch("app.services.area_analysis_service.enrich", side_effect=lambda value, _: {
+    with patch("app.services.area_analysis_service.enrich", side_effect=lambda value, *_: {
         **value, "unrecorded_decision_question_ids": [], "reference_reading_guide": {}}):
         payload = build_matched_input(full_view, {"cooling": [], "electrical": []})
     assert {entry["id"] for entry in payload["questions"]} == {"SOURCE", "CHECK", "SECOND"}
@@ -59,7 +59,7 @@ def test_focus_conflict_and_gate_are_consistent_in_saved_view_and_ai_preview():
     assert check["suggested_focus"]
     assert check["execution_blockers"] == projection["question_states"]["CHECK"]["condition_blockers"]
     assert payload["rule_conflicts"] == projection["synthesis"]["conflicts"]
-    assert payload["prompt_version"] == "matched-area-advice-v17"
+    assert payload["prompt_version"] == MATCHED_RULES_PROMPT_VERSION
 
 
 def test_independent_operation_can_use_case_intake_safety_without_legacy_question():

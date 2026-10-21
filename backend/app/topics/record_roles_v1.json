@@ -1,0 +1,2136 @@
+{
+  "version": "record-roles-v1",
+  "notes": "每道题的记录角色（观察、检查状态、人工判断、后续安排等），按模板版本和题目定义哈希绑定。只说明记录属于哪类信息，不决定发送哪些资料章节；没有条目的模板记录标为 unclassified，分析照常进行。",
+  "templates": [
+    {
+      "template_id": "tayron-dkvb-p0299",
+      "version": "1",
+      "content_hash": "77d3bbf13d814276c27c19018b0505555685675b794e9e27effa0c058589302c",
+      "questions": {
+        "AIR-01": {
+          "definition_hash": "8f562cfa8473bd59391ff09028efde04176d409f23958b43a74eec07274c298c",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "open_or_misaligned": "observation",
+            "damaged": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-02": {
+          "definition_hash": "7036b07661bea371b6654d62ee5e7a168e70bf2eedd78f4d01dca3f08100fb27",
+          "role": "observation",
+          "option_roles": {
+            "clean": "observation",
+            "restricted": "observation",
+            "wet": "observation",
+            "misinstalled": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-03": {
+          "definition_hash": "6c657777cae944640f136c82cfd9999d8b3d52e8b6b6e4c23d8a532b65adef19",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "collapsed": "observation",
+            "cracked": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-04": {
+          "definition_hash": "9ecf96f5bc4d062818f312630fb773ae9ea7916ab2e9b7e997f060a84acba799",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "crack": "observation",
+            "abrasion": "observation",
+            "bulge": "observation",
+            "collapsed": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-05": {
+          "definition_hash": "ade2662167ce4bc21a8cc066a4dc7db3aab9608380c1a5ec2523262e662b9e83",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "light_uniform": "observation",
+            "localized_heavy": "observation",
+            "fresh_wet": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-06": {
+          "definition_hash": "996ad51ea1a102b4b8c7d65b950f0a259ed3dda3b3b531b5af74840c88273ca4",
+          "role": "observation",
+          "option_roles": {
+            "clear": "observation",
+            "light_contact": "observation",
+            "rub_mark": "observation",
+            "active_interference": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-07": {
+          "definition_hash": "c82ea3fcfa1098e62e57183891cb3f5b427c9ee99f6f2b15dd74306c41b8debb",
+          "role": "observation",
+          "option_roles": {
+            "seated": "observation",
+            "partially_seated": "observation",
+            "not_locked": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-08": {
+          "definition_hash": "c34a2be3b3797f4e5077002cd552fa2da5d937faf1c6a5fc2c75c5a402772078",
+          "role": "observation",
+          "option_roles": {
+            "secure": "observation",
+            "small_play": "observation",
+            "pulls_out": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-09": {
+          "definition_hash": "486bca7fb12f2aefecef3ef92ccf2bf98f8e57598da9501be2bb27a0d3cad179",
+          "role": "observation",
+          "option_roles": {
+            "aligned": "observation",
+            "misaligned": "observation",
+            "mark_unreadable": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-10": {
+          "definition_hash": "cb58da2ad899ce2186db8d1d824df24d24a04a751dd22faae2ca861534f64c59",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "twisted": "observation",
+            "pinched": "observation",
+            "missing_or_damaged": "observation",
+            "not_visible": "inspection_status"
+          }
+        },
+        "AIR-11": {
+          "definition_hash": "c9c9277beb8ac1f613fa435d110d5d0ca9f964deadb7818b99d7c4720de6cb0d",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "impact": "observation",
+            "deformed": "observation",
+            "contaminated": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-12": {
+          "definition_hash": "39f984a680bdb9d9a84d8c0de13f43f727bf697feab32bd440928ffddeae14db",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "left_suspect": "observation",
+            "right_suspect": "observation",
+            "both_suspect": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-13": {
+          "definition_hash": "e41389ecd0b66b235f4243d79012a25aafecb02e1bbf5d911e18e60b6a1b3077",
+          "role": "inspection_status",
+          "option_roles": {
+            "available": "inspection_status",
+            "alternative_safe_tool": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-14": {
+          "definition_hash": "df961e7ff92061d338c69d0b6cc29ada1baa93f754c9e5c18d5dba6e452d4dc8",
+          "role": "inspection_status",
+          "option_roles": {
+            "within_limit": "inspection_status",
+            "not_performed": "inspection_status",
+            "unsafe_stop": "inspection_status"
+          }
+        },
+        "AIR-15": {
+          "definition_hash": "d26e062c32d5c2b158112ea32ba770d0bbb67868c129e3b685bcb9c1631559aa",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "hose": "observation",
+            "connector": "observation",
+            "intercooler": "observation",
+            "throttle_side": "observation",
+            "multiple": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-16": {
+          "definition_hash": "7ed79157f110fcadfc2cd0f2277907141d016d5d2f002be9a5cc0a84659221e7",
+          "role": "human_judgment",
+          "option_roles": {
+            "audible_or_bubble": "observation",
+            "ultrasonic": "observation",
+            "trace_only": "observation",
+            "inconclusive": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-01": {
+          "definition_hash": "d19beeabb7ec051907c1e146d7622681abb1cdeedbdd6602764eebabe2cbf123",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-02": {
+          "definition_hash": "c719b5ae492d15904f83f08daeb7ebb05c78d04476cc73f383294602f5c39948",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "signal_missing": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-03": {
+          "definition_hash": "f607c215d5d2f8397ce55de927a6c48fafd4e7dac43a3978c18a00a3073e2a41",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "signal_missing": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-04": {
+          "definition_hash": "dc84b031954e90e9f1aeb0768a43fb58efcdc599d4499f04f1c3cbcccd8d9eb1",
+          "role": "observation",
+          "option_roles": {
+            "consistent": "observation",
+            "g31_outlier": "observation",
+            "g71_outlier": "observation",
+            "multiple_outliers": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-05": {
+          "definition_hash": "1fae291707a51ca76c9c1243288b0c943eafb215ff5c7ff52224372ba7274e11",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "pin_damage": "observation",
+            "moisture": "observation",
+            "harness_damage": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-06": {
+          "definition_hash": "d4e1a77e989a7096b90f6acf897bb56d6faea93f18f8363a425ec7f54b63e62c",
+          "role": "observation",
+          "option_roles": {
+            "stable": "observation",
+            "intermittent": "observation",
+            "signal_lost": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-07": {
+          "definition_hash": "a7fc8b86919d4a80278eeecac7dfea7422d4adbe03b9cb7bf08d804b8e7dcc54",
+          "role": "observation",
+          "option_roles": {
+            "comparable": "observation",
+            "rpm_varied": "observation",
+            "load_varied": "observation",
+            "throttle_lifted": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-08": {
+          "definition_hash": "6a0235f11d148aa99114046c6c24e10d79b2731e91cf83e1b0465b0620cb64d4",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-09": {
+          "definition_hash": "b6a571b8fb5e4a6ae19251e69d92195cbdbb7df02e8d17750fd0ec6dc97dacb7",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-10": {
+          "definition_hash": "07eed30bf034256b514c4313f88016022e222f7110293cdbca1956391d968c2e",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-11": {
+          "definition_hash": "52c240c20c1f3b48b9998d9196c9a3e215c0c6426c991166fb5987e7044ab688",
+          "role": "human_judgment",
+          "option_roles": {
+            "tracks_target": "human_judgment",
+            "persistent_underboost": "human_judgment",
+            "intermittent_drop": "human_judgment",
+            "overshoot": "human_judgment",
+            "unreliable": "human_judgment"
+          }
+        },
+        "PRS-12": {
+          "definition_hash": "7d3bcd97d2ddd4f360a665302e9fb010e5ac6fe7f1f6be4d2e8af7b82e5a3b2e",
+          "role": "observation",
+          "option_roles": {
+            "request_held": "observation",
+            "request_reduced": "observation",
+            "unknown": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-01": {
+          "definition_hash": "44a2b52ec53207104693842dc9ba67dfbb512b8d0d3b5959d083aef5a9b19ec3",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "pin_damage": "observation",
+            "harness_damage": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-02": {
+          "definition_hash": "9ca25b097c47e5bde0c457221a63fa112f06da37db741cf962e48a43877cd1d6",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "dtc_present": "observation",
+            "feedback_implausible": "observation",
+            "intermittent": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-03": {
+          "definition_hash": "96a25e1ae740ac63ad33bbbf804b29c448618ff335f10cbc210bd12ea333fa53",
+          "role": "observation",
+          "option_roles": {
+            "moves_smoothly": "observation",
+            "no_movement": "observation",
+            "jerky": "observation",
+            "test_rejected": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-04": {
+          "definition_hash": "19c58111fb6bae3d0d6780c12cbc303dbcb22fb2ac85be42b16eff9d4cb309be",
+          "role": "observation",
+          "option_roles": {
+            "intact": "observation",
+            "loose": "observation",
+            "clip_missing": "observation",
+            "disconnected": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-05": {
+          "definition_hash": "04261fb61bcbc24fa178800620c088d9e96e22bfb93f874bd30d421a0203f58c",
+          "role": "observation",
+          "option_roles": {
+            "smooth": "observation",
+            "binding": "observation",
+            "excessive_play": "observation",
+            "not_testable": "inspection_status"
+          }
+        },
+        "ACT-06": {
+          "definition_hash": "31c281129561d5efdf84901c924b6181f9ae14a4dc276f25b4bd952b1ead165b",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "damaged": "observation",
+            "oil_contaminated": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-07": {
+          "definition_hash": "440ef6b57f40c2f106a11e000e6d1e14a8319b737da3ffcca24e97b9f5296e45",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "dtc": "observation",
+            "suspected_leak": "observation",
+            "intermittent": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-08": {
+          "definition_hash": "4e9c86699603d5e842b353959658dd0ae2a88a129f17ef527114fa7c218d7aa7",
+          "role": "inspection_status",
+          "option_roles": {
+            "ready": "inspection_status",
+            "voltage_low": "inspection_status",
+            "temperature_invalid": "inspection_status",
+            "dtc_blocking": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-09": {
+          "definition_hash": "d290aef45cb3acfa406b2f6498396c4aa392fbdb77be7b405877361f3920a3d2",
+          "role": "inspection_status",
+          "option_roles": {
+            "completed": "inspection_status",
+            "failed": "inspection_status",
+            "aborted": "inspection_status",
+            "not_supported": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-10": {
+          "definition_hash": "94dacb2fe383f75c2db2b07090410211dac4cb887f6e0f2e60d4fe38ab3be728",
+          "role": "retest",
+          "option_roles": {
+            "recovered": "retest",
+            "still_underboost": "retest",
+            "boost_ok_symptom_remains": "retest",
+            "not_comparable": "retest",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-01": {
+          "definition_hash": "0641b92dbe3f41d6d7415492d4a43a123aed6297ce5f05f958d14b83506976b0",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "crack_clue": "observation",
+            "loose": "observation",
+            "impact": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-02": {
+          "definition_hash": "44360cf37a4ae4438ccbe2741fddfa362e242a59dbf68930edad53f2aedb6077",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "foreign_object": "observation",
+            "excess_oil": "observation",
+            "visible_damage": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-03": {
+          "definition_hash": "35123bf08a8a0702e4cbf158bf898d589d742dd010c53e6a650abe993ab3b148",
+          "role": "observation",
+          "option_roles": {
+            "dry": "observation",
+            "seepage": "observation",
+            "active_leak": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-04": {
+          "definition_hash": "5f14964d8832dcef4ea0ada2b2275575f8f6a908a9ac4f8e49fe1e649886ce96",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "trace": "observation",
+            "active_leak": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-05": {
+          "definition_hash": "ab176e3faf5ff52673754c8c5a01e0643f065a7a92bc2ae3ffc91d64b1884fbe",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "exhaust_trace": "observation",
+            "charge_leak_trace": "observation",
+            "loose": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-06": {
+          "definition_hash": "6660a39c51b618c3625af740d589e21ed03b15881305fbbcd458721a5f314c1f",
+          "role": "observation",
+          "option_roles": {
+            "no_clue": "observation",
+            "binding_clue": "observation",
+            "play_clue": "observation",
+            "not_accessible": "inspection_status"
+          }
+        },
+        "TUR-07": {
+          "definition_hash": "252a21d06ef05179cd4ae10d39c327662fb7006896696dcf9c053191a2f181c6",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "whistle": "observation",
+            "scrape": "observation",
+            "rattle": "observation",
+            "load_related_unknown": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-08": {
+          "definition_hash": "565742fc8de4a0447963a0c9305abef137f2889e868318ddadbbc3335a8d4971",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "blue": "observation",
+            "black": "observation",
+            "other": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-09": {
+          "definition_hash": "4068dca07d1af3329a72531497d0c078575d3ac75aa1a367d778afaf35ca70cf",
+          "role": "human_judgment",
+          "option_roles": {
+            "no_support": "human_judgment",
+            "weak_support": "human_judgment",
+            "multiple_supporting_facts": "human_judgment",
+            "conflict": "human_judgment"
+          }
+        },
+        "TUR-10": {
+          "definition_hash": "054cb9d3081582b536dde6855bc904f6cd9c17b3467caef65f432e69ff1f9c73",
+          "role": "disposition",
+          "option_roles": {
+            "return_to_controls": "disposition",
+            "professional_test": "disposition",
+            "cross_system": "disposition",
+            "safety_stop": "disposition"
+          }
+        },
+        "X-01": {
+          "definition_hash": "d63b38df32b19a5132b5c1ad114f21e5a6671e53161413de5441732a13cc2d50",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "random": "observation",
+            "cyl1": "observation",
+            "cyl2": "observation",
+            "cyl3": "observation",
+            "cyl4": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-02": {
+          "definition_hash": "031ecb679de7a20b0d97478e123c676986379d87ed83be433ee32865ce797742",
+          "role": "observation",
+          "option_roles": {
+            "no": "observation",
+            "yes": "observation",
+            "idle_only": "observation",
+            "intermittent": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-03": {
+          "definition_hash": "4303dd2a87835ac6ebdd398a0e62260efc6e3ecf67cf79db736a5f09d85e1053",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "coil_damage": "observation",
+            "connector_issue": "observation",
+            "harness_issue": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-04": {
+          "definition_hash": "b0f2b3f1703b4da4b28fd688b5035d630bec6b3664f07ebbb99baa38b7410d5b",
+          "role": "observation",
+          "option_roles": {
+            "normal_consistent": "observation",
+            "worn": "observation",
+            "fouled": "observation",
+            "one_cylinder_differs": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-05": {
+          "definition_hash": "eba868e40e21ba381d8233059a2fd948f7aca3cfbaa289cb46fe804c7e8185fa",
+          "role": "observation",
+          "option_roles": {
+            "not_moved": "observation",
+            "moved_with_coil": "observation",
+            "moved_with_plug": "observation",
+            "not_performed": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-06": {
+          "definition_hash": "14e66672c470e75f6dc0ceb71ae12131d78449164e14b314f0f879e6a01fdee4",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "low_pressure": "observation",
+            "high_pressure": "observation",
+            "sensor_or_control": "observation",
+            "multiple": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-07": {
+          "definition_hash": "405e2c70796c11fe3509bb4cb8028e9d7edd14fb96f9fc0950eaef7c9a1c8da6",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "low": "observation",
+            "unstable": "observation",
+            "signal_unreliable": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-08": {
+          "definition_hash": "8ade08fc54c4980cde3b7caaf54839a1a638948d8b152afa4e5fb76c782360a3",
+          "role": "observation",
+          "option_roles": {
+            "tracks": "observation",
+            "falls_under_load": "observation",
+            "excessive": "observation",
+            "signal_unreliable": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-09": {
+          "definition_hash": "2230c456c0bb16aad74ff9624e52b476a45696312dc46d7b57f41776bf071f38",
+          "role": "observation",
+          "option_roles": {
+            "no_clue": "observation",
+            "low_level": "observation",
+            "quality_suspect": "observation",
+            "restriction_suspect": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-10": {
+          "definition_hash": "72d762bc75e419d4d02c15d9978d79668d5625066b52e065490cd58d3f0e318a",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "restriction_clue": "observation",
+            "overheat_clue": "observation",
+            "rattle": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-11": {
+          "definition_hash": "ce669d9afad9f0058309c23be6cf4ffe3d7505143f64faec0fb32f3732125f6f",
+          "role": "observation",
+          "option_roles": {
+            "tracks": "observation",
+            "limited": "observation",
+            "implausible": "observation",
+            "not_available": "inspection_status"
+          }
+        },
+        "X-12": {
+          "definition_hash": "fb10e91c4a0cbd6830c89467bf68c576bf1d4d0dccee6e34a2b50c7a164743f8",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "dtc": "observation",
+            "position_abnormal": "observation",
+            "not_available": "inspection_status"
+          }
+        },
+        "X-13": {
+          "definition_hash": "38c2040325040569d1ae93b41ff5c6d2b9b073bab21d23a6cacd6892de007855",
+          "role": "human_judgment",
+          "option_roles": {
+            "ignition": "human_judgment",
+            "fuel": "human_judgment",
+            "exhaust": "human_judgment",
+            "intake_control": "human_judgment",
+            "none": "human_judgment",
+            "multiple": "human_judgment"
+          }
+        },
+        "X-14": {
+          "definition_hash": "016f1c26f28ac75affe40c9b6a3b8ef14e8bb450ccc62c14b10c9ba2c5ec3c0d",
+          "role": "disposition",
+          "option_roles": {
+            "continue_here": "disposition",
+            "specialist_handoff": "disposition",
+            "data_missing": "disposition",
+            "conflicting_facts": "disposition"
+          }
+        }
+      }
+    },
+    {
+      "template_id": "tayron-dkvb-p0236",
+      "version": "1",
+      "content_hash": "cb99433e736f2535c387c4cedb6dbcfff79388418959fcfb9b38a6016b5924b6",
+      "questions": {
+        "AIR-01": {
+          "definition_hash": "8f562cfa8473bd59391ff09028efde04176d409f23958b43a74eec07274c298c",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "open_or_misaligned": "observation",
+            "damaged": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-02": {
+          "definition_hash": "7036b07661bea371b6654d62ee5e7a168e70bf2eedd78f4d01dca3f08100fb27",
+          "role": "observation",
+          "option_roles": {
+            "clean": "observation",
+            "restricted": "observation",
+            "wet": "observation",
+            "misinstalled": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-03": {
+          "definition_hash": "6c657777cae944640f136c82cfd9999d8b3d52e8b6b6e4c23d8a532b65adef19",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "collapsed": "observation",
+            "cracked": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-04": {
+          "definition_hash": "9ecf96f5bc4d062818f312630fb773ae9ea7916ab2e9b7e997f060a84acba799",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "crack": "observation",
+            "abrasion": "observation",
+            "bulge": "observation",
+            "collapsed": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-05": {
+          "definition_hash": "ade2662167ce4bc21a8cc066a4dc7db3aab9608380c1a5ec2523262e662b9e83",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "light_uniform": "observation",
+            "localized_heavy": "observation",
+            "fresh_wet": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-06": {
+          "definition_hash": "996ad51ea1a102b4b8c7d65b950f0a259ed3dda3b3b531b5af74840c88273ca4",
+          "role": "observation",
+          "option_roles": {
+            "clear": "observation",
+            "light_contact": "observation",
+            "rub_mark": "observation",
+            "active_interference": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-07": {
+          "definition_hash": "c82ea3fcfa1098e62e57183891cb3f5b427c9ee99f6f2b15dd74306c41b8debb",
+          "role": "observation",
+          "option_roles": {
+            "seated": "observation",
+            "partially_seated": "observation",
+            "not_locked": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-08": {
+          "definition_hash": "c34a2be3b3797f4e5077002cd552fa2da5d937faf1c6a5fc2c75c5a402772078",
+          "role": "observation",
+          "option_roles": {
+            "secure": "observation",
+            "small_play": "observation",
+            "pulls_out": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-09": {
+          "definition_hash": "486bca7fb12f2aefecef3ef92ccf2bf98f8e57598da9501be2bb27a0d3cad179",
+          "role": "observation",
+          "option_roles": {
+            "aligned": "observation",
+            "misaligned": "observation",
+            "mark_unreadable": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-10": {
+          "definition_hash": "cb58da2ad899ce2186db8d1d824df24d24a04a751dd22faae2ca861534f64c59",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "twisted": "observation",
+            "pinched": "observation",
+            "missing_or_damaged": "observation",
+            "not_visible": "inspection_status"
+          }
+        },
+        "AIR-11": {
+          "definition_hash": "c9c9277beb8ac1f613fa435d110d5d0ca9f964deadb7818b99d7c4720de6cb0d",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "impact": "observation",
+            "deformed": "observation",
+            "contaminated": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-12": {
+          "definition_hash": "39f984a680bdb9d9a84d8c0de13f43f727bf697feab32bd440928ffddeae14db",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "left_suspect": "observation",
+            "right_suspect": "observation",
+            "both_suspect": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-13": {
+          "definition_hash": "e41389ecd0b66b235f4243d79012a25aafecb02e1bbf5d911e18e60b6a1b3077",
+          "role": "inspection_status",
+          "option_roles": {
+            "available": "inspection_status",
+            "alternative_safe_tool": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-14": {
+          "definition_hash": "df961e7ff92061d338c69d0b6cc29ada1baa93f754c9e5c18d5dba6e452d4dc8",
+          "role": "inspection_status",
+          "option_roles": {
+            "within_limit": "inspection_status",
+            "not_performed": "inspection_status",
+            "unsafe_stop": "inspection_status"
+          }
+        },
+        "AIR-15": {
+          "definition_hash": "d26e062c32d5c2b158112ea32ba770d0bbb67868c129e3b685bcb9c1631559aa",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "hose": "observation",
+            "connector": "observation",
+            "intercooler": "observation",
+            "throttle_side": "observation",
+            "multiple": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-16": {
+          "definition_hash": "7ed79157f110fcadfc2cd0f2277907141d016d5d2f002be9a5cc0a84659221e7",
+          "role": "human_judgment",
+          "option_roles": {
+            "audible_or_bubble": "observation",
+            "ultrasonic": "observation",
+            "trace_only": "observation",
+            "inconclusive": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-01": {
+          "definition_hash": "d19beeabb7ec051907c1e146d7622681abb1cdeedbdd6602764eebabe2cbf123",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-02": {
+          "definition_hash": "c719b5ae492d15904f83f08daeb7ebb05c78d04476cc73f383294602f5c39948",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "signal_missing": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-03": {
+          "definition_hash": "f607c215d5d2f8397ce55de927a6c48fafd4e7dac43a3978c18a00a3073e2a41",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "signal_missing": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-04": {
+          "definition_hash": "dc84b031954e90e9f1aeb0768a43fb58efcdc599d4499f04f1c3cbcccd8d9eb1",
+          "role": "observation",
+          "option_roles": {
+            "consistent": "observation",
+            "g31_outlier": "observation",
+            "g71_outlier": "observation",
+            "multiple_outliers": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-05": {
+          "definition_hash": "1fae291707a51ca76c9c1243288b0c943eafb215ff5c7ff52224372ba7274e11",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "pin_damage": "observation",
+            "moisture": "observation",
+            "harness_damage": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-06": {
+          "definition_hash": "d4e1a77e989a7096b90f6acf897bb56d6faea93f18f8363a425ec7f54b63e62c",
+          "role": "observation",
+          "option_roles": {
+            "stable": "observation",
+            "intermittent": "observation",
+            "signal_lost": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-07": {
+          "definition_hash": "a7fc8b86919d4a80278eeecac7dfea7422d4adbe03b9cb7bf08d804b8e7dcc54",
+          "role": "observation",
+          "option_roles": {
+            "comparable": "observation",
+            "rpm_varied": "observation",
+            "load_varied": "observation",
+            "throttle_lifted": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-08": {
+          "definition_hash": "6a0235f11d148aa99114046c6c24e10d79b2731e91cf83e1b0465b0620cb64d4",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-09": {
+          "definition_hash": "b6a571b8fb5e4a6ae19251e69d92195cbdbb7df02e8d17750fd0ec6dc97dacb7",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-10": {
+          "definition_hash": "07eed30bf034256b514c4313f88016022e222f7110293cdbca1956391d968c2e",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-11": {
+          "definition_hash": "52c240c20c1f3b48b9998d9196c9a3e215c0c6426c991166fb5987e7044ab688",
+          "role": "human_judgment",
+          "option_roles": {
+            "tracks_target": "human_judgment",
+            "persistent_underboost": "human_judgment",
+            "intermittent_drop": "human_judgment",
+            "overshoot": "human_judgment",
+            "unreliable": "human_judgment"
+          }
+        },
+        "PRS-12": {
+          "definition_hash": "7d3bcd97d2ddd4f360a665302e9fb010e5ac6fe7f1f6be4d2e8af7b82e5a3b2e",
+          "role": "observation",
+          "option_roles": {
+            "request_held": "observation",
+            "request_reduced": "observation",
+            "unknown": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-01": {
+          "definition_hash": "44a2b52ec53207104693842dc9ba67dfbb512b8d0d3b5959d083aef5a9b19ec3",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "pin_damage": "observation",
+            "harness_damage": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-02": {
+          "definition_hash": "9ca25b097c47e5bde0c457221a63fa112f06da37db741cf962e48a43877cd1d6",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "dtc_present": "observation",
+            "feedback_implausible": "observation",
+            "intermittent": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-03": {
+          "definition_hash": "96a25e1ae740ac63ad33bbbf804b29c448618ff335f10cbc210bd12ea333fa53",
+          "role": "observation",
+          "option_roles": {
+            "moves_smoothly": "observation",
+            "no_movement": "observation",
+            "jerky": "observation",
+            "test_rejected": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-04": {
+          "definition_hash": "19c58111fb6bae3d0d6780c12cbc303dbcb22fb2ac85be42b16eff9d4cb309be",
+          "role": "observation",
+          "option_roles": {
+            "intact": "observation",
+            "loose": "observation",
+            "clip_missing": "observation",
+            "disconnected": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-05": {
+          "definition_hash": "04261fb61bcbc24fa178800620c088d9e96e22bfb93f874bd30d421a0203f58c",
+          "role": "observation",
+          "option_roles": {
+            "smooth": "observation",
+            "binding": "observation",
+            "excessive_play": "observation",
+            "not_testable": "inspection_status"
+          }
+        },
+        "ACT-06": {
+          "definition_hash": "31c281129561d5efdf84901c924b6181f9ae14a4dc276f25b4bd952b1ead165b",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "damaged": "observation",
+            "oil_contaminated": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-07": {
+          "definition_hash": "440ef6b57f40c2f106a11e000e6d1e14a8319b737da3ffcca24e97b9f5296e45",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "dtc": "observation",
+            "suspected_leak": "observation",
+            "intermittent": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-08": {
+          "definition_hash": "4e9c86699603d5e842b353959658dd0ae2a88a129f17ef527114fa7c218d7aa7",
+          "role": "inspection_status",
+          "option_roles": {
+            "ready": "inspection_status",
+            "voltage_low": "inspection_status",
+            "temperature_invalid": "inspection_status",
+            "dtc_blocking": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-09": {
+          "definition_hash": "d290aef45cb3acfa406b2f6498396c4aa392fbdb77be7b405877361f3920a3d2",
+          "role": "inspection_status",
+          "option_roles": {
+            "completed": "inspection_status",
+            "failed": "inspection_status",
+            "aborted": "inspection_status",
+            "not_supported": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-10": {
+          "definition_hash": "94dacb2fe383f75c2db2b07090410211dac4cb887f6e0f2e60d4fe38ab3be728",
+          "role": "retest",
+          "option_roles": {
+            "recovered": "retest",
+            "still_underboost": "retest",
+            "boost_ok_symptom_remains": "retest",
+            "not_comparable": "retest",
+            "unavailable": "inspection_status"
+          }
+        }
+      }
+    },
+    {
+      "template_id": "tayron-dkvb-p0299",
+      "version": "2",
+      "content_hash": "4bcf9a91ec1deeecb905841294cc4713d663b240c48b461c32dc7e66dc7eb1f1",
+      "questions": {
+        "AIR-01": {
+          "definition_hash": "f3d9ebbc2887a51c5979a18c5ddf606ce7330281ebc461b99ac32f86a7af7400",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "open_or_misaligned": "observation",
+            "damaged": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-02": {
+          "definition_hash": "bc616709e8f61229dfac65c37ab3dbdc76936d8d0a805d073185919d495ad1c3",
+          "role": "observation",
+          "option_roles": {
+            "clean": "observation",
+            "restricted": "observation",
+            "wet": "observation",
+            "misinstalled": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-03": {
+          "definition_hash": "50c2412c64f34d90224c9f9c962a2237d57909e086b942a696cfe1b951b59f7f",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "collapsed": "observation",
+            "cracked": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-04": {
+          "definition_hash": "55a7d7a993f1a4b836fbd4c503d4c5ce581bbbee8df2e8d59df049c3acef417d",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "crack": "observation",
+            "abrasion": "observation",
+            "bulge": "observation",
+            "collapsed": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-05": {
+          "definition_hash": "567380cc7f48dd8093e1d06c51297ae4cfc819dbe1d243be7081801d2fb650ae",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "light_uniform": "observation",
+            "localized_heavy": "observation",
+            "fresh_wet": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-06": {
+          "definition_hash": "9fc409da14ed427f008052c0004ecc30fa3f005e0bc84e9d3749d0ccca020baa",
+          "role": "observation",
+          "option_roles": {
+            "clear": "observation",
+            "light_contact": "observation",
+            "rub_mark": "observation",
+            "active_interference": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-07": {
+          "definition_hash": "387774515214868db9002470a5a637a371bea5c1885d50a081d76871acb7e522",
+          "role": "observation",
+          "option_roles": {
+            "seated": "observation",
+            "partially_seated": "observation",
+            "not_locked": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-08": {
+          "definition_hash": "1349d108a45822623850e6903bc2f141ba1e3029accb4bdebb17204013a6ff24",
+          "role": "observation",
+          "option_roles": {
+            "secure": "observation",
+            "small_play": "observation",
+            "pulls_out": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-09": {
+          "definition_hash": "61ff051432556281c843e6d65b8a3f0ebf119457193004d63fc89bde05652c13",
+          "role": "observation",
+          "option_roles": {
+            "aligned": "observation",
+            "misaligned": "observation",
+            "mark_unreadable": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-10": {
+          "definition_hash": "3843fb44d7ee9a710437cfd9d48b0bebbd66d83f9459f3a2fb602212c57467cc",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "twisted": "observation",
+            "pinched": "observation",
+            "missing_or_damaged": "observation",
+            "not_visible": "inspection_status"
+          }
+        },
+        "AIR-11": {
+          "definition_hash": "0cfb858fcc0d7cbecc4b616c39d60df1a2ebfdf9a35e0f324af658263085ed7b",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "impact": "observation",
+            "deformed": "observation",
+            "contaminated": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-12": {
+          "definition_hash": "051cb73247085572aaac45a885decb0d7342143dee02b1ee56517fb0fdf7d20e",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "left_suspect": "observation",
+            "right_suspect": "observation",
+            "both_suspect": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-13": {
+          "definition_hash": "43daa27208541b82508980c06a60a093295271f1e92ae92e132d21ff07f20c53",
+          "role": "inspection_status",
+          "option_roles": {
+            "available": "inspection_status",
+            "alternative_safe_tool": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-14": {
+          "definition_hash": "0f596fcf28c86f7e52827c10f8f25cf8d1c7c483b4656831e7c84662c0a5bebc",
+          "role": "inspection_status",
+          "option_roles": {
+            "within_limit": "inspection_status",
+            "not_performed": "inspection_status",
+            "unsafe_stop": "inspection_status"
+          }
+        },
+        "AIR-15": {
+          "definition_hash": "56d7e5200aaf4f426feece6fafd1e08f198c69dbc079494cbe10d60d27b2950b",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "hose": "observation",
+            "connector": "observation",
+            "intercooler": "observation",
+            "throttle_side": "observation",
+            "multiple": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-16": {
+          "definition_hash": "e39361cdb34a60dd1d34e657875b4535796ad9f2f3279d56074a85a0cd5b5510",
+          "role": "human_judgment",
+          "option_roles": {
+            "audible_or_bubble": "observation",
+            "ultrasonic": "observation",
+            "trace_only": "observation",
+            "inconclusive": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-01": {
+          "definition_hash": "0097d0b95a9193d52fda946373d1d0bcba72c055fd075011e271e729010088d6",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-02": {
+          "definition_hash": "1ee09ef2e9a19549fcdbd46f1d7ff14ddb615f0f0a2fc0a48490ec112706c62a",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "signal_missing": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-03": {
+          "definition_hash": "aaeb8fc93729b952c2b521ac7f2eb2f541c224fdd939c80455e87e5c2a3ed4e9",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "signal_missing": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-04": {
+          "definition_hash": "1a885ed8716dcaf35a708bd3e8638b307e4cee9777b633ab0c0420716679c2a3",
+          "role": "observation",
+          "option_roles": {
+            "consistent": "observation",
+            "g31_outlier": "observation",
+            "g71_outlier": "observation",
+            "multiple_outliers": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-05": {
+          "definition_hash": "f1e5ec56040717064c612275623c28c0ff2eca4c4a113573a8985027fd850950",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "pin_damage": "observation",
+            "moisture": "observation",
+            "harness_damage": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-06": {
+          "definition_hash": "2cc3872376c34c5c8f9a0b4eed4c6775b324636f65501d7fbb555bfc5af8a10d",
+          "role": "observation",
+          "option_roles": {
+            "stable": "observation",
+            "intermittent": "observation",
+            "signal_lost": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-07": {
+          "definition_hash": "3f793e630b82446252077367b55ee084f622f3919f64020aeac0ab377eda30db",
+          "role": "observation",
+          "option_roles": {
+            "comparable": "observation",
+            "rpm_varied": "observation",
+            "load_varied": "observation",
+            "throttle_lifted": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-08": {
+          "definition_hash": "6e7117fbfebb5596d0c606a61b8e58bda10eb27a078e81bf72d4c34e481b0aeb",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-09": {
+          "definition_hash": "aa5e5ef3d54dc2a955a9aba9a145b73807e8a7728dc5338cc8681a29c5034fd9",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-10": {
+          "definition_hash": "9defa70b1843871c73b09eba2bb6e6c2a903e1f868ba2797b163cc80050f7f2e",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-11": {
+          "definition_hash": "f34309970ffd66299d51721382c4f6bd98f5422287f2f4c6a842a34ddf01966b",
+          "role": "human_judgment",
+          "option_roles": {
+            "tracks_target": "human_judgment",
+            "persistent_underboost": "human_judgment",
+            "intermittent_drop": "human_judgment",
+            "overshoot": "human_judgment",
+            "unreliable": "human_judgment"
+          }
+        },
+        "PRS-12": {
+          "definition_hash": "a048f4045bba6497d8cc53bf426b391dbaa1d28b483bf88951a5cf824d5a279f",
+          "role": "observation",
+          "option_roles": {
+            "request_held": "observation",
+            "request_reduced": "observation",
+            "unknown": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-01": {
+          "definition_hash": "c473b8ec3ef2fcf60b6a72d3d67ab81763be1fe4bcaf21bced483d2329b9dcfc",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "pin_damage": "observation",
+            "harness_damage": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-02": {
+          "definition_hash": "383fa4dd5683872c5673203b26d6c5081ef66b939caca6382b8842e5dad4e8b5",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "dtc_present": "observation",
+            "feedback_implausible": "observation",
+            "intermittent": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-03": {
+          "definition_hash": "9327c34806b578b39908360bcb76edbd2f425c369feb86fdb655972522189a56",
+          "role": "observation",
+          "option_roles": {
+            "moves_smoothly": "observation",
+            "no_movement": "observation",
+            "jerky": "observation",
+            "test_rejected": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-04": {
+          "definition_hash": "ed357026e41ed9492b520299d54876d9f47c30479f4c870790d3a6c23beda045",
+          "role": "observation",
+          "option_roles": {
+            "intact": "observation",
+            "loose": "observation",
+            "clip_missing": "observation",
+            "disconnected": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-05": {
+          "definition_hash": "f9d4a0f459b3f104af40e6c54c120ff9e08d9f92955d569c4bf36630a9eed7f5",
+          "role": "observation",
+          "option_roles": {
+            "smooth": "observation",
+            "binding": "observation",
+            "excessive_play": "observation",
+            "not_testable": "inspection_status"
+          }
+        },
+        "ACT-06": {
+          "definition_hash": "97d9cd1e87f9b35b41b03999ab164416c955bf4ddd3a8726e2b4165849317da7",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "damaged": "observation",
+            "oil_contaminated": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-07": {
+          "definition_hash": "e4256430b36a8b3293da42720242e4cac65558aed8a82ed44d919724107fc613",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "dtc": "observation",
+            "suspected_leak": "observation",
+            "intermittent": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-08": {
+          "definition_hash": "1cdce3f17db6fae67fe83075cc7eab44eb6460937c509b779ba51a1ce807c9ee",
+          "role": "inspection_status",
+          "option_roles": {
+            "ready": "inspection_status",
+            "voltage_low": "inspection_status",
+            "temperature_invalid": "inspection_status",
+            "dtc_blocking": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-09": {
+          "definition_hash": "43bba5a4a1199cf0e0f85bd740e048da8670deaa11c6c3c897ff1d1a48d48be1",
+          "role": "inspection_status",
+          "option_roles": {
+            "completed": "inspection_status",
+            "failed": "inspection_status",
+            "aborted": "inspection_status",
+            "not_supported": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-10": {
+          "definition_hash": "586d9745f263555c2f9f8ecc5fb98a09d49e615f551a60ac562aa5ca92417c3a",
+          "role": "retest",
+          "option_roles": {
+            "recovered": "retest",
+            "still_underboost": "retest",
+            "boost_ok_symptom_remains": "retest",
+            "not_comparable": "retest",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-01": {
+          "definition_hash": "e8abd8da5c0d7d5edfb17bc11f0b8ceb38315f5965834ef263252718b885d138",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "crack_clue": "observation",
+            "loose": "observation",
+            "impact": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-02": {
+          "definition_hash": "d51878919e9602b4af1fd17e48d4e9a523f4e5b4c9788a6153c6b1a8f0df1a48",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "foreign_object": "observation",
+            "excess_oil": "observation",
+            "visible_damage": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-03": {
+          "definition_hash": "471c6434357731287c4295d108ea65fbe07967b15262d15b4bd8d8cb74888e3d",
+          "role": "observation",
+          "option_roles": {
+            "dry": "observation",
+            "seepage": "observation",
+            "active_leak": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-04": {
+          "definition_hash": "0a0b330aecb0f60478a8d8c695f85057b83786887ef896ecba771f299b0e43f6",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "trace": "observation",
+            "active_leak": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-05": {
+          "definition_hash": "e72517e8bc06c31405de90692320b70092decff89df85004d3b6af0f703a92bf",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "exhaust_trace": "observation",
+            "charge_leak_trace": "observation",
+            "loose": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-06": {
+          "definition_hash": "0bddfbe9d96411a669d6a0e44f5729bc155352a9ee69063ca076bf6aebac7db9",
+          "role": "observation",
+          "option_roles": {
+            "no_clue": "observation",
+            "binding_clue": "observation",
+            "play_clue": "observation",
+            "not_accessible": "inspection_status"
+          }
+        },
+        "TUR-07": {
+          "definition_hash": "eeb4d417434c96961637b92e1d4b0509edce4a242bdfa17b52b1e35f64831e69",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "whistle": "observation",
+            "scrape": "observation",
+            "rattle": "observation",
+            "load_related_unknown": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-08": {
+          "definition_hash": "5e0e7603ee0e4ee3a2c23d047dfd7e2adba7186747b03e2cfb0a699495046397",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "blue": "observation",
+            "black": "observation",
+            "other": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "TUR-09": {
+          "definition_hash": "d8da153ecbe403d6ac82b749c537b040e6343bb1181baf824331bc7069ea8bbc",
+          "role": "human_judgment",
+          "option_roles": {
+            "no_support": "human_judgment",
+            "weak_support": "human_judgment",
+            "multiple_supporting_facts": "human_judgment",
+            "conflict": "human_judgment"
+          }
+        },
+        "TUR-10": {
+          "definition_hash": "2a9a2c367ee63e3e77e5c83be484d4e4d83a915437dfc5913d8b080f0e875200",
+          "role": "disposition",
+          "option_roles": {
+            "return_to_controls": "disposition",
+            "professional_test": "disposition",
+            "cross_system": "disposition",
+            "safety_stop": "disposition"
+          }
+        },
+        "X-01": {
+          "definition_hash": "01e0693633fa9d1ebaeb9f48fa61762d9f3d9172153d89637ded8ee7c71a1e6c",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "random": "observation",
+            "cyl1": "observation",
+            "cyl2": "observation",
+            "cyl3": "observation",
+            "cyl4": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-02": {
+          "definition_hash": "394569b593a02c03d9a5220933ec19a2b9cf3311e15473b4e02dd26f2c0f4cc2",
+          "role": "observation",
+          "option_roles": {
+            "no": "observation",
+            "yes": "observation",
+            "idle_only": "observation",
+            "intermittent": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-03": {
+          "definition_hash": "761a7c0103ff4ca228d0079d708c36ad271806a7f7e1217b8f68fb0bc5b041cc",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "coil_damage": "observation",
+            "connector_issue": "observation",
+            "harness_issue": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-04": {
+          "definition_hash": "83844ba00d43c595b3f83ac6cae5151235d198b46456c3efedde37677babc408",
+          "role": "observation",
+          "option_roles": {
+            "normal_consistent": "observation",
+            "worn": "observation",
+            "fouled": "observation",
+            "one_cylinder_differs": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-05": {
+          "definition_hash": "5a5e1a1e1c7e99260ea5f667adf1a78c03a289b42bed8da6a221fdfc8dbdf03f",
+          "role": "observation",
+          "option_roles": {
+            "not_moved": "observation",
+            "moved_with_coil": "observation",
+            "moved_with_plug": "observation",
+            "not_performed": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-06": {
+          "definition_hash": "397df6464ce3fa4fadbb194c2ec337c4b016889461615e1543e60b50a5954c4b",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "low_pressure": "observation",
+            "high_pressure": "observation",
+            "sensor_or_control": "observation",
+            "multiple": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-07": {
+          "definition_hash": "19d787f045f7d4ded946cf7cf80264eb3983488220edbafdda75424241e227ca",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "low": "observation",
+            "unstable": "observation",
+            "signal_unreliable": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-08": {
+          "definition_hash": "8a0b6514bf56547b6c79cccaa130ba5bb7d70e1c20b3b10862abfebaea7fbbda",
+          "role": "observation",
+          "option_roles": {
+            "tracks": "observation",
+            "falls_under_load": "observation",
+            "excessive": "observation",
+            "signal_unreliable": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-09": {
+          "definition_hash": "172fef0137f0399a17c033125703ec56598fddc3effe75b22a307d1fa6f12fd0",
+          "role": "observation",
+          "option_roles": {
+            "no_clue": "observation",
+            "low_level": "observation",
+            "quality_suspect": "observation",
+            "restriction_suspect": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-10": {
+          "definition_hash": "969b0bd19ade48f93c94e089a818b5b92c71f6173a71f5d307feadd9e6a8fb3a",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "restriction_clue": "observation",
+            "overheat_clue": "observation",
+            "rattle": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "X-11": {
+          "definition_hash": "dfc443404885448045096d28cee87bccf06211c77b867f4eb75e0c51ef3ae93d",
+          "role": "observation",
+          "option_roles": {
+            "tracks": "observation",
+            "limited": "observation",
+            "implausible": "observation",
+            "not_available": "inspection_status"
+          }
+        },
+        "X-12": {
+          "definition_hash": "c01ec68575e8f0d058b78306038836cb76f0ab662a6723b354e11b48d8d2d0c1",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "dtc": "observation",
+            "position_abnormal": "observation",
+            "not_available": "inspection_status"
+          }
+        },
+        "X-13": {
+          "definition_hash": "f34bee1c0e3a7158a146aba848249248a5236f4b8e5eb1ef0c20a051d20bf3f9",
+          "role": "human_judgment",
+          "option_roles": {
+            "ignition": "human_judgment",
+            "fuel": "human_judgment",
+            "exhaust": "human_judgment",
+            "intake_control": "human_judgment",
+            "none": "human_judgment",
+            "multiple": "human_judgment"
+          }
+        },
+        "X-14": {
+          "definition_hash": "8d57e7ca4f0a986221e64cf9cb226fa19ee020b78d92a5adbd4cb80172831e60",
+          "role": "disposition",
+          "option_roles": {
+            "continue_here": "disposition",
+            "specialist_handoff": "disposition",
+            "data_missing": "disposition",
+            "conflicting_facts": "disposition"
+          }
+        }
+      }
+    },
+    {
+      "template_id": "tayron-dkvb-p0236",
+      "version": "2",
+      "content_hash": "718d2db225564b6a36b481d6e7e2fc013d4fcd1e48152ab08591a4d6525112b9",
+      "questions": {
+        "AIR-01": {
+          "definition_hash": "78610352df6765df5cea857448bbc5f4b2792849bbce3ddb80b196503420bb4c",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "open_or_misaligned": "observation",
+            "damaged": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-02": {
+          "definition_hash": "41ceaa9650b90099b8154ea5769349447123034c7a1bfbb0ffc29805d21ce5ec",
+          "role": "observation",
+          "option_roles": {
+            "clean": "observation",
+            "restricted": "observation",
+            "wet": "observation",
+            "misinstalled": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-03": {
+          "definition_hash": "fb87c6341a36599bca9e51a386861d357eb5b926294aa5d782535d8de02973ee",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "collapsed": "observation",
+            "cracked": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-04": {
+          "definition_hash": "a668ccf99d8861037d76e1185105dd5571a67382883df1304b810d3a8aba2610",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "crack": "observation",
+            "abrasion": "observation",
+            "bulge": "observation",
+            "collapsed": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-05": {
+          "definition_hash": "40b1bc2984e6e913997c9cc6eedc3ecc4c1910ee55faae32c6692f8ae8db9c7a",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "light_uniform": "observation",
+            "localized_heavy": "observation",
+            "fresh_wet": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-06": {
+          "definition_hash": "e155d2d5139d3d2bf6482caf625ced66e967d410364b5b9944eeb72673d4423b",
+          "role": "observation",
+          "option_roles": {
+            "clear": "observation",
+            "light_contact": "observation",
+            "rub_mark": "observation",
+            "active_interference": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-07": {
+          "definition_hash": "94bee492a1976d59b072634cedd90c9d7d2839fc4e54343e680eec0b3e951abd",
+          "role": "observation",
+          "option_roles": {
+            "seated": "observation",
+            "partially_seated": "observation",
+            "not_locked": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-08": {
+          "definition_hash": "96b982d6ad8dbd29108a9f8065694542577106a75eaa7a8253358823f88c5a04",
+          "role": "observation",
+          "option_roles": {
+            "secure": "observation",
+            "small_play": "observation",
+            "pulls_out": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-09": {
+          "definition_hash": "be0fa015c658c8b0b059bff5701da59881d5d3960574a06988b9610e2425bd39",
+          "role": "observation",
+          "option_roles": {
+            "aligned": "observation",
+            "misaligned": "observation",
+            "mark_unreadable": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-10": {
+          "definition_hash": "a34d54ad613abb0494b22190005b945428a33d6549e9fa4f8adf8101e7798b42",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "twisted": "observation",
+            "pinched": "observation",
+            "missing_or_damaged": "observation",
+            "not_visible": "inspection_status"
+          }
+        },
+        "AIR-11": {
+          "definition_hash": "6b225953fbe2e8aeee812c0136625b8ab6b29aa53b0e67f7281e255da96eecc5",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "impact": "observation",
+            "deformed": "observation",
+            "contaminated": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-12": {
+          "definition_hash": "2995dace0321f29dfdf06fdc346d6dc29ee359dae75546c7103c198138558a93",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "left_suspect": "observation",
+            "right_suspect": "observation",
+            "both_suspect": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-13": {
+          "definition_hash": "77adbd2c21daabbaf462f6f6af4bccaa1dd58090acbfad851b0882fcda502774",
+          "role": "inspection_status",
+          "option_roles": {
+            "available": "inspection_status",
+            "alternative_safe_tool": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-14": {
+          "definition_hash": "aa618c44601831573829a6f487b31d389357881f686f56d90cb8706749ef7bfd",
+          "role": "inspection_status",
+          "option_roles": {
+            "within_limit": "inspection_status",
+            "not_performed": "inspection_status",
+            "unsafe_stop": "inspection_status"
+          }
+        },
+        "AIR-15": {
+          "definition_hash": "de6d22872c741cffb5415af0080d5113d1a85b49e7e95845dc696a65ba418781",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "hose": "observation",
+            "connector": "observation",
+            "intercooler": "observation",
+            "throttle_side": "observation",
+            "multiple": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "AIR-16": {
+          "definition_hash": "b8ecf5777b488bc2291e6db35fa121af7486099aa2e6842d3a78c136e90eef3f",
+          "role": "human_judgment",
+          "option_roles": {
+            "audible_or_bubble": "observation",
+            "ultrasonic": "observation",
+            "trace_only": "observation",
+            "inconclusive": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-01": {
+          "definition_hash": "463c8ead9d9503676d803844aaded08fab89285f328892e0a1a9e6eec9a28562",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-02": {
+          "definition_hash": "501d396c027b6f45f0e0aecb7a9c0c0395ff2836684932aab9242c1fc3c1a4b2",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "signal_missing": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-03": {
+          "definition_hash": "1bff67550682fd73b9257253b91dcd0d9e0f8193fd07215d6b011d185853c2b3",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "signal_missing": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-04": {
+          "definition_hash": "9ab2e5ce0e273ba2f732e4cd3e0fe11b12ea2b447522ca6687f0f7b6005e98dc",
+          "role": "observation",
+          "option_roles": {
+            "consistent": "observation",
+            "g31_outlier": "observation",
+            "g71_outlier": "observation",
+            "multiple_outliers": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-05": {
+          "definition_hash": "4f6848075788566fc724ed56ac80cb6d9cc839e0c67154e1381f5451079981c4",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "pin_damage": "observation",
+            "moisture": "observation",
+            "harness_damage": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-06": {
+          "definition_hash": "52329b9e730343166c5b3653dc28d4406671ddec71aad9e2289ad3d5bf1a1e0f",
+          "role": "observation",
+          "option_roles": {
+            "stable": "observation",
+            "intermittent": "observation",
+            "signal_lost": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-07": {
+          "definition_hash": "8b5307f59402258f4a5d7d428d0ea69d3f3825642533dce0ac437de57b3308f2",
+          "role": "observation",
+          "option_roles": {
+            "comparable": "observation",
+            "rpm_varied": "observation",
+            "load_varied": "observation",
+            "throttle_lifted": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-08": {
+          "definition_hash": "03d91cd6c120e780b7e861b253572a81b328e4532a56bc18aa601cc154734e69",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-09": {
+          "definition_hash": "4be1379f08a2470b4522043ccc1741eddb1ab363b0b284f34bcd4c6f02d22f22",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-10": {
+          "definition_hash": "b93e86c4ecfda39c0ae4a72dd5473377acce088a960c20a589c965de2404fcb4",
+          "role": "observation",
+          "option_roles": {
+            "recorded": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "PRS-11": {
+          "definition_hash": "07427419ab8a4159afbff3d7d1d29bddd28c4512b11ca9e2dc73fe8d6c05f0c9",
+          "role": "human_judgment",
+          "option_roles": {
+            "tracks_target": "human_judgment",
+            "persistent_underboost": "human_judgment",
+            "intermittent_drop": "human_judgment",
+            "overshoot": "human_judgment",
+            "unreliable": "human_judgment"
+          }
+        },
+        "PRS-12": {
+          "definition_hash": "4ee5ea85a674ee4f3c1059abec851494db4bdd39164040641e699966006db4da",
+          "role": "observation",
+          "option_roles": {
+            "request_held": "observation",
+            "request_reduced": "observation",
+            "unknown": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-01": {
+          "definition_hash": "3394dfc40a041e827c8b41831b32657fb2b250a1776405f92031cc4ea1d7fe36",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "pin_damage": "observation",
+            "harness_damage": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-02": {
+          "definition_hash": "fca4d63e8eb36ff8651d8ea253799b9687645583d53bd18906c7dab499fe6de3",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "dtc_present": "observation",
+            "feedback_implausible": "observation",
+            "intermittent": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-03": {
+          "definition_hash": "bba163e3dfcd9570d2dea1c7698cc9062a81316a39f9ef616bda27532495786b",
+          "role": "observation",
+          "option_roles": {
+            "moves_smoothly": "observation",
+            "no_movement": "observation",
+            "jerky": "observation",
+            "test_rejected": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-04": {
+          "definition_hash": "2bc1d52c3f2d50fd28e5f62276d65fc31349ef9bdf86776e1ad74a84e4fa5b23",
+          "role": "observation",
+          "option_roles": {
+            "intact": "observation",
+            "loose": "observation",
+            "clip_missing": "observation",
+            "disconnected": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-05": {
+          "definition_hash": "294d04b646ba5797ca51548a91b901bc73c7163a0655aff2d3dc915bd1a723f6",
+          "role": "observation",
+          "option_roles": {
+            "smooth": "observation",
+            "binding": "observation",
+            "excessive_play": "observation",
+            "not_testable": "inspection_status"
+          }
+        },
+        "ACT-06": {
+          "definition_hash": "e7f18c8147b46f7234cc22606b8cd32169953acf8bde8d4b45490a8fbd4d34f8",
+          "role": "observation",
+          "option_roles": {
+            "normal": "observation",
+            "loose": "observation",
+            "damaged": "observation",
+            "oil_contaminated": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-07": {
+          "definition_hash": "b5bf3b1eed3dd785a518b3f8bd411e70005c9ba2bf3bcd9d0726b2486469a958",
+          "role": "observation",
+          "option_roles": {
+            "none": "observation",
+            "dtc": "observation",
+            "suspected_leak": "observation",
+            "intermittent": "observation",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-08": {
+          "definition_hash": "b0d4c9ed1f813572aff77ade037fc3b4e9b9be7f8cb3f5da752521a0e87743ec",
+          "role": "inspection_status",
+          "option_roles": {
+            "ready": "inspection_status",
+            "voltage_low": "inspection_status",
+            "temperature_invalid": "inspection_status",
+            "dtc_blocking": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-09": {
+          "definition_hash": "751fbe5098264512c86235b893f0bfcbd1cfeffd5adc61cf19e141ba909e8da8",
+          "role": "inspection_status",
+          "option_roles": {
+            "completed": "inspection_status",
+            "failed": "inspection_status",
+            "aborted": "inspection_status",
+            "not_supported": "inspection_status",
+            "unavailable": "inspection_status"
+          }
+        },
+        "ACT-10": {
+          "definition_hash": "a644c89bc18b7a658827672557fbe191c18ef6e48097553db1ddf212023e795b",
+          "role": "retest",
+          "option_roles": {
+            "recovered": "retest",
+            "still_underboost": "retest",
+            "boost_ok_symptom_remains": "retest",
+            "not_comparable": "retest",
+            "unavailable": "inspection_status"
+          }
+        }
+      }
+    }
+  ]
+}

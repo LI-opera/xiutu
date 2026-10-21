@@ -30,6 +30,8 @@
 
 ## 3. 优先项：同步 v2 的资料阅读配置
 
+> 2026-10 更新：本节记录的是当时的人工对照表方案。现在发送哪些章节已改为检索资料原文选出，对照表只保留在 `evals/section-retrieval/reference_table_v1.json` 作检索评测的标准答案；记录角色单独存放在 `backend/app/topics/record_roles_v1.json`。
+
 ### 3.1 本轮核对发现
 
 `backend/app/topics/analysis_context_v1.json` 当前仅有：

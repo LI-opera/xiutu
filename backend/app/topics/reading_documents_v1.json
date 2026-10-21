@@ -1,0 +1,61 @@
+{
+  "version": "reading-documents-v1",
+  "notes": "每份资料每次分析都带上的章节（按标题），只按资料设置、不按题目。资料正文变化（content_hash 不同）时不使用这里的设置。",
+  "documents": [
+    {
+      "id": "tayron-dkvb-boost-air",
+      "version": "3",
+      "content_hash": "83c6e5e31218dd64aa1b566d1ccf0f8684fca4346e9ee9ff5e1b1dbd29059be3",
+      "always_include": [
+        "## 1. 本区域处理什么问题",
+        "## 2. 开始检查前，先把记录整理好",
+        "## 10. 处理完成后，怎样证明有效",
+        "## 11. 气路与其他区域怎样联合判断"
+      ]
+    },
+    {
+      "id": "tayron-dkvb-pressure",
+      "version": "3",
+      "content_hash": "5df3eb9e0dd5008fa96f70b1e7487456badf883a7fb5a2b3480a48565f792892",
+      "always_include": [
+        "## 1. 这个区域检查什么，不检查什么",
+        "## 2. 开始前：把数据的含义统一",
+        "## 12. 修复后怎样确认结果",
+        "## 13. 与其他排查区域怎样配合"
+      ]
+    },
+    {
+      "id": "tayron-dkvb-actuator",
+      "version": "4",
+      "content_hash": "3a44db5296b23a8fb6cf2b1867974f56a391a721f58684d76794c755bb7410c3",
+      "always_include": [
+        "## 1. 先分清两个不同的控制对象",
+        "## 2. 开始前：保留故障背景并选择检查顺序",
+        "## 14. 与其他排查区域怎样配合"
+      ]
+    },
+    {
+      "id": "tayron-dkvb-turbo",
+      "version": "4",
+      "content_hash": "94f79c64a802afa5e978cf67ade4ed650060e10cc923594f8ad59048cfaeb4b5",
+      "always_include": [
+        "## 1. 本体区域检查什么",
+        "## 2. 检查前的准备与分流",
+        "## 12. 维修路径：从外部处理到总成更换",
+        "## 13. 处理后的独立复检",
+        "## 17. 与其他区域联合分析时怎样使用"
+      ]
+    },
+    {
+      "id": "tayron-dkvb-powertrain",
+      "version": "4",
+      "content_hash": "eccad19a0fe6c577519c15f82dd8aa06a8c1cd3852f33554737ca7f45fac75c1",
+      "always_include": [
+        "## 1. 本区域与增压排查怎样衔接",
+        "## 2. 检查前的记录与作业条件",
+        "## 15. 根据已经确认的对象组织实际处理",
+        "## 16. 处理后的独立复检"
+      ]
+    }
+  ]
+}

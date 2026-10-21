@@ -138,7 +138,7 @@ area_reference_documents：title、body、content_hash、provenance
 
 源码：[analysis_context.enrich](../../backend/app/services/analysis_context.py#L17)。
 
-它读取 `backend/app/topics/analysis_context_v1.json`，先匹配模板 ID、版本、content_hash，再校验各题 definition_hash。
+记录角色读取 `backend/app/topics/record_roles_v1.json`，先匹配模板 ID、版本、content_hash，再校验各题 definition_hash；没有条目时记录为 unclassified，分析照常进行。发送哪些章节由检索资料原文选出（`retrieval_reading.py`），不再查题目→章节对照表。
 
 | 角色 | 说明 |
 | --- | --- |
@@ -199,7 +199,7 @@ area_reference_documents：title、body、content_hash、provenance
 ```text
 有有效 analysis_extracts：
   body = 合并的章节原文
-  body_scope = configured_sections_with_context
+  body_scope = retrieved_sections_with_context
   full_content_hash = 完整资料原哈希
   content_hash = 发送章节正文的新哈希
 

@@ -1,22 +1,20 @@
-"""Carry reviewed reading-guide entries to a new template version, or stop for manual review.
+"""Carry reviewed record roles to a new template version, or stop for manual review.
 
-The reading guide (backend/app/topics/analysis_context_v1.json) binds roles and source sections
-to exact question definitions and document bodies by hash. A new template version therefore
-matches nothing until it gets its own entries. This script derives them from the previously
-reviewed version and never guesses: every carried value must pass the checks below.
+Record roles (backend/app/topics/record_roles_v1.json) say what kind of information a saved
+record is: observation, inspection status, human judgment, disposition, ... They are bound
+to exact question definitions by hash, so a new template version has no roles until it gets
+its own entries. This script derives them from the previously reviewed version and never
+guesses. Which manual sections an analysis sends is chosen by search, not configured here;
+a template without roles still gets an analysis, with its records marked unclassified.
 
 Checks per question:
   - the previous version already classified this question ID;
   - the option IDs are exactly the ones the previous roles were written for;
-  - an option marked "not executed" (not_executed_not_normal) is classified as inspection_status;
-  - every referenced section exists in the new document entries.
-Checks per document:
-  - the new body is byte-identical to a configured version, so section offsets stay valid.
-    A changed body stops the script: its sections must be located and reviewed again.
+  - an option marked "not executed" (not_executed_not_normal) is classified as inspection_status.
 
 Usage (from the repository root):
   python scripts/build_analysis_context.py          # report only, writes nothing
-  python scripts/build_analysis_context.py --write  # update the reading guide in place
+  python scripts/build_analysis_context.py --write  # update the record roles in place
 """
 import argparse
 import json
@@ -26,9 +24,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT), str(ROOT / "backend")]
 
-from app.services.analysis_context import CONFIG, ROLES, digest  # noqa: E402
-
-from scripts.seed_area_references import DEFAULT_PACKAGE, build_documents  # noqa: E402
+from app.services.analysis_context import ROLES, ROLES_CONFIG, digest  # noqa: E402
 
 BUNDLE = ROOT / "resources/templates/tayron-v2"
 RELATIONS = BUNDLE / "relations.json"
@@ -40,26 +36,12 @@ class ReviewRequired(ValueError):
     """Something changed in a way only a person can classify."""
 
 
-def derive_documents(config, manifest, package=DEFAULT_PACKAGE):
-    entries = []
-    for _, doc in build_documents(package, manifest):
-        same_body = [d for d in config["documents"]
-                     if d["id"] == doc["document_id"] and d["content_hash"] == doc["content_hash"]]
-        if not same_body:
-            raise ReviewRequired(f"{doc['document_id']} v{doc['version']}: body changed; "
-                                 "locate and review its sections manually")
-        source = same_body[-1]
-        entries.append({**source, "version": doc["version"]})
-    return entries
-
-
-def derive_template(config, relation, topic, documents):
+def derive_template(config, relation, topic):
     sources = [t for t in config["templates"]
                if t["template_id"] == relation["template_id"] and t["version"] == FROM_VERSION]
     if len(sources) != 1:
         raise ReviewRequired(f"{relation['template_id']}: no reviewed v{FROM_VERSION} entry to carry")
     reviewed = sources[0]["questions"]
-    sections = {d["id"]: set(d["sections"]) for d in documents}
     questions = {}
     for q in topic["questions"]:
         where = f"{relation['template_id']} v{relation['version']} {q['id']}"
@@ -76,55 +58,41 @@ def derive_template(config, relation, topic, documents):
             role = option_roles.get(o["id"], spec["role"])
             if o.get("status_semantics") == "not_executed_not_normal" and role != "inspection_status":
                 raise ReviewRequired(f"{where}/{o['id']}: not executed but classified as {role}")
-        refs = [spec.get("references", {})] + list(spec.get("option_references", {}).values())
-        for ref in refs:
-            for doc_id, ids in ref.items():
-                missing = set(ids) - sections.get(doc_id, set())
-                if missing:
-                    raise ReviewRequired(f"{where}: sections {sorted(missing)} not in {doc_id}")
         questions[q["id"]] = {**spec, "definition_hash": digest(q)}
     return {"template_id": relation["template_id"], "version": relation["version"],
             "content_hash": digest(topic), "questions": questions}
 
 
-def build(config, relations_path=RELATIONS, manifest_path=MANIFEST, package=DEFAULT_PACKAGE):
+def build(config, relations_path=RELATIONS):
     relations = json.loads(Path(relations_path).read_text(encoding="utf-8"))
-    manifest = json.loads(Path(manifest_path).read_text(encoding="utf-8"))
-    documents = derive_documents(config, manifest, package)
     templates = []
     for relation in relations["relations"]:
-        path = Path(relations_path).parent / relation["content_file"]
-        topic = json.loads(path.read_text(encoding="utf-8"))
-        templates.append(derive_template(config, relation, topic, documents))
+        topic = json.loads((Path(relations_path).parent / relation["content_file"]).read_text(encoding="utf-8"))
+        templates.append(derive_template(config, relation, topic))
     # Replace entries of the same identity; keep every other reviewed entry unchanged.
-    new_templates = {(t["template_id"], t["version"]) for t in templates}
-    new_documents = {(d["id"], d["version"]) for d in documents}
+    new = {(t["template_id"], t["version"]) for t in templates}
     result = dict(config)
     result["templates"] = [t for t in config["templates"]
-                           if (t["template_id"], t["version"]) not in new_templates] + templates
-    result["documents"] = [d for d in config["documents"]
-                           if (d["id"], d["version"]) not in new_documents] + documents
-    return result, templates, documents
+                           if (t["template_id"], t["version"]) not in new] + templates
+    return result, templates
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("--write", action="store_true")
     args = parser.parse_args()
-    config = json.loads(CONFIG.read_text(encoding="utf-8"))
+    config = json.loads(ROLES_CONFIG.read_text(encoding="utf-8"))
     try:
-        result, templates, documents = build(config)
+        result, templates = build(config)
     except ReviewRequired as error:
         print("REVIEW REQUIRED:", error)
         raise SystemExit(1)
     for t in templates:
         print(f"template {t['template_id']} v{t['version']}: {len(t['questions'])} questions carried")
-    for d in documents:
-        print(f"document {d['id']} v{d['version']}: {len(d['sections'])} sections carried")
     changed = result != config
     if args.write and changed:
-        CONFIG.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
-        print("written:", CONFIG.relative_to(ROOT))
+        ROLES_CONFIG.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print("written:", ROLES_CONFIG.relative_to(ROOT))
     else:
         print("up to date" if not changed else "dry run: pass --write to update")
 

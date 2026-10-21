@@ -28,7 +28,7 @@ from scripts.build_analysis_context import RELATIONS  # noqa: E402
 from scripts.seed_area_references import build_documents  # noqa: E402
 
 CONFIG = ROOT / "evals/section-retrieval/config.json"
-CONTEXT = ROOT / "backend/app/topics/analysis_context_v1.json"
+CONTEXT = ROOT / "evals/section-retrieval/reference_table_v1.json"
 MANIFEST = RELATIONS.parent / "area_reference_manifest_v2.json"
 PACKAGE = ROOT / "resources/knowledge/tayron"
 OUT_DIR = ROOT / ".local-data/evals/section-retrieval"
@@ -136,11 +136,14 @@ def score(ranking, chunks, gold, top_k):
 
 
 def embedder():
+    """The vector model the analysis itself uses, chosen by the project settings (E5 or BGE-M3)."""
     from app.config import load_settings
-    from app.infrastructure.embedding_gateway import gateway
+    from app.infrastructure.model_factory import embedding_factory, selected_config
     settings = load_settings(project_env=True)
-    path = settings.embedding_path if settings.embedding_path.is_absolute() else ROOT / settings.embedding_path
-    return gateway(path)
+    config = selected_config(settings)
+    model = embedding_factory(settings, config)
+    model.fingerprint = config["config_version"]
+    return model
 
 
 def cached_vectors(model, texts, cache_path):
@@ -163,7 +166,7 @@ def evaluate(config, documents, queries, *, skip_navigation, model=None):
     if model is not None:
         for doc_id, chunks in chunks_by_doc.items():
             vectors[doc_id] = cached_vectors(model, [c.search_text for c in chunks],
-                                             OUT_DIR / "cache" / "e5-chunk-vectors.json")
+                                             OUT_DIR / "cache" / f"{model.fingerprint}-chunk-vectors.json")
     rows = []
     for query in queries:
         doc_id = query["document_id"]
@@ -252,7 +255,7 @@ def main():
     lines = [f"# 资料章节检索评测 {stamp}", "",
         f"- 题集：{config['version']}；查询 {len(rows)} 条（题目去掉题号 + 选项）；资料块 {sum(chunk_counts.values())} 个（{chunk_counts}）",
         "- 排名单位：整个 `##` 章节（同一章节的多个小节只占一个名额）；标准答案是 `###` 小节时，包含它的章节进前 k 即算命中",
-        f"- 向量模型：{'未使用（--no-dense）' if model is None else 'multilingual-e5-small（本地）'}",
+        f"- 向量模型：{'未使用（--no-dense）' if model is None else model.fingerprint + '（项目配置，与分析时相同）'}",
         f"- 及格线（事先写定）：{main_channel} 前 {k} 召回率 ≥ {config['pass']['overall']}，每份资料 ≥ {config['pass']['each_document']}",
         f"- **结果：{main_channel} 前 {k} 召回率 {overall}，{'达到' if passed else '未达到'}及格线**", "",
         "## 主分数（按章节排名；不用题号，导航章节不参与检索）", "", *table(summary, config["top_k"]), "",
