@@ -203,7 +203,7 @@ uv run python scripts/setup_workspace.py --enable-ai-budget
 
 ```powershell
 uv run python scripts/check_repository.py      # 资源完整性 + 密钥泄露扫描
-uv run pytest tests/unit -p no:cacheprovider    # 单元测试
+uv run python -m pytest tests/unit -p no:cacheprovider --basetemp .test-runs\pt   # 单元测试
 Push-Location frontend
 npm run typecheck; npm run test:wp14 -- --run   # 前端类型检查与组件测试
 Pop-Location
@@ -212,6 +212,7 @@ Pop-Location
 - 后端约 500 个测试用例，分为 `unit` / `integration` / `contract` / `probes`；前端 19 个测试文件。
 - 需要数据库的集成测试只连接显式指定的隔离库 `xiutu_test_*`，不会误连开发库。
 - 调用付费模型的 `live` 测试默认不运行。
+- 单元测试要用 `python -m pytest` 启动，测试才能导入项目里的 `scripts`；`--basetemp` 把临时目录放在项目内，避免 Windows 系统临时目录的权限错误。
 
 详见 [测试指南](docs/guides/testing.md)。
 
