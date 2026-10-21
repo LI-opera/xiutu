@@ -1,5 +1,5 @@
 {
-  "version": "area-advice-eval-v2",
+  "version": "area-advice-eval-v3",
   "template": {"template_id": "tayron-dkvb-p0299", "version": "2"},
   "notes": "全部为合成数据，只用于检查 AI 是否遵守输入中的事实与规则，不代表真实车辆或维修标准。",
   "vehicle": {"brand": "大众", "model": "探岳", "year": 2019, "engine_code": "DKVB"},
@@ -134,7 +134,7 @@
       "records": ["intercooler_suspect", "static_consistent", "frames_underboost"],
       "repairs": [],
       "checks": [
-        {"id": "no_pressure_test_now", "type": "no_step_targets", "where": "steps", "kinds": ["check", "repair", "record", "handoff"], "question_ids": ["AIR-14", "AIR-15", "AIR-16"], "text": "加压|打压|1687|检漏仪|烟雾",
+        {"id": "no_pressure_test_now", "type": "no_step_targets", "where": "steps", "kinds": ["check", "repair"], "question_ids": ["AIR-14", "AIR-15", "AIR-16"], "text": "加压|打压|1687|检漏仪|烟雾",
          "label": "现在的步骤里没有加压检漏"},
         {"id": "pressure_test_deferred", "type": "any_step_targets", "where": "branches", "kinds": ["check"], "question_ids": ["AIR-14", "AIR-15", "AIR-16"], "text": "加压|打压|1687|检漏仪|烟雾",
          "label": "加压检漏放在暂缓步骤里"}

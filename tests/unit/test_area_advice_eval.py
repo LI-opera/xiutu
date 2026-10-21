@@ -146,7 +146,8 @@ def test_deferred_pressure_test_passes_and_current_one_fails():
     only_repair = result([step("record", "记录工具缺失，具备条件后按 0.5 bar 加压定位", ["AIR-13", "AIR-14"])],
                          [("定位检漏确认右侧接口有响应", [step("repair", "处理右侧接口密封", ["AIR-15"])])])
     graded = by_id(ev.grade(case, payload, only_repair))
-    assert not graded["no_pressure_test_now"] and not graded["pressure_test_deferred"]
+    # Recording the missing tool is allowed now; what matters is that the test itself is deferred.
+    assert graded["no_pressure_test_now"] and not graded["pressure_test_deferred"]
 
 
 def test_text_match_finds_g71_without_question_ids():
