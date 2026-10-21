@@ -61,17 +61,15 @@ function Advice({ item, onQuestion }: { item: Attempt; onQuestion: (id: string) 
         <h3>操作提醒</h3><ul>{result.precautions.map((text, i) => <li key={i}>{text}</li>)}</ul>
       </section>}
       {result.steps.length > 0 && <section><h3>现在怎么做</h3>{steps(result.steps)}</section>}
-      {(result.verification || result.conditional_branches.length > 0 || result.if_unresolved) && <section className="formal-advice-followup">
-        <h3>处理后的复检与后续安排</h3>
-        {result.verification && <div className="formal-advice-verification"><h4>先确认处理效果</h4><p>{result.verification}</p></div>}
-        {result.conditional_branches.length > 0 && <div className="formal-advice-branches">
-          <h4>满足条件后，再继续</h4>
-          {result.conditional_branches.map((branch, i) => <details key={i} className="formal-advice-row">
-            <summary><span className="formal-advice-row-label">条件 {i + 1}</span><span>{branch.trigger}</span></summary>
-            <div className="formal-advice-row-body">{branch.reason && <p>{branch.reason}</p>}{steps(branch.steps)}</div>
-          </details>)}
-        </div>}
-        {result.if_unresolved && <details className="formal-advice-row"><summary>仍未解决时，如何继续</summary><div className="formal-advice-row-body"><p>{result.if_unresolved}</p></div></details>}
+      {(result.conditional_branches.length > 0 || result.if_unresolved) && <section className="formal-advice-followup">
+        {/* Retesting is recorded in the repair & retest section; the advice only lists what must wait. */}
+        <h3>暂缓的步骤与后续方向</h3>
+        <p className="formal-advice-followup-note">以下步骤需等条件满足后再做；处理后的复检请在下方“维修处理与独立复检”中记录。</p>
+        {result.conditional_branches.map((branch, i) => <details key={i} className="formal-advice-row">
+          <summary><span className="formal-advice-row-label">条件 {i + 1}</span><span>{branch.trigger}</span></summary>
+          <div className="formal-advice-row-body">{branch.reason && <p>{branch.reason}</p>}{steps(branch.steps)}</div>
+        </details>)}
+        {result.if_unresolved && <details className="formal-advice-row"><summary><span className="formal-advice-row-label">之后</span><span>当前行动完成后仍未解决</span></summary><div className="formal-advice-row-body"><p>{result.if_unresolved}</p></div></details>}
       </section>}
       {(result.missing.length > 0 || result.directions.length > 0 || result.uncertainty) && <details className="formal-advice-supplement">
         <summary><span>待确认与补充说明</span>{result.missing.length > 0 && <span className="formal-advice-count">{result.missing.length} 项待确认</span>}</summary>

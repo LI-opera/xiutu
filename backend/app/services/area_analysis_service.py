@@ -26,11 +26,11 @@ from app.services.run_service import lock_case
 from app.services.workbench_observation_service import TopicService
 from app.services.workbench_templates import is_template
 
-PROMPT_VERSION = "area-advice-v8"
+PROMPT_VERSION = "area-advice-v9"
 MATCHED_SCOPE_ID = "__matched_areas__"
-MATCHED_PROMPT_VERSION = "matched-area-advice-v12"
+MATCHED_PROMPT_VERSION = "matched-area-advice-v14"
 # Templates with observation rules also send rule_conflicts.
-MATCHED_RULES_PROMPT_VERSION = "matched-area-advice-v13"
+MATCHED_RULES_PROMPT_VERSION = "matched-area-advice-v15"
 ANALYSIS_PRINCIPLES = """
 先利用已有结果，再决定新增动作。综合判断车辆、主诉、记录及资料，不按区域逐一复述，不预设区域数量、故障结论或固定维修顺序。
 
@@ -42,14 +42,14 @@ reference_reading_guide.result_methods 提供已选结果直接关联的方法�
 组织建议前，逐条区分已取得的结果、尚缺的事实、当前不能执行的动作。已完成的试验及复检结果必须推进下一步判断，不能退回“再做一次看看”。若原结果缺少可信条件，只核实具体缺失条件，并说明为什么足以改变处理；不要无目的重复整套验证。资料支持处理且记录条件成立时，给出处理对象、方法和独立复检，不无限追加检查。
 各异常只有共现关系时，不写成确定因果或统一根因。用户选择的方向/交接意见仍需依据事实分析，未填写此类判断不是缺少测量事实。数值、单位或工况冲突时，指出具体冲突和最小核实方法，不直接断言部件坏了。
 
-行动组织：先识别会阻止启动、运行、负荷、拆装或测量的条件，约束整份建议中所有依赖这些条件的动作。允许的静态检查可以并行；必须等待风险解除或结果确认的动作进入 conditional_branches。不能只在 precautions 写停止要求，却在 steps/retest/verification 安排被禁止的动作。prerequisites 写明确的放行条件，stop_condition 写实际相关的中止条件；无此条件才留空。
+行动组织：先识别会阻止启动、运行、负荷、拆装或测量的条件，约束整份建议中所有依赖这些条件的动作。允许的静态检查可以并行；必须等待风险解除或结果确认的动作进入 conditional_branches。不能只在 precautions 写停止要求，却在 steps/retest/conditional_branches 安排被禁止的动作。prerequisites 写明确的放行条件，stop_condition 写实际相关的中止条件；无此条件才留空。
 分支 trigger 必须是执行该分支之前能够成立的条件；不得以该分支内检查的结果作为启动该检查的条件。尚未取得的结果先安排采集，拿到不同结果后再分支处理。某一步结束不自动证明另一步前提成立。
 一个行动对应一个能操作并单独验证的目标。同一连接、同一操作可合并；工具、对象、验证方式不同的独立异常分开。无需把所有问题凑成一条线，也不得把多个系统塞进“检查其他方向”。重要已记录异常应有处理、核实、交接或明确暂缓理由，不要求所有区域检查完才推进。
 
 每项行动的 title 是简短的对象加动作；action 根据资料写清当前所需对象、工具或测量方式、操作及结果区分。资料已有方法不能退化成“按资料检查”“核对电路”“进一步检测”。缺少精确规格时不编造阈值、针脚、扭矩；仍写出有依据的定位方法和需要核对的参数。reason 只解释哪些已有结果支持此动作、新动作解决什么不确定性；retest 写处理后新的观察及结果对下一步的影响，不能忽略安全条件。已记录结果不再作为待取得结果。
 
 summary 只用短段落说当前优先决定、可并行事项及关键阻碍，避免逐区域列异常。steps 放当前有依据可推进的行动。conditional_branches 放条件未满足的后续动作。missing 只列会改变当前决定且未在步骤中安排的事实缺口，说明获得方法与影响，不让用户替你判断去向；无法对应实际问题 ID 时写入相关行动，不编造 ID。
-directions 只保留未在 summary/steps 说过的竞争解释或反证；没有新增信息留空。uncertainty、verification、if_unresolved、precautions 同样不重复清单；整体复检不能绕过各动作的放行条件。不为了填满栏目加内容，也不通过删除执行条件缩短篇幅。
+directions 只保留未在 summary/steps 说过的竞争解释或反证；没有新增信息留空。uncertainty、precautions 同样不重复清单。verification 与 if_unresolved 一律留空：每项行动的复检写在该行动的 retest，处理后的实际复检由用户在维修复检中另行记录；当前行动全部完成后仍未解决时的去向，写成 trigger 为“当前行动完成后仍未解决”的 conditional_branches，或写入 directions。不为了填满栏目加内容，也不通过删除执行条件缩短篇幅。
 输出前逐项核对：是否重复已完成验证？是否把不同限制误认作因果？分支是否循环？停止要求是否与后续行动冲突？重要异常是否只被提到而无安排？每项具体操作是否足以推进？删除重复但保留必要条件。
 保持给定 JSON 结构，不固定行动数量。source_ids、question_ids、basis_observation_ids 仅引用输入中存在且支持该行动的对象；内部编号放引用字段，不在正文堆题号。资料支持与推断分开，建议不等于已维修。中文输出。
 

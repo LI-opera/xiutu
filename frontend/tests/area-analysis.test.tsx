@@ -128,3 +128,21 @@ it('separates action headings, keeps conditions visible and groups valid questio
   expect(screen.queryByText('查看依据')).toBeNull();
   expect(request.mock.calls.every(([, options]) => options?.method !== 'POST')).toBe(true);
 });
+
+it('lists only deferred steps after the current actions and leaves retesting to the repair section', async () => {
+  vi.spyOn(apiClient, 'request').mockResolvedValue({ ...baseline, history: [{
+    id: 'old', status: 'completed', stale: false, model: 'fixture', input_revision: 12,
+    documents: [], observations: [], questions: [],
+    result: { summary: '先处理接头', directions: [], missing: [], precautions: [], steps: [],
+      verification: '逐项复述各步骤的核对内容', if_unresolved: '交由专业检测',
+      conditional_branches: [{ trigger: '具备检漏设备后', steps: [] }] },
+  }] });
+  mount();
+  expect(await screen.findByRole('heading', { name: '暂缓的步骤与后续方向' })).toBeTruthy();
+  expect(screen.queryByText('处理后的复检与后续安排')).toBeNull();
+  // An older result may still carry the overall verification text; it repeats the per-step checks.
+  expect(screen.queryByText('逐项复述各步骤的核对内容')).toBeNull();
+  expect(screen.getByText('具备检漏设备后')).toBeTruthy();
+  fireEvent.click(screen.getByText('当前行动完成后仍未解决'));
+  expect(screen.getByText('交由专业检测')).toBeTruthy();
+});

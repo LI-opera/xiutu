@@ -309,3 +309,8 @@ class AreaAdviceV3(CaseAdviceOpenV2):
     """Used only by area advice; historical snapshots retain their original shape."""
     steps: list[AreaAdviceAction] = Field(default_factory=list, max_length=30)
     conditional_branches: list[AreaAdviceBranch] = Field(default_factory=list, max_length=12)
+    # Kept optional so earlier saved results still validate; new advice leaves them empty.
+    verification: str | None = Field(default=None, max_length=6000,
+        description="留空。各行动的复检写在其 retest；处理后的实际复检由用户另行记录。")
+    if_unresolved: str | None = Field(default=None, max_length=4000,
+        description="留空。当前行动完成后仍未解决的去向写入 conditional_branches 或 directions。")
