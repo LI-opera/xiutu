@@ -18,8 +18,10 @@ def _areas(row):
 
 
 class TemplateRepairService:
-    def __init__(self, engine):
+    def __init__(self, engine, topic_service=None):
         self.engine = engine
+        # Writes post-repair re-checks as ordinary records; optional for read-only callers.
+        self.topic_service = topic_service
 
     def get(self, actor, case_id):
         with UnitOfWork(self.engine) as uow:
@@ -69,6 +71,11 @@ class TemplateRepairService:
                 raise DomainError("RETEST_ALREADY_RECORDED", "本轮复检已保存；如再次处理，请建立新轮次。", 409)
             if body.next_area_id and (body.next_area_id not in areas or body.next_area_id == record["area_id"]):
                 raise DomainError("NEXT_AREA_INVALID", "下一排查区域必须是本病例的另一个匹配区域。", 422)
+            rechecks = getattr(body, "observations", None) or []
+            if len({item.question_id for item in rechecks}) != len(rechecks):
+                raise DomainError("RETEST_QUESTION_DUPLICATE", "同一复检项目只能提交一次。", 422)
+            for item in rechecks:
+                case = self._write_recheck(conn, actor, case, record, item)
             conn.execute(update(rounds).where(rounds.c.id == round_id).values(
                 retest_condition=body.retest_condition, retest_outcome=body.retest_outcome,
                 retest_evidence=body.retest_evidence.strip(), next_area_id=body.next_area_id,
@@ -76,3 +83,34 @@ class TemplateRepairService:
             conn.execute(update(cases).where(cases.c.id == case_id).values(
                 revision=cases.c.revision + 1, updated_at=func.now()))
         return self.get(actor, case_id)
+
+    def _write_recheck(self, conn, actor, case, record, item):
+        """Save one re-checked question as a new record that supersedes the pre-repair one.
+
+        The old answer stays in history; summaries, rule calculations and AI input then use
+        the post-repair value. Returns the refreshed case row.
+        """
+        from app.services.workbench_observation_service import TopicAnswer
+        from app.services.workbench_topic_workflow import workflow_for
+
+        if self.topic_service is None:
+            raise DomainError("RETEST_RECORDS_UNAVAILABLE", "当前服务未启用复检记录保存。", 503)
+        module = self.topic_service._topic(case)
+        topic, _ = module.catalog()
+        q = next((q for q in topic["questions"] if q["id"] == item.question_id), None)
+        if q is None or q.get("area_id") != record["area_id"]:
+            raise DomainError("RETEST_QUESTION_INVALID", "复检项目不属于本轮处理区域。", 422)
+        if (q.get("capture") or {}).get("batch_id_required"):
+            raise DomainError("RETEST_BATCH_UNSUPPORTED",
+                              "成组采集的读数暂不支持在复检中单项重录，请写入复检证据。", 422)
+        rows = self.topic_service._rows(conn, case["id"], module.TOPIC_VERSION)
+        existing = workflow_for(topic, template_bound=True).effective(rows, q["id"], None)
+        answer = TopicAnswer(expected_revision=case["revision"], topic_version=topic["version"],
+                             question_id=q["id"], option_ids=item.option_ids, fields=item.fields,
+                             note=item.note, unavailable_reason=item.unavailable_reason,
+                             correction_reason="处理后复检")
+        self.topic_service._write(conn, actor, case, module, answer,
+                                  existing["id"] if existing else None,
+                                  extra_payload={"repair_round_id": str(record["id"]),
+                                                 "operation_type": "post_repair_recheck"})
+        return conn.execute(select(cases).where(cases.c.id == case["id"])).mappings().one()

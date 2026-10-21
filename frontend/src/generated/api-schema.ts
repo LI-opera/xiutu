@@ -1734,6 +1734,27 @@ export interface components {
             /** Expected Revision */
             expected_revision: number;
         };
+        /** RecheckInput */
+        RecheckInput: {
+            /** Fields */
+            fields?: {
+                [key: string]: unknown;
+            };
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+            /** Option Ids */
+            option_ids: string[];
+            /** Question Id */
+            question_id: string;
+            /**
+             * Unavailable Reason
+             * @default
+             */
+            unavailable_reason: string;
+        };
         /** ReindexInput */
         ReindexInput: {
             /** Config Version */
@@ -1865,6 +1886,8 @@ export interface components {
             expected_revision: number;
             /** Next Area Id */
             next_area_id?: string | null;
+            /** Observations */
+            observations?: components["schemas"]["RecheckInput"][];
             /** Retest Condition */
             retest_condition: string;
             /** Retest Evidence */

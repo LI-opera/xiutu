@@ -28,6 +28,7 @@ from app.services.area_service import AreaService
 from app.services.area_ranking_service import AreaRankingService
 from app.services.area_analysis_service import AreaAnalysisService
 from app.services.template_repair_service import TemplateRepairService
+from app.services.workbench_observation_service import TopicService
 from app.services.case_service import CaseService
 from app.services.case_analysis_read_service import CaseAnalysisReadService
 from app.services.correction_service import CorrectionService
@@ -76,7 +77,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.area_ranking_service = AreaRankingService(app.state.case_service, settings)
     app.state.area_analysis_service = AreaAnalysisService(app.state.case_service, settings)
-    app.state.template_repair_service = TemplateRepairService(engine)
+    app.state.template_repair_service = TemplateRepairService(
+        engine, TopicService(app.state.case_service))
     app.state.run_service = RunService(engine)
     app.state.diagnosis_read_service = DiagnosisReadService(engine, settings)
     app.state.observation_service = ObservationService(engine, settings)

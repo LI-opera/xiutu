@@ -2179,6 +2179,48 @@
         "title": "RankRequest",
         "type": "object"
       },
+      "RecheckInput": {
+        "properties": {
+          "fields": {
+            "additionalProperties": true,
+            "title": "Fields",
+            "type": "object"
+          },
+          "note": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Note",
+            "type": "string"
+          },
+          "option_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Option Ids",
+            "type": "array"
+          },
+          "question_id": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Question Id",
+            "type": "string"
+          },
+          "unavailable_reason": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Unavailable Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "question_id",
+          "option_ids"
+        ],
+        "title": "RecheckInput",
+        "type": "object"
+      },
       "ReindexInput": {
         "additionalProperties": false,
         "properties": {
@@ -2483,6 +2525,14 @@
               }
             ],
             "title": "Next Area Id"
+          },
+          "observations": {
+            "items": {
+              "$ref": "#/components/schemas/RecheckInput"
+            },
+            "maxItems": 40,
+            "title": "Observations",
+            "type": "array"
           },
           "retest_condition": {
             "pattern": "^(same|different|unavailable)$",

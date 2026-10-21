@@ -26,12 +26,22 @@ class RepairInput(BaseModel):
     repair_note: str = Field(default="", max_length=4000)
 
 
+# One question re-answered after the repair; saved as an ordinary record.
+class RecheckInput(BaseModel):
+    question_id: str = Field(min_length=1, max_length=80)
+    option_ids: list[str] = Field(min_length=1, max_length=20)
+    fields: dict[str, object] = Field(default_factory=dict)
+    note: str = Field(default="", max_length=2000)
+    unavailable_reason: str = Field(default="", max_length=2000)
+
+
 class RetestInput(BaseModel):
     expected_revision: int = Field(ge=0)
     retest_condition: str = Field(pattern="^(same|different|unavailable)$")
     retest_outcome: str = Field(pattern="^(resolved|persists|uncertain)$")
     retest_evidence: str = Field(min_length=1, max_length=4000)
     next_area_id: str | None = None
+    observations: list[RecheckInput] = Field(default_factory=list, max_length=40)
 
 
 @router.get("/{case_id}/template-repairs")

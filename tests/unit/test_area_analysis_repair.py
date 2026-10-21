@@ -121,3 +121,35 @@ def test_prompts_explain_before_after_and_unconfirmed_retests():
     for prompt in (SYSTEM_PROMPT, MATCHED_SYSTEM_PROMPT):
         assert "repair_rounds" in prompt and "after_repair_round_id" in prompt
         assert "不能视为已确认解决" in prompt
+
+
+def test_rechecked_record_keeps_its_pre_repair_value_for_comparison():
+    treated = repair("boost-air", 4, "persists")
+    view = view_with([("AIR-02", 3)], [treated])
+    original = view["observations"][0]
+    question = next(q for q in view["topic"]["questions"] if q["id"] == "AIR-02")
+    view["observations"] = [{**original, "effective": False}, {
+        "id": str(uuid4()), "question_id": "AIR-02", "effective": True, "created_revision": 6,
+        "supersedes_id": original["id"],
+        "payload": {"question_id": "AIR-02", "option_ids": [question["options"][1]["id"]],
+                    "repair_round_id": treated["id"]}}]
+    with no_reading_guide():
+        payload = build_input(view, "boost-air", [])
+    sent = payload["observations"][0]
+    assert sent["after_repair_round_id"] == treated["id"]
+    assert sent["option_ids"] == [question["options"][1]["id"]]
+    assert sent["before_repair"]["id"] == original["id"]
+    assert sent["before_repair"]["option_labels"] == [question["options"][0]["label"]]
+
+
+def test_a_correction_made_before_the_repair_is_not_a_before_after_pair():
+    view = view_with([("AIR-02", 3)], [repair("boost-air", 8)])
+    original = view["observations"][0]
+    question = next(q for q in view["topic"]["questions"] if q["id"] == "AIR-02")
+    view["observations"] = [{**original, "effective": False}, {
+        "id": str(uuid4()), "question_id": "AIR-02", "effective": True, "created_revision": 5,
+        "supersedes_id": original["id"],
+        "payload": {"question_id": "AIR-02", "option_ids": [question["options"][1]["id"]]}}]
+    with no_reading_guide():
+        sent = build_input(view, "boost-air", [])["observations"][0]
+    assert sent["after_repair_round_id"] is None and sent["before_repair"] is None
