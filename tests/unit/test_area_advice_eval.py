@@ -127,6 +127,9 @@ def test_repeat_repair_is_caught_and_retest_first_passes():
     assert by_id(ev.grade(case, payload, good))["no_repeat_repair"]
     assert not by_id(ev.grade(case, payload, bad))["first_step_is_check"]
     assert not by_id(ev.grade(case, payload, bad))["no_repeat_repair"]
+    # Collecting the retest frames is a record step; it still counts as retesting first.
+    collect = result([step("record", "接头复位后按原工况采集压力", ["PRS-08"])])
+    assert by_id(ev.grade(case, payload, collect))["first_step_is_check"]
 
 
 def test_deferred_pressure_test_passes_and_current_one_fails():
@@ -138,6 +141,11 @@ def test_deferred_pressure_test_passes_and_current_one_fails():
         "refs_exist": True, "retired_fields_empty": True,
         "no_pressure_test_now": True, "pressure_test_deferred": True}
     graded = by_id(ev.grade(case, payload, bad))
+    assert not graded["no_pressure_test_now"] and not graded["pressure_test_deferred"]
+    # A branch that only repairs what a leak test found does not defer the test itself.
+    only_repair = result([step("record", "记录工具缺失，具备条件后按 0.5 bar 加压定位", ["AIR-13", "AIR-14"])],
+                         [("定位检漏确认右侧接口有响应", [step("repair", "处理右侧接口密封", ["AIR-15"])])])
+    graded = by_id(ev.grade(case, payload, only_repair))
     assert not graded["no_pressure_test_now"] and not graded["pressure_test_deferred"]
 
 

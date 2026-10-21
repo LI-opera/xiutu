@@ -191,9 +191,11 @@ def check_result(check, result):
     if kind == "first_step_kind":
         steps = result.get("steps") or []
         actual = steps[0].get("kind") if steps else None
-        return actual == check["kind"], f"第一步类型：{actual or '没有步骤'}"
+        return actual in check["kinds"], f"第一步类型：{actual or '没有步骤'}"
     if kind == "any_step_targets":
         for location, index, step in _steps(result, check["where"]):
+            if check.get("kinds") and step.get("kind") not in check["kinds"]:
+                continue
             reasons = _hits(step, check)
             if reasons:
                 return True, f"{_label(location, index, step)}：{'；'.join(reasons)}"
