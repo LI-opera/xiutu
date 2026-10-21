@@ -9,3 +9,7 @@ frontend/public/** -text
 
 # Tokenizer assets are integrity-checked byte resources
 backend/app/retrieval/assets/** -text
+
+# Frozen B01 catalog: its content hash (recorded in the B02 rules) was computed
+# on CRLF bytes, so check it out with CRLF on every platform.
+backend/app/topics/tanyue_dkvb_p0299_b01.json text eol=crlf
