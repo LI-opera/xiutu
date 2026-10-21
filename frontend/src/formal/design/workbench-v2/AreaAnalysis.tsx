@@ -105,6 +105,9 @@ export function AreaAnalysis({ caseId, areaId, revision, onQuestion }: { caseId:
   const endpoint = areaId ? `/cases/${caseId}/areas/${areaId}/analysis` : `/cases/${caseId}/matched-areas/analysis`;
   const query = useQuery({ queryKey: ['area-analysis', caseId, areaId ?? 'matched', revision],
     queryFn: ({ signal }) => apiClient.request<Analysis>(endpoint, { signal }),
+    // Same case and scope: keep the previous result visible while the new revision loads.
+    placeholderData: (previous, previousQuery) => previousQuery?.queryKey[1] === caseId
+      && previousQuery?.queryKey[2] === (areaId ?? 'matched') ? previous : undefined,
     refetchInterval: q => q.state.data?.history.some(h => h.status === 'running') ? 2500 : false });
   const data = query.data;
   const current = data?.history.find(item => !item.stale);

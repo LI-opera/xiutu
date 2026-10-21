@@ -165,3 +165,26 @@ it('shows the saved conclusion instead of disabled inputs once the round is rete
   expect(screen.queryByRole('button', { name: /本轮处理后，原问题是否仍存在/ })).toBeNull();
   expect(screen.queryByRole('heading', { name: '结果与转区' })).toBeNull();
 });
+
+it('keeps the section on screen after saving a repair and moves straight to step 2', async () => {
+  const scroll = vi.fn();
+  Element.prototype.scrollIntoView = scroll;
+  let rounds: unknown[] = [];
+  let release: () => void = () => undefined;
+  vi.spyOn(apiClient, 'request').mockImplementation(async (_path, options) => {
+    if (options?.method === 'POST') { rounds = [{ id: 'round', area_id: 'alpha', repair_action: '复紧卡扣', repair_note: '', created_at: '2026-09-26T00:00:00Z', retested_at: null }]; return {} as never; }
+    return { ...snapshot, rounds } as never;
+  });
+  const ui = render(<TemplateRepairRetest {...props} />, { wrapper: wrapper() });
+  fireEvent.click(await screen.findByRole('button', { name: /本轮对区域甲做了什么处理/ }));
+  fireEvent.change(screen.getByLabelText('实际处理动作'), { target: { value: '复紧卡扣' } });
+  fireEvent.click(screen.getByRole('button', { name: '保存实际处理，进入复检' }));
+  expect(await screen.findByRole('button', { name: '与故障发生时可比' })).toBeTruthy();
+  expect(scroll).toHaveBeenCalled();
+  // A new revision refetches the rounds; the previous content stays mounted meanwhile.
+  vi.spyOn(apiClient, 'request').mockImplementation(() => new Promise(resolve => { release = () => resolve({ ...snapshot, rounds } as never); }));
+  ui.rerender(<TemplateRepairRetest {...props} revision={8} />);
+  expect(screen.getByRole('heading', { name: '第 2 步 · 独立复检' })).toBeTruthy();
+  expect(screen.queryByText('正在读取处理记录…')).toBeNull();
+  release();
+});

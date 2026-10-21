@@ -41,7 +41,12 @@ function RepairArea({ caseId, areaId, revision, questions, cards, observations, 
   const [error, setError] = useState('');
   const [open, setOpen] = useState<string | null>(null);
   const query = useQuery({ queryKey: ['template-repairs', caseId, revision],
-    queryFn: ({ signal }) => apiClient.request<Snapshot>(`/cases/${caseId}/template-repairs`, { signal }) });
+    queryFn: ({ signal }) => apiClient.request<Snapshot>(`/cases/${caseId}/template-repairs`, { signal }),
+    // Keep the section on screen while a new revision loads; unmounting it shrank the page
+    // and the browser jumped up to the AI analysis after every save.
+    placeholderData: (previous, previousQuery) => previousQuery?.queryKey[1] === caseId ? previous : undefined });
+  const stepTwo = useRef<HTMLElement>(null);
+  const justSavedRepair = useRef(false);
   const data = query.data;
   const rounds = data?.rounds.filter(item => item.area_id === areaId) ?? [];
   const latest = rounds[0];
@@ -53,6 +58,12 @@ function RepairArea({ caseId, areaId, revision, questions, cards, observations, 
     const identity = `${latest?.id ?? 'new'}:${latest?.retested_at ?? 'pending'}`;
     if (roundIdentity.current !== undefined && roundIdentity.current !== identity) {
       setAction(''); setNote(''); setError(''); clearRetest();
+      if (justSavedRepair.current && pending) {
+        // Continue where the user is: open the first retest item instead of leaving them to scroll.
+        setOpen('condition');
+        stepTwo.current?.scrollIntoView?.({ block: 'start', behavior: 'smooth' });
+      }
+      justSavedRepair.current = false;
     }
     roundIdentity.current = identity;
   }, [data, latest?.id, latest?.retested_at, pending]);
@@ -122,8 +133,9 @@ function RepairArea({ caseId, areaId, revision, questions, cards, observations, 
       await apiClient.request(`/cases/${caseId}/template-repairs`, { method: 'POST', body: {
         expected_revision: revision, area_id: areaId, repair_action: action.trim(), repair_note: note.trim() } });
       setAction(''); setNote(''); clearRetest();
+      justSavedRepair.current = true;
       await query.refetch(); onChanged();
-    } catch (cause) { setError(errorText(cause)); await query.refetch(); onChanged(); }
+    } catch (cause) { justSavedRepair.current = false; setError(errorText(cause)); await query.refetch(); onChanged(); }
     finally { setBusy(false); }
   };
   const saveRetest = async () => {
@@ -150,7 +162,7 @@ function RepairArea({ caseId, areaId, revision, questions, cards, observations, 
             <label>补充说明（可选）<textarea value={note} disabled={busy} onChange={e => setNote(e.target.value)} maxLength={4000} /></label>
             <button type="button" className="prototype-button" disabled={busy || !action.trim()} onClick={() => void saveRepair()}>保存实际处理，进入复检</button></div>)}
       </article>
-      <article className="formal-retest-step" aria-label="第 2 步 · 独立复检"><h3>第 2 步 · 独立复检</h3>
+      <article ref={stepTwo} className="formal-retest-step" aria-label="第 2 步 · 独立复检"><h3>第 2 步 · 独立复检</h3>
         <p>{pending ? '按顺序填写：复检工况 → 重新检查的项目 → 原问题是否仍存在，最后一起保存。' : latest?.retested_at ? '本轮复检已保存；如再次处理，请先在第 1 步建立新轮次。' : '先在第 1 步保存实际处理，再填写复检。'}</p>
         {!pending && latest?.retested_at && <section className="formal-retest-conclusion" aria-label="本轮复检结论">
           <p><b>{conditions[latest.retest_condition as keyof typeof conditions]} · {outcomes[latest.retest_outcome as keyof typeof outcomes]}</b></p>
