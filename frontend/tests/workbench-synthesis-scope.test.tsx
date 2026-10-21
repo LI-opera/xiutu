@@ -27,13 +27,13 @@ it('links a template summary to the selected matched area and can show all match
   const { rerender } = render(<SynthesisGrid data={data as never} label={(id) => id} questionMap={questionMap as never}
     templateBound selectedAreaId="pressure" />);
 
-  expect(screen.getByText(/全部 2 个匹配区域/)).toBeTruthy();
+  expect(screen.getByText(/当前汇总全部匹配区域/)).toBeTruthy();
   expect(screen.getByRole('button', { name: /增压压力测量 · PRS-01/ })).toBeTruthy();
   expect(screen.getByRole('button', { name: /增压空气通路 · AIR-01/ })).toBeTruthy();
   expect(screen.queryByText('IN-08')).toBeNull();
 
   fireEvent.click(screen.getByRole('button', { name: '只看当前区域' }));
-  expect(screen.getByText(/当前区域 · 增压压力测量/)).toBeTruthy();
+  expect(screen.getByText(/当前汇总“增压压力测量”/)).toBeTruthy();
   expect(screen.getByRole('button', { name: 'PRS-01' })).toBeTruthy();
   expect(screen.getByRole('button', { name: 'PRS-02' })).toBeTruthy();
   expect(screen.getByRole('button', { name: /压力缺项：尚未记录/ })).toBeTruthy();
@@ -42,7 +42,7 @@ it('links a template summary to the selected matched area and can show all match
   fireEvent.click(screen.getByRole('button', { name: '查看全部匹配区域' }));
   rerender(<SynthesisGrid data={data as never} label={(id) => id} questionMap={questionMap as never}
     templateBound selectedAreaId="boost-air" />);
-  expect(screen.getByText(/当前区域 · 增压空气通路/)).toBeTruthy();
+  expect(screen.getByText(/当前汇总“增压空气通路”/)).toBeTruthy();
   expect(screen.getByRole('button', { name: 'AIR-01' })).toBeTruthy();
   expect(screen.getByRole('button', { name: 'AIR-02' })).toBeTruthy();
   expect(screen.queryByRole('button', { name: 'PRS-01' })).toBeNull();

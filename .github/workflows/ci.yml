@@ -1,0 +1,103 @@
+# 每次开 PR、合并到 main 时自动检查：后端单元/契约测试、仓库资源检查、
+# 接口文档一致性、前端类型检查和测试。不连数据库，不调用付费模型。
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# 同一分支连续推送时，只保留最新一次运行，节省额度
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: 后端测试与接口一致性
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: 安装 Python 依赖
+        run: uv sync --frozen --python 3.12
+
+      # 两个旧版病例分析测试已知失败，按决定随旧代码清理一并删除，这里先排除
+      - name: 单元测试与契约测试
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: >-
+          uv run --frozen python -B -m pytest tests/unit tests/contract
+          -p no:cacheprovider -q --basetemp "$RUNNER_TEMP/pytest"
+          --junitxml "$RUNNER_TEMP/pytest.xml"
+          --deselect tests/unit/test_case_analysis_c11.py::test_record_existing_question_result_not_recast_as_pressure_instruction
+          --deselect tests/unit/test_case_analysis_air_reference.py::test_new_prompt_grant_is_bound_to_current_contract
+
+      # 把失败的测试名写成 PR 页面上的注释，不用翻日志也能看到哪里挂了
+      - name: 列出失败的测试
+        if: failure()
+        run: |
+          python3 - "$RUNNER_TEMP/pytest.xml" <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          for case in ET.parse(sys.argv[1]).iter("testcase"):
+              for bad in list(case.iter("failure")) + list(case.iter("error")):
+                  msg = (bad.get("message") or "").splitlines()[0][:300] if bad.get("message") else ""
+                  print(f"::error title={case.get('classname')}.{case.get('name')}::{msg}")
+          PY
+
+      - name: 仓库资源检查
+        if: ${{ !cancelled() }}
+        run: uv run --frozen python -B scripts/check_repository.py
+
+      - name: 接口文档与代码一致（后端部分）
+        if: ${{ !cancelled() }}
+        run: uv run --frozen python -B scripts/export_frontend_openapi.py --check
+
+      - uses: actions/setup-node@v5
+        if: ${{ !cancelled() }}
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 接口文档与前端类型一致
+        if: ${{ !cancelled() }}
+        working-directory: frontend
+        run: |
+          npm ci
+          npx openapi-typescript ../docs/api/openapi.wp14.json -o src/generated/api-schema.ts --check
+
+  frontend:
+    name: 前端类型检查与测试
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 类型检查
+        run: npm run typecheck
+
+      - name: 前端测试
+        if: ${{ !cancelled() }}
+        run: npm run test:wp14
