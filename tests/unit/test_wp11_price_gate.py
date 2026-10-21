@@ -87,8 +87,8 @@ def test_config_and_post_reservation_deadline_remain_fail_closed(tmp_path, monke
     gateway = DeepSeekGateway(settings, paid=True)
     reserve = gateway.ledger.reserve
 
-    def expire_after_reserving(*args):
-        reserve(*args)
+    def expire_after_reserving(*args, **kwargs):
+        reserve(*args, **kwargs)
         gateway.started = time.monotonic() - 121
 
     monkeypatch.setattr(gateway.ledger, "reserve", expire_after_reserving)
