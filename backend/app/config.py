@@ -30,6 +30,16 @@ class Settings(BaseSettings):
     embedding_revision: str | None = None
     embedding_dimension: int | None = None
     embedding_local_files_only: Literal[True] = True
+
+    @field_validator("embedding_local_files_only", mode="before")
+    @classmethod
+    def accept_true_text(cls, value):
+        # .env values arrive as text; "true" from .env.example must mean True. Anything else
+        # (including "false") still fails: embeddings are never downloaded at run time.
+        if isinstance(value, str) and value.strip().lower() in {"true", "1", "yes"}:
+            return True
+        return value
+
     llm_provider: Literal["deepseek"] = "deepseek"
     deepseek_model: str = "deepseek-flash"
     deepseek_base_url: str = "https://api.deepseek.com"

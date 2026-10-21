@@ -1,6 +1,6 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from app.api.dependencies import authenticated, writing
 from app.services.area_analysis_service import MATCHED_SCOPE_ID
 
@@ -8,6 +8,7 @@ router = APIRouter(prefix="/api/v2/cases", tags=["area-analyses"])
 
 
 class AreaAnalysisRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     expected_revision: int = Field(ge=0)
 
 
