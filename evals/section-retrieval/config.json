@@ -1,10 +1,10 @@
 {
-  "version": "section-retrieval-eval-v1",
+  "version": "section-retrieval-eval-v2",
   "templates": [
     {"template_id": "tayron-dkvb-p0299", "version": "2"},
     {"template_id": "tayron-dkvb-p0236", "version": "2"}
   ],
-  "notes": "标准答案来自人工关系表 analysis_context_v1.json；及格线在看到结果之前写定，不因结果修改。",
+  "notes": "标准答案来自人工关系表 analysis_context_v1.json；及格线在看到 v1 结果之前写定，不因结果修改。v2 把排名单位从小节改为整个 ## 章节（现有关系表大多按整章引用：140 处 ## 对 47 处 ###），v1 的按小节分数在报告中保留作对照。",
   "navigation_sections": [
     "阅读入口",
     "快速入口",
@@ -16,6 +16,7 @@
     "^## [0-9]+\\. *(资料)?来源"
   ],
   "top_k": [3, 5, 10],
+  "rank_unit": "section",
   "main_channel": "exact+bm25+dense",
   "pass": {"recall_at": 5, "overall": 0.90, "each_document": 0.80}
 }

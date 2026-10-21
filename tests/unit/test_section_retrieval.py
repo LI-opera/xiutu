@@ -102,3 +102,15 @@ def test_every_gold_section_is_reachable_after_skipping_navigation():
     navigation = [c for doc_id, doc in documents.items()
                   for c in split(doc_id, doc["body"]) if "对应关系" in c.section]
     assert navigation  # the manuals really contain question-to-section tables, so skipping matters
+
+
+def test_section_ranking_counts_each_section_once_and_parent_covers_subsection_gold():
+    chunks = split("doc", DOC)  # 0: ## 1 lead, 1: 1.1, 2: 1.2, 3: 2.1
+    assert ev.section_ranking([1, 2, 0, 3], chunks) == ["## 1. 接头座合", "## 2. 检漏"]
+    gold = [{"id": "s1.2", "heading": "### 1.2 卡箍"}, {"id": "s2", "heading": "## 2. 检漏"}]
+    result = ev.score_sections([1, 2, 0, 3], chunks, gold, [1, 2])
+    # Section 1 fills one slot however many of its subsections rank first, and contains 1.2.
+    assert result["recall@1"] == 0.5 and result["recall@2"] == 1
+    assert result["first_hit"] == 1 and result["top"] == ["1. 接头座合", "2. 检漏"]
+    chunk_level = ev.score([1, 2, 0, 3], chunks, gold, [2])
+    assert chunk_level["recall@2"] == 0.5  # chunk ranking spends both slots inside section 1

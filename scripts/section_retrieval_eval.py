@@ -92,6 +92,36 @@ def hits(chunk, gold):
     return covered
 
 
+def section_ranking(ranking, chunks):
+    """Whole ## sections in the order their best chunk ranks: what the analysis would send."""
+    order = []
+    for index in ranking:
+        if chunks[index].section not in order:
+            order.append(chunks[index].section)
+    return order
+
+
+def section_hits(section, gold, parents):
+    """A ## gold is covered by its own section; a ### gold by the section that contains it."""
+    return {g["id"] for g in gold if g["heading"] == section or parents.get(g["heading"]) == section}
+
+
+def score_sections(ranking, chunks, gold, top_k):
+    parents = {c.subsection: c.section for c in chunks if c.subsection}
+    order = section_ranking(ranking, chunks)
+    result = {}
+    for k in top_k:
+        found = set()
+        for section in order[:k]:
+            found |= section_hits(section, gold, parents)
+        result[f"recall@{k}"] = len(found) / len(gold)
+    first = next((pos for pos, section in enumerate(order, 1) if section_hits(section, gold, parents)), None)
+    result["rr"] = 1 / first if first else 0.0
+    result["first_hit"] = first
+    result["top"] = [section.lstrip("# ") for section in order[:5]]
+    return result
+
+
 def score(ranking, chunks, gold, top_k):
     result = {}
     for k in top_k:
@@ -145,23 +175,33 @@ def evaluate(config, documents, queries, *, skip_navigation, model=None):
             rankings["bm25+dense"] = rrf([rankings["bm25"], rankings["dense"]])
             rankings["exact+bm25+dense"] = rrf([rankings["exact"], rankings["bm25"], rankings["dense"]])
         rankings["exact+bm25"] = rrf([rankings["exact"], rankings["bm25"]])
-        row = {**query, "unreachable": [g["id"] for g in query["gold"] if g not in reachable], "channels": {}}
+        row = {**query, "unreachable": [g["id"] for g in query["gold"] if g not in reachable],
+               "channels": {}, "chunk_channels": {}}
         for name, ranking in rankings.items():
-            row["channels"][name] = score(ranking, chunks, query["gold"], config["top_k"])
-            row["channels"][name]["top"] = [chunks[i].path for i in ranking[:5]]
+            # Main unit (v2): whole ## sections. Chunk-level (v1) is kept for comparison.
+            row["channels"][name] = score_sections(ranking, chunks, query["gold"], config["top_k"])
+            row["chunk_channels"][name] = score(ranking, chunks, query["gold"], config["top_k"])
+            row["chunk_channels"][name]["top"] = [chunks[i].path for i in ranking[:5]]
         rows.append(row)
     return rows, {doc_id: len(chunks) for doc_id, chunks in chunks_by_doc.items()}
 
 
-def summarize(rows, channels, top_k):
+def summarize(rows, channels, top_k, key="channels"):
     def mean(values):
         values = list(values)
         return round(sum(values) / len(values), 3) if values else None
     summary = {}
     for name in channels:
-        summary[name] = {f"recall@{k}": mean(r["channels"][name][f"recall@{k}"] for r in rows) for k in top_k}
-        summary[name]["mrr"] = mean(r["channels"][name]["rr"] for r in rows)
+        summary[name] = {f"recall@{k}": mean(r[key][name][f"recall@{k}"] for r in rows) for k in top_k}
+        summary[name]["mrr"] = mean(r[key][name]["rr"] for r in rows)
     return summary
+
+
+def by_gold_size(rows, channel, k):
+    sizes = {}
+    for r in rows:
+        sizes.setdefault(len(r["gold"]), []).append(r["channels"][channel][f"recall@{k}"])
+    return {n: (round(sum(v) / len(v), 3), len(v)) for n, v in sorted(sizes.items())}
 
 
 def by_document(rows, channel, k):
@@ -191,6 +231,7 @@ def main():
     rows, chunk_counts = evaluate(config, documents, queries, skip_navigation=True, model=model)
     channels = list(rows[0]["channels"])
     summary = summarize(rows, channels, config["top_k"])
+    chunk_summary = summarize(rows, channels, config["top_k"], key="chunk_channels")
     # Comparison only: question IDs in the query and navigation tables searchable.
     leak_rows, _ = evaluate(config, documents, load_queries(config, documents, with_ids=True),
                             skip_navigation=False, model=model)
@@ -210,10 +251,14 @@ def main():
                     key=lambda r: (r["channels"][main_channel][f"recall@{k}"], r["document_id"], r["question_id"]))
     lines = [f"# 资料章节检索评测 {stamp}", "",
         f"- 题集：{config['version']}；查询 {len(rows)} 条（题目去掉题号 + 选项）；资料块 {sum(chunk_counts.values())} 个（{chunk_counts}）",
+        "- 排名单位：整个 `##` 章节（同一章节的多个小节只占一个名额）；标准答案是 `###` 小节时，包含它的章节进前 k 即算命中",
         f"- 向量模型：{'未使用（--no-dense）' if model is None else 'multilingual-e5-small（本地）'}",
         f"- 及格线（事先写定）：{main_channel} 前 {k} 召回率 ≥ {config['pass']['overall']}，每份资料 ≥ {config['pass']['each_document']}",
         f"- **结果：{main_channel} 前 {k} 召回率 {overall}，{'达到' if passed else '未达到'}及格线**", "",
-        "## 主分数（不用题号，导航章节不参与检索）", "", *table(summary, config["top_k"]), "",
+        "## 主分数（按章节排名；不用题号，导航章节不参与检索）", "", *table(summary, config["top_k"]), "",
+        f"## 按标准章节个数（{main_channel}，前 {k}）", "", "| 标准章节个数 | 召回率 | 查询数 |", "| --- | --- | --- |",
+        *[f"| {n} | {v} | {c} |" for n, (v, c) in by_gold_size(rows, main_channel, k).items()], "",
+        "## 对照：按小节排名（v1 的算法）", "", *table(chunk_summary, config["top_k"]), "",
         f"## 按资料（{main_channel}，前 {k}）", "", "| 资料 | 召回率 | 查询数 |", "| --- | --- | --- |",
         *[f"| {d} | {v} | {n} |" for d, (v, n) in per_doc.items()], "",
         "## 对照：查询带题号、导航章节也参与检索（只作对照，不作为结论；导航章节会占用名额）", "", *table(leak_summary, config["top_k"]), "",
@@ -227,6 +272,7 @@ def main():
         lines.append(f"  - 实际前 5：{'；'.join(c['top'])}")
     (folder / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
     (folder / "results.json").write_text(json.dumps({"config": config, "summary": summary,
+        "chunk_level_summary": chunk_summary,
         "reference_with_ids": leak_summary, "per_document": per_doc, "passed": passed, "rows": rows},
         ensure_ascii=False, indent=2), encoding="utf-8")
     print("\n".join(table(summary, config["top_k"])))
