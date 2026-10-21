@@ -477,7 +477,7 @@ observation-B：AIR-01 = 损伤，supersedes_id = observation-A
 
 `model_payload` 生成传输副本：存在有效 `analysis_extracts` 时，把 `documents.body` 换成选中章节原文，并保存 `full_content_hash`；发送正文另算 content_hash。没有有效章节提取时发送完整正文。
 
-这样既能减少无关篇幅，又能追溯当时保存的完整来源。不能把 `body_scope=configured_sections_with_context` 误读成“上传了整份原文件”。
+这样既能减少无关篇幅，又能追溯当时保存的完整来源。不能把 `body_scope=retrieved_sections_with_context`（检索选出的章节）误读成“上传了整份原文件”。
 
 ### 10.8 综合输入概览
 

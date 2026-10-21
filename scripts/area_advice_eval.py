@@ -11,6 +11,7 @@ not judge whether a diagnosis is correct for a real vehicle.
 import json
 import re
 import sys
+from copy import deepcopy
 from pathlib import Path
 from uuid import NAMESPACE_URL, uuid5
 
@@ -144,16 +145,20 @@ def build_view(spec, case, topic=None):
         "repair_rounds": rounds}
 
 
-def build_payload(spec, case, *, topic=None, references=None,
+def build_payload(spec, case, *, topic=None, references=None, embeddings=None,
                   max_output_tokens=DEFAULT_MAX_OUTPUT_TOKENS):
-    """Mirror AreaAnalysisService._payload for the combined (matched areas) analysis."""
+    """Mirror AreaAnalysisService._payload for the combined (matched areas) analysis.
+
+    Pass the local vector model as embeddings to choose sections exactly as the service
+    does; without it sections are chosen by exact codes and keywords only.
+    """
     topic = topic or load_topic(spec["template"])
-    references = references if references is not None else load_references(spec["template"])
+    references = deepcopy(references if references is not None else load_references(spec["template"]))
     view = build_view(spec, case, topic)
     area_of = {q["id"]: q["area_id"] for q in topic["questions"]}
     recorded = {area_of[o["question_id"]] for o in view["observations"] if o["effective"]}
     recorded |= {r["area_id"] for r in view["repair_rounds"]}
-    payload = build_matched_input(view, {area: references.get(area, []) for area in recorded})
+    payload = build_matched_input(view, {area: references.get(area, []) for area in recorded}, embeddings)
     payload["max_output_tokens"] = max_output_tokens
     return payload
 

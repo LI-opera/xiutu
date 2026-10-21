@@ -144,8 +144,16 @@ def main():
 
     topic = ev.load_topic(spec["template"])
     references = ev.load_references(spec["template"])
-    payloads = {c["id"]: ev.build_payload(spec, c, topic=topic, references=references,
+    # Same section choice as the service: local vectors, loaded from the project settings.
+    from app.config import load_settings
+    from app.services.area_analysis_service import reading_embeddings
+    embeddings = reading_embeddings(settings or load_settings(project_env=True))
+    payloads = {c["id"]: ev.build_payload(spec, c, topic=topic, references=references, embeddings=embeddings,
                                           max_output_tokens=max_output) for c in cases}
+    unavailable = [d for p in payloads.values() for g in p["reference_reading_guide"] for d in g["documents"]
+                   if d["status"] != "selected"]
+    if unavailable:
+        sys.exit(f"资料章节没有按检索选出（{unavailable[0]['status']}），检查本地向量模型。未调用。")
     upper = {cid: upper_estimate(p) for cid, p in payloads.items()}
     planned = sum(upper.values()) * args.runs
     print(f"{len(cases)} 题 × {args.runs} 次 = {len(cases) * args.runs} 次调用")

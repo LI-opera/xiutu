@@ -53,7 +53,7 @@ def view_with(saved, rounds=()):
 
 
 def no_reading_guide():
-    return patch("app.services.area_analysis_service.enrich", side_effect=lambda value, _: {
+    return patch("app.services.area_analysis_service.enrich", side_effect=lambda value, *_: {
         **value, "unrecorded_decision_question_ids": [], "reference_reading_guide": {}})
 
 

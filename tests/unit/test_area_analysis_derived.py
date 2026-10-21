@@ -42,7 +42,7 @@ def view_with(values):
 
 def no_reading_guide():
     # Reading-guide behaviour has its own tests; keep these focused on derived results.
-    return patch("app.services.area_analysis_service.enrich", side_effect=lambda value, _: {
+    return patch("app.services.area_analysis_service.enrich", side_effect=lambda value, *_: {
         **value, "unrecorded_decision_question_ids": [], "reference_reading_guide": {}})
 
 

@@ -50,11 +50,22 @@ def queries_for(payload):
 
 
 class Embeddings:
-    """Chunk vectors cached by content; query vectors computed on demand."""
+    """Chunk vectors cached by content (memory and optional disk); query vectors memoised.
 
-    def __init__(self, model, cache_dir=None):
-        self.model, self.cache_dir = model, Path(cache_dir) if cache_dir else None
-        self.memory = {}
+    model may be a zero-argument callable returning the model, so loading is deferred to
+    the first search and a missing model only affects that search.
+    """
+
+    def __init__(self, model, cache_dir=None, fingerprint=None):
+        self._model, self.cache_dir = model, Path(cache_dir) if cache_dir else None
+        self.fingerprint = fingerprint
+        self.memory, self.queries = {}, {}
+
+    @property
+    def model(self):
+        if callable(self._model) and not hasattr(self._model, "embed_query"):
+            self._model = self._model()
+        return self._model
 
     def documents(self, texts):
         keys = [hashlib.sha256(t.encode()).hexdigest() for t in texts]
@@ -75,7 +86,9 @@ class Embeddings:
         return [self.memory[k] for k in keys]
 
     def query(self, text):
-        return [float(x) for x in self.model.embed_query(text)]
+        if text not in self.queries:
+            self.queries[text] = [float(x) for x in self.model.embed_query(text)]
+        return self.queries[text]
 
 
 def rank_sections(query, chunks, index, vectors, embeddings):

@@ -28,7 +28,7 @@ from scripts.build_analysis_context import RELATIONS  # noqa: E402
 from scripts.seed_area_references import build_documents  # noqa: E402
 
 CONFIG = ROOT / "evals/section-retrieval/config.json"
-CONTEXT = ROOT / "backend/app/topics/analysis_context_v1.json"
+CONTEXT = ROOT / "evals/section-retrieval/reference_table_v1.json"
 MANIFEST = RELATIONS.parent / "area_reference_manifest_v2.json"
 PACKAGE = ROOT / "resources/knowledge/tayron"
 OUT_DIR = ROOT / ".local-data/evals/section-retrieval"
