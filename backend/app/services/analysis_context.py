@@ -101,9 +101,10 @@ def enrich(payload, topic, config=None):
                     else:
                         merged.append([start, end])
                 document["analysis_extracts"] = [document["body"][a:b] for a,b in merged]
+                # Point to the section by heading only: its text is already in the sent body,
+                # so repeating it here would send the same method twice.
                 entry["result_methods"] = [{"section_id":sid, "heading":spec["sections"][sid]["heading"],
-                    "selected_by":links, "text":document["body"][spec["sections"][sid]["start"]:spec["sections"][sid]["end"]]}
-                    for sid,links in focus.items()]
+                    "selected_by":links} for sid,links in focus.items()]
         guide["documents"].append(entry)
     payload["reference_reading_guide"] = guide
     return payload

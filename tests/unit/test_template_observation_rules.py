@@ -59,7 +59,7 @@ def test_focus_conflict_and_gate_are_consistent_in_saved_view_and_ai_preview():
     assert check["suggested_focus"]
     assert check["execution_blockers"] == projection["question_states"]["CHECK"]["condition_blockers"]
     assert payload["rule_conflicts"] == projection["synthesis"]["conflicts"]
-    assert payload["prompt_version"] == "matched-area-advice-v15"
+    assert payload["prompt_version"] == "matched-area-advice-v17"
 
 
 def test_independent_operation_can_use_case_intake_safety_without_legacy_question():
