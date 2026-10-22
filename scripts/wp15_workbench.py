@@ -50,6 +50,24 @@ def save(state):
     temp.replace(STATE)
 
 
+EMBEDDING_FIELDS = ("embedding_provider", "embedding_path", "embedding_model_path", "embedding_model",
+                    "embedding_revision", "embedding_dimension")
+
+
+def embedding_environment(settings):
+    """The project's local embedding choice (.env), passed to the launched API and worker.
+
+    The launched processes run in test mode and do not read .env, so without this they fall
+    back to the default E5 model while scripts and evaluations use the configured one.
+    """
+    result = {}
+    for name in EMBEDDING_FIELDS:
+        value = getattr(settings, name, None)
+        if value is not None:
+            result[name.upper()] = str(value)
+    return result
+
+
 def environment(state, *, real_case_id=None, real_revision=None, c05_key=None,
                 real_output_tokens=4096, local_auto_identity=True, real_context_hash=None,
                 real_prompt_version=None, ranking_real_case_id=None,
@@ -95,6 +113,10 @@ def environment(state, *, real_case_id=None, real_revision=None, c05_key=None,
         XIUTU_WP11_PAID="0",
         CASE_ANALYSIS_MAX_OUTPUT_TOKENS="1536",
     )
+    sys.path.insert(0, str(ROOT / "backend"))
+    from app.config import load_settings
+
+    env.update(embedding_environment(load_settings(project_env=True, embedding_local_files_only=True)))
     if real_case_id is None and (ranking_real_case_id is not None or ranking_local_testing):
         ranking_case_id = str(UUID(ranking_real_case_id)) if ranking_real_case_id is not None else None
         sys.path.insert(0, str(ROOT / "backend"))

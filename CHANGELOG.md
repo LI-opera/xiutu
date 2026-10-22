@@ -5,6 +5,7 @@
 - 迁移 `0024_reference_ingest`：`area_reference_documents` 增加处理状态、来源、小块数、向量模型标识、必带章节、待绑定区域；新表 `area_reference_chunks`（按 `###` 小节切块，编号数组带 GIN 索引，导航章节存但不参与检索）和 `area_reference_chunk_vectors`（pgvector，按模型标识区分）。
 - 新接口 `POST/GET /api/v2/area-references`、`GET /api/v2/area-references/{id}/versions/{v}/chunks`：上传 Markdown → 后台任务 `reference_ingest` 切块、提取编号、用本地向量模型计算向量 → 全部成功后才把所选区域切到新版本；同内容重复上传返回原版本，失败的版本可重新上传重试。
 - `install_area_references.py` 升级到当前数据库版本，导入清单资料后用同一套处理代码切块、计算向量（`--no-vectors` 只切块）；必带章节从 `reading_documents_v1.json` 写入资料行。
+- `wp15_workbench.py` 把 `.env` 里的向量模型设置传给启动的 API 和后台进程。此前它们以测试模式运行、不读 `.env`，实际用的是默认的 multilingual-e5-small，而检索评测和 AI 评测用的是 BGE-M3。
 - AI 分析的读取方式不变（第 2 期改为读库里的小块和向量）。
 
 ## 2026-10-22 — 保守清理（不改变行为）
