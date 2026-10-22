@@ -22,6 +22,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v2/area-references/targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reference Targets
+         * @description Templates and their areas a manual can be bound to.
+         */
+        get: operations["reference_targets_api_v2_area_references_targets_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v2/area-references/{document_id}/versions/{version}/chunks": {
         parameters: {
             query?: never;
@@ -1799,6 +1819,85 @@ export interface components {
              */
             unavailable_reason: string;
         };
+        /** ReferenceChunk */
+        ReferenceChunk: {
+            /** Char End */
+            char_end: number;
+            /** Char Start */
+            char_start: number;
+            /** Has Vector */
+            has_vector: boolean;
+            /** Identifiers */
+            identifiers: string[];
+            /** Ordinal */
+            ordinal: number;
+            /** Searchable */
+            searchable: boolean;
+            /** Section */
+            section: string;
+            /** Subsection */
+            subsection: string | null;
+            /** Text */
+            text: string;
+        };
+        /** ReferenceChunkList */
+        ReferenceChunkList: {
+            /** Document Id */
+            document_id: string;
+            /** Items */
+            items: components["schemas"]["ReferenceChunk"][];
+            /** Status */
+            status: string;
+            /** Vector Fingerprint */
+            vector_fingerprint: string | null;
+            /** Version */
+            version: string;
+        };
+        /** ReferenceItem */
+        ReferenceItem: {
+            /** Always Include */
+            always_include: string[];
+            /** Bound Areas */
+            bound_areas: components["schemas"]["AreaTarget"][];
+            /** Chars */
+            chars: number;
+            /** Chunk Count */
+            chunk_count: number | null;
+            /** Chunker Version */
+            chunker_version: string | null;
+            /** Content Hash */
+            content_hash: string;
+            /** Created At */
+            created_at: string;
+            /** Document Id */
+            document_id: string;
+            /** Error Code */
+            error_code: string | null;
+            /** Requested Areas */
+            requested_areas: components["schemas"]["AreaTarget"][];
+            /** Source Kind */
+            source_kind: string;
+            /** Status */
+            status: string;
+            /** Title */
+            title: string;
+            /** Updated At */
+            updated_at: string;
+            /** Vector Fingerprint */
+            vector_fingerprint: string | null;
+            /** Version */
+            version: string;
+        };
+        /** ReferenceList */
+        ReferenceList: {
+            /** Items */
+            items: components["schemas"]["ReferenceItem"][];
+        };
+        /** ReferenceTargets */
+        ReferenceTargets: {
+            /** Templates */
+            templates: components["schemas"]["TargetTemplate"][];
+        };
         /**
          * ReferenceUpload
          * @description A Markdown manual for one or more workbench areas. Same document_id adds a version.
@@ -1819,6 +1918,19 @@ export interface components {
             filename: string;
             /** Title */
             title: string;
+        };
+        /** ReferenceUploadResult */
+        ReferenceUploadResult: {
+            /** Document Id */
+            document_id: string;
+            /** Reused */
+            reused: boolean;
+            /** Run Id */
+            run_id: string | null;
+            /** Status */
+            status: string;
+            /** Version */
+            version: string;
         };
         /** ReindexInput */
         ReindexInput: {
@@ -2200,6 +2312,24 @@ export interface components {
             /** Topic Version */
             topic_version?: string | null;
         };
+        /** TargetArea */
+        TargetArea: {
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+        };
+        /** TargetTemplate */
+        TargetTemplate: {
+            /** Areas */
+            areas: components["schemas"]["TargetArea"][];
+            /** Template Id */
+            template_id: string;
+            /** Title */
+            title: string;
+            /** Version */
+            version: string;
+        };
         /** TopicAnswer */
         TopicAnswer: {
             /** Batch Id */
@@ -2508,7 +2638,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ReferenceList"];
                 };
             };
             /** @description Bad Request */
@@ -2625,13 +2755,141 @@ export interface operations {
             };
         };
         responses: {
+            /** @description Same content: existing version */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReferenceUploadResult"];
+                };
+            };
             /** @description Successful Response */
             202: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ReferenceUploadResult"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    reference_targets_api_v2_area_references_targets_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReferenceTargets"];
                 };
             };
             /** @description Bad Request */
@@ -2753,7 +3011,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": unknown;
+                    "application/json": components["schemas"]["ReferenceChunkList"];
                 };
             };
             /** @description Bad Request */

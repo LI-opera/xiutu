@@ -2256,6 +2256,269 @@
         "title": "RecheckInput",
         "type": "object"
       },
+      "ReferenceChunk": {
+        "properties": {
+          "char_end": {
+            "title": "Char End",
+            "type": "integer"
+          },
+          "char_start": {
+            "title": "Char Start",
+            "type": "integer"
+          },
+          "has_vector": {
+            "title": "Has Vector",
+            "type": "boolean"
+          },
+          "identifiers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Identifiers",
+            "type": "array"
+          },
+          "ordinal": {
+            "title": "Ordinal",
+            "type": "integer"
+          },
+          "searchable": {
+            "title": "Searchable",
+            "type": "boolean"
+          },
+          "section": {
+            "title": "Section",
+            "type": "string"
+          },
+          "subsection": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subsection"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ordinal",
+          "section",
+          "subsection",
+          "text",
+          "char_start",
+          "char_end",
+          "identifiers",
+          "searchable",
+          "has_vector"
+        ],
+        "title": "ReferenceChunk",
+        "type": "object"
+      },
+      "ReferenceChunkList": {
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReferenceChunk"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "vector_fingerprint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vector Fingerprint"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document_id",
+          "version",
+          "status",
+          "vector_fingerprint",
+          "items"
+        ],
+        "title": "ReferenceChunkList",
+        "type": "object"
+      },
+      "ReferenceItem": {
+        "properties": {
+          "always_include": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Always Include",
+            "type": "array"
+          },
+          "bound_areas": {
+            "items": {
+              "$ref": "#/components/schemas/AreaTarget"
+            },
+            "title": "Bound Areas",
+            "type": "array"
+          },
+          "chars": {
+            "title": "Chars",
+            "type": "integer"
+          },
+          "chunk_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chunk Count"
+          },
+          "chunker_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Chunker Version"
+          },
+          "content_hash": {
+            "title": "Content Hash",
+            "type": "string"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "requested_areas": {
+            "items": {
+              "$ref": "#/components/schemas/AreaTarget"
+            },
+            "title": "Requested Areas",
+            "type": "array"
+          },
+          "source_kind": {
+            "title": "Source Kind",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "string"
+          },
+          "vector_fingerprint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vector Fingerprint"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document_id",
+          "version",
+          "title",
+          "status",
+          "error_code",
+          "source_kind",
+          "content_hash",
+          "chars",
+          "chunk_count",
+          "chunker_version",
+          "vector_fingerprint",
+          "always_include",
+          "requested_areas",
+          "bound_areas",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ReferenceItem",
+        "type": "object"
+      },
+      "ReferenceList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ReferenceItem"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ReferenceList",
+        "type": "object"
+      },
+      "ReferenceTargets": {
+        "properties": {
+          "templates": {
+            "items": {
+              "$ref": "#/components/schemas/TargetTemplate"
+            },
+            "title": "Templates",
+            "type": "array"
+          }
+        },
+        "required": [
+          "templates"
+        ],
+        "title": "ReferenceTargets",
+        "type": "object"
+      },
       "ReferenceUpload": {
         "additionalProperties": false,
         "description": "A Markdown manual for one or more workbench areas. Same document_id adds a version.",
@@ -2309,6 +2572,46 @@
           "areas"
         ],
         "title": "ReferenceUpload",
+        "type": "object"
+      },
+      "ReferenceUploadResult": {
+        "properties": {
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "reused": {
+            "title": "Reused",
+            "type": "boolean"
+          },
+          "run_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Id"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document_id",
+          "version",
+          "status",
+          "reused",
+          "run_id"
+        ],
+        "title": "ReferenceUploadResult",
         "type": "object"
       },
       "ReindexInput": {
@@ -3322,6 +3625,55 @@
         "title": "SubmitObservation",
         "type": "object"
       },
+      "TargetArea": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title"
+        ],
+        "title": "TargetArea",
+        "type": "object"
+      },
+      "TargetTemplate": {
+        "properties": {
+          "areas": {
+            "items": {
+              "$ref": "#/components/schemas/TargetArea"
+            },
+            "title": "Areas",
+            "type": "array"
+          },
+          "template_id": {
+            "title": "Template Id",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "template_id",
+          "version",
+          "title",
+          "areas"
+        ],
+        "title": "TargetTemplate",
+        "type": "object"
+      },
       "TopicAnswer": {
         "additionalProperties": false,
         "properties": {
@@ -4190,7 +4542,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceList"
+                }
               }
             },
             "description": "Successful Response"
@@ -4324,10 +4678,22 @@
           "required": true
         },
         "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceUploadResult"
+                }
+              }
+            },
+            "description": "Same content: existing version"
+          },
           "202": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceUploadResult"
+                }
               }
             },
             "description": "Successful Response"
@@ -4449,6 +4815,138 @@
         ]
       }
     },
+    "/api/v2/area-references/targets": {
+      "get": {
+        "description": "Templates and their areas a manual can be bound to.",
+        "operationId": "reference_targets_api_v2_area_references_targets_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceTargets"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Reference Targets",
+        "tags": [
+          "area-references"
+        ]
+      }
+    },
     "/api/v2/area-references/{document_id}/versions/{version}/chunks": {
       "get": {
         "operationId": "reference_chunks_api_v2_area_references__document_id__versions__version__chunks_get",
@@ -4476,7 +4974,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceChunkList"
+                }
               }
             },
             "description": "Successful Response"
