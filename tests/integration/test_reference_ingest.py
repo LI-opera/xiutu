@@ -63,8 +63,8 @@ def doc_id():
     return "demo-ingest-" + uuid4().hex[:12]
 
 
-def upload(rig, document_id, content=BODY, **extra):
-    body = {"document_id": extra.pop("document_id", document_id), "title": "演示资料", "filename": "demo.md",
+def upload(rig, default_id, content=BODY, **extra):
+    body = {"document_id": extra.pop("document_id", default_id), "title": "演示资料", "filename": "demo.md",
             "content": content, "areas": [first_area(rig)], **extra}
     return rig.client.post("/api/v2/area-references", json=body, headers=rig.headers)
 
@@ -99,7 +99,8 @@ def test_upload_processes_binds_and_versions(docrig, fake_embedder, doc_id):  # 
     run_worker(docrig, created["run_id"])
     ready = item(docrig, doc_id, "1")
     assert ready["status"] == "ready" and ready["vector_fingerprint"] == "fake-embedding-v1"
-    assert ready["chunk_count"] == 5 and area in ready["bound_areas"]
+    # 1 lead, 2.1, 2.2, 3 lead: "## 2" has no text of its own before its first ###.
+    assert ready["chunk_count"] == 4 and area in ready["bound_areas"]
     assert bound_version(docrig, area, doc_id) == "1"
 
     chunks = docrig.client.get(f"/api/v2/area-references/{doc_id}/versions/1/chunks").json()["items"]
