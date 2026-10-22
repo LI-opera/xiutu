@@ -15,7 +15,8 @@ from app.retrieval.sparse import DTC, tokens
 HEADING = re.compile(r"^(#{2,3}) +(.+?)\s*$", re.MULTILINE)
 # Part, connector and tool codes as written in manuals: G31, GX9, N75, J623, V.A.G 1687, VAS 6150.
 PART_CODE = re.compile(r"(?<![A-Za-z0-9.\-])([A-Z]{1,3}[0-9]{1,4}[A-Z]?)(?![A-Za-z0-9\-])")
-TOOL_CODE = re.compile(r"\b(V\.?\s?A\.?\s?G|VAS)\s*([0-9]{3,5})\b", re.I)
+# No \b: Chinese characters count as word characters, so "具备V.A.G 1687" would be missed.
+TOOL_CODE = re.compile(r"(?<![A-Za-z0-9])(V\.?\s?A\.?\s?G|VAS)\s*([0-9]{3,5})(?![0-9])", re.I)
 RRF_K = 60
 
 

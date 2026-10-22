@@ -138,7 +138,7 @@ def test_deferred_pressure_test_passes_and_current_one_fails():
                   [("取得 V.A.G 1687 或等效安全检漏工具后", [step("check", "低压加压检漏", ["AIR-14"])])])
     bad = result([step("check", "用烟雾检漏仪加压查找泄漏")])
     assert by_id(ev.grade(case, payload, good)) == {
-        "refs_exist": True, "retired_fields_empty": True,
+        "refs_exist": True, "retired_fields_empty": True, "codes_grounded": True, "values_grounded": True,
         "no_pressure_test_now": True, "pressure_test_deferred": True}
     graded = by_id(ev.grade(case, payload, bad))
     assert not graded["no_pressure_test_now"] and not graded["pressure_test_deferred"]
@@ -172,3 +172,81 @@ def test_invented_references_and_filled_retired_fields_fail():
     real["basis_observation_ids"] = [obs(payload, "AIR-07")["id"]]
     real["source_ids"] = [payload["documents"][0]["id"]]
     assert all(by_id(ev.grade(case, payload, result([real]))).values())
+
+
+# ---------------------------------------------------------------- reading modes (experiment)
+
+def sent_documents(payload):
+    from app.services.analysis_context import model_payload
+    return model_payload(payload)["documents"]
+
+
+def doc_chars(payload):
+    return sum(len(d["body"]) for d in sent_documents(payload))
+
+
+def mode_payload(case_id, mode):
+    return ev.build_payload(SPEC, CASES[case_id], topic=TOPIC, references=REFERENCES, reading=mode)
+
+
+@pytest.mark.parametrize("case_id", list(CASES))
+def test_reading_modes_send_less_text_step_by_step(case_id):
+    sizes = {mode: doc_chars(mode_payload(case_id, mode)) for mode in ev.READING_MODES}
+    assert sizes["full"] > sizes["current"] >= sizes["answered"] > sizes["answered-top1"] > 0
+    # The experiment never changes what the product sends.
+    assert input_identity(mode_payload(case_id, "current")) == input_identity(payload_of(case_id))
+
+
+def test_full_mode_sends_whole_documents():
+    payload = mode_payload("c1-baseline", "full")
+    for sent, original in zip(sent_documents(payload), payload["documents"]):
+        assert sent["body"] == original["body"] and sent["body_scope"] == "full_document_fallback"
+    assert all(d["status"] == "full_body_retained" and not d["sections"]
+               for g in payload["reference_reading_guide"] for d in g["documents"])
+
+
+def test_answered_modes_search_only_recorded_questions():
+    for mode in ("answered", "answered-top1"):
+        payload = mode_payload("c1-baseline", mode)
+        recorded = {o["question_id"] for o in payload["observations"]}
+        for guide in payload["reference_reading_guide"]:
+            for doc in guide["documents"]:
+                assert doc["status"] == "selected"
+                for section in doc["sections"]:
+                    assert set(section["question_ids"]) <= recorded
+                    assert section["reason"] in {"recorded_question", "context_conditions_and_verification"}
+    top1 = mode_payload("c1-baseline", "answered-top1")
+    sections = [s for g in top1["reference_reading_guide"] for d in g["documents"] for s in d["sections"]]
+    assert all(s["reason"] == "recorded_question" for s in sections)
+    per_question = {}
+    for s in sections:
+        for qid in s["question_ids"]:
+            per_question[qid] = per_question.get(qid, 0) + 1
+    assert per_question and max(per_question.values()) == 1
+
+
+def test_reading_mode_restores_the_product_functions():
+    from app.services import analysis_context, area_analysis_service
+    before = (analysis_context.queries_for, analysis_context._always_include, area_analysis_service.enrich)
+    mode_payload("c1-baseline", "answered-top1")
+    assert (analysis_context.queries_for, analysis_context._always_include, area_analysis_service.enrich) == before
+    with pytest.raises(ValueError):
+        mode_payload("c1-baseline", "everything")
+
+
+def test_grounding_flags_codes_and_values_not_in_the_input():
+    case, payload = CASES["c6-prerequisite-missing"], payload_of("c6-prerequisite-missing")
+    sent = ev.sent_text(payload)
+    assert "G31" in sent and "0.5 bar" in sent
+    grounded = result([step("check", "核对 G31 读数，按 0.5 bar 加压", action="使用 V.A.G 1687")])
+    assert by_id(ev.grade(case, payload, grounded))["codes_grounded"]
+    assert by_id(ev.grade(case, payload, grounded))["values_grounded"]
+    invented = result([step("check", "检查 G999 传感器", action="按 7.3 bar 加压，拧紧到 23 Nm")])
+    graded = {g["id"]: g for g in ev.grade(case, payload, invented)}
+    assert not graded["codes_grounded"]["passed"] and "G999" in graded["codes_grounded"]["detail"]
+    assert not graded["values_grounded"]["passed"]
+    assert "7.3 bar" in graded["values_grounded"]["detail"] and "23 Nm" in graded["values_grounded"]["detail"]
+    # Question, record and document IDs are references, not codes: refs_exist covers them.
+    ids_only = step("check", "检查接头", ["AIR-07"])
+    ids_only["source_ids"] = [payload["documents"][0]["id"]]
+    assert by_id(ev.grade(case, payload, result([ids_only])))["codes_grounded"]

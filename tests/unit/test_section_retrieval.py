@@ -35,6 +35,9 @@ DOC = """# 标题
 def test_identifiers_are_exact_codes_but_not_question_ids():
     assert identifiers("G71 与 G31 不同，故障码 p0299") == {"G71", "G31", "P0299"}
     assert identifiers("使用 V.A.G 1687 或 VAS 6150") == {"VAG1687", "VAS6150"}
+    # Written straight after Chinese text, as in question titles.
+    assert identifiers("是否具备V.A.G 1687或等效工具，VAS6150可用") == {"VAG1687", "VAS6150"}
+    assert identifiers("XVAS 6150、V.A.G 168701") == set()
     assert identifiers("AIR-07 与 PRS-05—PRS-06") == set()
 
 

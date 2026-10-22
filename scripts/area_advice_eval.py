@@ -11,8 +11,11 @@ not judge whether a diagnosis is correct for a real vehicle.
 import json
 import re
 import sys
+from contextlib import ExitStack, contextmanager
 from copy import deepcopy
+from functools import partial
 from pathlib import Path
+from unittest.mock import patch
 from uuid import NAMESPACE_URL, uuid5
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,7 +23,10 @@ for _path in (ROOT, ROOT / "backend"):
     if str(_path) not in sys.path:
         sys.path.insert(0, str(_path))
 
-from app.services.area_analysis_service import build_matched_input  # noqa: E402
+from app.retrieval.section_search import identifiers  # noqa: E402
+from app.services import analysis_context, area_analysis_service  # noqa: E402
+from app.services.analysis_context import model_payload  # noqa: E402
+from app.services.area_analysis_service import MATCHED_SYSTEM_PROMPT, build_matched_input  # noqa: E402
 from app.services.template_projection import build_plan, project_template  # noqa: E402
 from app.services.workbench_templates import content_hash  # noqa: E402
 
@@ -145,12 +151,51 @@ def build_view(spec, case, topic=None):
         "repair_rounds": rounds}
 
 
+# How much manual text an analysis sends. Only "current" is what the product does; the
+# others exist to compare advice quality against the amount of text (experiment only).
+READING_MODES = {
+    "current": "现在的方式：已填题和未填题都检索，每题前 3 个章节，加必带章节",
+    "full": "整份资料全发",
+    "answered": "只按已填题检索，每题前 3 个章节，加必带章节",
+    "answered-top1": "只按已填题检索，每题只取第 1 个章节，不带必带章节",
+}
+
+
+@contextmanager
+def reading_mode(mode):
+    """Run the product's own section selection with one setting changed for the experiment."""
+    if mode not in READING_MODES:
+        raise ValueError("Unknown reading mode: " + mode)
+    with ExitStack() as stack:
+        if mode in ("answered", "answered-top1"):
+            original = analysis_context.queries_for
+            stack.enter_context(patch.object(analysis_context, "queries_for", lambda payload: [
+                q for q in original(payload) if q["reason"] == "recorded_question"]))
+        if mode == "answered-top1":
+            stack.enter_context(patch.object(analysis_context, "_always_include", lambda *_: []))
+            stack.enter_context(patch.object(area_analysis_service, "enrich",
+                                             partial(analysis_context.enrich, top_k=1)))
+        yield
+
+
+def send_full_documents(payload):
+    """The "full" mode: every document goes whole, recorded in the guide like the fallback."""
+    for document in payload["documents"]:
+        document.pop("analysis_extracts", None)
+    for guide in payload["reference_reading_guide"]:
+        guide["mode"] = "full_documents_experiment"
+        for entry in guide["documents"]:
+            entry.update(status="full_body_retained", sections=[], result_methods=[])
+    return payload
+
+
 def build_payload(spec, case, *, topic=None, references=None, embeddings=None,
-                  max_output_tokens=DEFAULT_MAX_OUTPUT_TOKENS):
+                  max_output_tokens=DEFAULT_MAX_OUTPUT_TOKENS, reading="current"):
     """Mirror AreaAnalysisService._payload for the combined (matched areas) analysis.
 
     Pass the local vector model as embeddings to choose sections exactly as the service
-    does; without it sections are chosen by exact codes and keywords only.
+    does; without it sections are chosen by exact codes and keywords only. reading picks
+    an experiment mode from READING_MODES; "current" is the product behaviour.
     """
     topic = topic or load_topic(spec["template"])
     references = deepcopy(references if references is not None else load_references(spec["template"]))
@@ -158,9 +203,18 @@ def build_payload(spec, case, *, topic=None, references=None, embeddings=None,
     area_of = {q["id"]: q["area_id"] for q in topic["questions"]}
     recorded = {area_of[o["question_id"]] for o in view["observations"] if o["effective"]}
     recorded |= {r["area_id"] for r in view["repair_rounds"]}
-    payload = build_matched_input(view, {area: references.get(area, []) for area in recorded}, embeddings)
+    with reading_mode(reading):
+        payload = build_matched_input(view, {area: references.get(area, []) for area in recorded}, embeddings)
+    if reading == "full":
+        send_full_documents(payload)
     payload["max_output_tokens"] = max_output_tokens
     return payload
+
+
+def sent_text(payload):
+    """Everything the model actually received: system prompt and the sent JSON."""
+    sent = {k: v for k, v in model_payload(payload).items() if k != "max_output_tokens"}
+    return MATCHED_SYSTEM_PROMPT + json.dumps(sent, ensure_ascii=False)
 
 
 # ---------------------------------------------------------------- grading
@@ -217,6 +271,72 @@ def check_result(check, result):
     raise ValueError("Unknown check type: " + kind)
 
 
+# A number with a unit, as written in specifications: 0.5 bar, 150 kPa, 8 Nm, 5 V, 80 °C.
+# A slash series shares the unit: "1450/1500/1580 hPa" is three values.
+NUMBER = r"[0-9]+(?:[.,][0-9]+)?"
+UNITS = ("mbar", "bar", "kPa", "hPa", "psi", "N·m", "Nm", "mm", "cm", "mV", "V", "kΩ", "Ω", "°C", "℃",
+         "ms", "rpm", "r/min", "mA", "A", "g/s", "kg/h", "%")
+VALUE = re.compile(rf"(?<![0-9.,/])({NUMBER}(?:\s*/\s*{NUMBER})*)\s*({'|'.join(map(re.escape, UNITS))})(?![A-Za-z])")
+
+
+def _number(number):
+    number = str(number).replace(",", ".")
+    return number.rstrip("0").rstrip(".") if "." in number else number
+
+
+def _unit(unit):
+    unit = (unit or "").split(" ")[0]  # "hPa absolute" -> "hPa"
+    return {"℃": "°C", "N·m": "Nm", "r/min": "rpm"}.get(unit, unit)
+
+
+def _values(text):
+    return {(_number(n), _unit(unit)) for series, unit in VALUE.findall(text) for n in series.split("/")}
+
+
+def _numbers(value):
+    """Every number the model was given as data: recorded fields, targets, rule results."""
+    if isinstance(value, bool):
+        return set()
+    if isinstance(value, (int, float)):
+        return {_number(value)}
+    items = value.values() if isinstance(value, dict) else value if isinstance(value, list) else []
+    return set().union(*(_numbers(item) for item in items)) if items else set()
+
+
+def _advice_text(value, key=""):
+    """Readable text of the advice: IDs and enum fields are left out."""
+    if isinstance(value, dict):
+        return " ".join(_advice_text(v, k) for k, v in value.items())
+    if isinstance(value, list):
+        return " ".join(_advice_text(v, key) for v in value)
+    if isinstance(value, str) and not (key.endswith("id") or key.endswith("ids") or key == "kind"):
+        return value
+    return ""
+
+
+def grounding_checks(payload, result):
+    """Codes and specified values in the advice must appear in what the model was given.
+
+    Catches invented part/tool/fault codes and specification numbers. A value counts as
+    given when the same number and unit are in the sent text, or the number is in the sent
+    data (recorded fields and rule results carry units separately). A value the model
+    computed itself (a difference, a converted unit) still shows up here: read the detail.
+    """
+    sent, advice = sent_text(payload), _advice_text(result)
+    codes = sorted(identifiers(advice) - identifiers(sent))
+    given, numbers = _values(sent), _numbers(model_payload(payload))
+    values = sorted(f"{n} {u}" for n, u in _values(advice) if (n, u) not in given and n not in numbers)
+    return [
+        {"id": "codes_grounded", "label": "建议里的零件/工具/故障码都能在输入里找到",
+         "passed": not codes, "detail": "、".join(codes) or "全部能找到"},
+        {"id": "values_grounded", "label": "建议里带单位的数值都能在输入里找到（信号，可能是自行换算）",
+         "passed": not values, "detail": "、".join(values) or "全部能找到"},
+    ]
+
+
+HUMAN_GROUNDING = "建议里有没有在资料和记录中找不到依据的具体说法（数值、零件、操作方法）？如有，请写出来。"
+
+
 def generic_checks(payload, result):
     """Checks every case gets: no invented references, retired fields left empty."""
     known = {
@@ -250,7 +370,7 @@ def generic_checks(payload, result):
 
 
 def grade(case, payload, result):
-    graded = generic_checks(payload, result)
+    graded = generic_checks(payload, result) + grounding_checks(payload, result)
     for check in case["checks"]:
         passed, detail = check_result(check, result)
         graded.append({"id": check["id"], "label": check["label"], "passed": passed, "detail": detail})
