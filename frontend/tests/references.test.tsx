@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { apiClient } from '../src/formal/api-client';
@@ -59,44 +59,47 @@ describe('ReferencesPage', () => {
     expect(screen.getByRole('alert').textContent).toContain('MODEL_PATH_UNAVAILABLE');
     await userEvent.click(screen.getByRole('button', { name: /第 1 版/ }));
     expect(await screen.findByText(/2\. 检查接头/)).toBeTruthy();
-    // In use for, and requested at upload for, the same area.
-    expect(screen.getAllByText('增压不足初始排查 v2 · 增压空气通路', { selector: 'dd' })).toHaveLength(2);
+    expect(screen.getByText('增压不足初始排查 v2 · 增压空气通路', { selector: 'dd' })).toBeTruthy();
     // Navigation sections are hidden until asked for.
     expect(screen.queryByText('导航章节，不参与检索')).toBeNull();
     await userEvent.click(screen.getByLabelText('只看参与检索的'));
     expect(screen.getByText('导航章节，不参与检索')).toBeTruthy();
   });
 
-  it('uploads a Markdown file to the chosen areas with its always-included sections', async () => {
-    const posted: unknown[] = [];
-    vi.spyOn(apiClient, 'request').mockImplementation(async (path: string, options?: { body?: unknown }) => {
-      if (path === '/area-references' && options?.body) {
-        posted.push(options.body);
-        return { document_id: 'boost-v3', version: '1', status: 'queued', reused: false, run_id: 'r1' } as never;
-      }
+  it('asks for the file, title and vehicle only, with no template or area choices', async () => {
+    vi.spyOn(apiClient, 'request').mockImplementation(async (path: string) => {
       if (path === '/area-references') return { items: [] } as never;
       if (path === '/area-references/targets') return targets as never;
       throw new Error(path);
     });
     mount();
-    const submit = await screen.findByRole('button', { name: '上传并处理' });
-    expect((submit as HTMLButtonElement).disabled).toBe(true);
     const markdown = '# 增压\n\n## 1. 检查什么\n\n正文\n\n## 2. 怎样确认\n\n正文\n';
-    fireEvent.change(screen.getByLabelText('Markdown 文件'), { target: { files: [new File([markdown], 'Boost v3.md', { type: 'text/markdown' })] } });
+    fireEvent.change(await screen.findByLabelText('Markdown 文件'), { target: { files: [new File([markdown], 'Boost v3.md', { type: 'text/markdown' })] } });
     expect(await screen.findByLabelText('2. 怎样确认')).toBeTruthy();
     expect((screen.getByLabelText('资料编号') as HTMLInputElement).value).toBe('boost-v3');
-    expect(screen.getByText('请至少选择一个区域')).toBeTruthy();
-    await userEvent.click(screen.getByLabelText('增压空气通路'));
-    await userEvent.click(screen.getByLabelText('2. 怎样确认'));
-    await waitFor(() => expect((submit as HTMLButtonElement).disabled).toBe(false));
-    await userEvent.click(submit);
-    expect(await screen.findByText(/已受理为第 1 版/)).toBeTruthy();
-    expect(posted).toEqual([{ document_id: 'boost-v3', title: 'Boost v3', filename: 'Boost v3.md', content: markdown,
-      areas: [area], always_include: ['## 2. 怎样确认'] }]);
+    expect((screen.getByLabelText('标题') as HTMLInputElement).value).toBe('Boost v3');
+    for (const name of ['品牌', '车型', '年款从', '年款到', '发动机代码']) expect(screen.getByLabelText(name)).toBeTruthy();
+    expect(screen.getByText('请填写适用车型（至少品牌和车型）')).toBeTruthy();
+    expect(screen.queryByText('用于哪些区域 *')).toBeNull();
+    expect(screen.queryByText('新资料还是新版本')).toBeNull();
+    expect((screen.getByRole('button', { name: '上传并处理' }) as HTMLButtonElement).disabled).toBe(true);
   });
 
-  it('refuses a file without ## sections before sending anything', async () => {
-    const request = vi.spyOn(apiClient, 'request').mockImplementation(async (path: string) => {
+  it('offers a new version from the manual itself', async () => {
+    vi.spyOn(apiClient, 'request').mockImplementation(async (path: string) => {
+      if (path === '/area-references') return { items: [item('1', 'ready')] } as never;
+      if (path === '/area-references/targets') return targets as never;
+      throw new Error(path);
+    });
+    mount();
+    await userEvent.click(await screen.findByRole('button', { name: '上传新版本' }));
+    expect(screen.getByLabelText('增压空气通路 的新版本（Markdown）')).toBeTruthy();
+    await userEvent.click(screen.getByRole('button', { name: '取消' }));
+    expect(screen.queryByLabelText('增压空气通路 的新版本（Markdown）')).toBeNull();
+  });
+
+  it('refuses a file without ## sections', async () => {
+    vi.spyOn(apiClient, 'request').mockImplementation(async (path: string) => {
       if (path === '/area-references') return { items: [] } as never;
       if (path === '/area-references/targets') return targets as never;
       throw new Error(path);
@@ -104,7 +107,5 @@ describe('ReferencesPage', () => {
     mount();
     fireEvent.change(await screen.findByLabelText('Markdown 文件'), { target: { files: [new File(['# 只有标题\n正文'], 'x.md')] } });
     expect(await screen.findByText(/没有 "## " 二级标题/)).toBeTruthy();
-    expect((screen.getByRole('button', { name: '上传并处理' }) as HTMLButtonElement).disabled).toBe(true);
-    expect(request.mock.calls.some(([, options]) => options?.body !== undefined)).toBe(false);
   });
 });

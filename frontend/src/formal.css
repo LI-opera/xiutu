@@ -52,3 +52,10 @@
 .upload-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;margin-top:8px}.upload-actions .inline-error{margin:0}
 @media (max-width:1000px){.upload-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:700px){.upload-row{grid-template-columns:1fr}.references-page{gap:16px}.upload-card{padding:18px}}
+.upload-row.three{grid-template-columns:minmax(220px,1.3fr) minmax(180px,1fr) minmax(180px,1fr)}
+.vehicle-row{display:grid;grid-template-columns:repeat(5,minmax(110px,1fr));gap:12px 16px}
+.reference-group-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.reference-group-head span{display:flex;flex-direction:column;gap:4px}.reference-group-head small{color:var(--x-muted)}
+.formal-app button.small{padding:6px 12px;font-size:13px;white-space:nowrap}
+.new-version-form{border:1px dashed var(--x-line);border-radius:10px;padding:10px 12px;display:grid;gap:8px}
+@media (max-width:1000px){.upload-row.three{grid-template-columns:repeat(2,minmax(0,1fr))}.vehicle-row{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:700px){.upload-row.three,.vehicle-row{grid-template-columns:1fr 1fr}}
