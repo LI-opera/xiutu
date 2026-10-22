@@ -40,6 +40,7 @@ def main():
     target = validate_target(os.environ["DATABASE_URL"], "migration")
     engine = create_engine(target.sqlalchemy_url(), connect_args=target.connect_kwargs())
     service = AreaAnalysisService(CaseService(engine, b"read-only-compare"), settings)
+    print("加载向量模型…", file=sys.stderr, flush=True)
     service.reading_embeddings.warm()
     used = {"stored": 0, "computed": 0}
     real_load = reference_store.load
@@ -58,7 +59,10 @@ def main():
         with conn.begin():
             rows = conn.execute(select(cases).where(cases.c.owner_id == state["actor"])
                                 .order_by(cases.c.created_at)).mappings().all()
-        for row in (r for r in rows if is_template(r)):
+        targets = [r for r in rows if is_template(r)]
+        print(f"共 {len(targets)} 个模板病例", file=sys.stderr, flush=True)
+        for number, row in enumerate(targets, 1):
+            print(f"  {number}/{len(targets)} {str(row['id'])[:8]}", file=sys.stderr, flush=True)
             transaction = conn.begin()  # one short read-only transaction per case, rolled back
             try:
                 view = service._view(conn, state["actor"], row["id"])
