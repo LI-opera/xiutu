@@ -4,6 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { apiClient, idempotencyKey } from '../../api-client';
 import { ErrorState } from '../../components/States';
 import type { CaseSnapshot } from '../../types';
+import './workbench-v2-prototype.css';
+import './workbench-v2-content.css';
+import './formal-workbench-v2.css';
 
 export type MatchedVehicleDraft = { brand: string; model: string; year: string; engine: string; complaint: string; codes: string; condition: string; safety: string };
 const empty: Draft = { brand: '', model: '', year: '', engine: '', complaint: '', codes: '', condition: '', safety: '' };

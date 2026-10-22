@@ -1,0 +1,10 @@
+{
+  "description": "评测用标准答案：每个模板区域应读哪份资料（来自原区域资料清单 v2）。产品运行时不读它；只用于检查两步检索第一步是否选对资料，以及 AI 评测按区域准备资料。",
+  "areas": {
+    "boost-air": "tayron-dkvb-boost-air",
+    "pressure": "tayron-dkvb-pressure",
+    "actuator": "tayron-dkvb-actuator",
+    "turbo": "tayron-dkvb-turbo",
+    "powertrain": "tayron-dkvb-powertrain"
+  }
+}

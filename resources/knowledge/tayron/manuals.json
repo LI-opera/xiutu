@@ -1,70 +1,81 @@
 {
-  "version": "1",
-  "template_ids": [
-    "tayron-dkvb-p0299",
-    "tayron-dkvb-p0236"
-  ],
-  "template_version": "1",
+  "description": "仓库自带的维修资料：安装时写进资料表，再切块、算向量。资料只说明适用车型和内容，不和模板、区域挂钩；分析时按车型取资料、按内容选读哪份。",
+  "vehicle": {
+    "brand": "大众",
+    "model": "探岳",
+    "year": 2019,
+    "engine_code": "DKVB"
+  },
   "documents": [
     {
       "document_id": "tayron-dkvb-boost-air",
-      "version": "2",
-      "area_id": "boost-air",
+      "version": "3",
       "title": "增压空气通路检查与维修参考-详细版",
       "coverage": "详细检查与维修参考",
       "sources": [
         {
           "file": "11-增压空气通路检查与维修参考-详细版.md"
         }
-      ]
+      ],
+      "source_hashes": {
+        "11-增压空气通路检查与维修参考-详细版.md": "765bc687f1e06faa5d6907c5f268575b047a74662c63c93271a06a7d9a34637c"
+      }
     },
     {
       "document_id": "tayron-dkvb-pressure",
-      "version": "2",
-      "area_id": "pressure",
+      "version": "3",
       "title": "增压压力测量检查与维修参考-详细版",
       "coverage": "详细检查与维修参考",
       "sources": [
         {
           "file": "14-增压压力测量检查与维修参考-详细版.md"
         }
-      ]
+      ],
+      "source_hashes": {
+        "14-增压压力测量检查与维修参考-详细版.md": "67fc6fd54e82d27156966e074756de5b8ee87a6b59738a32702165662dcfad8c"
+      }
     },
     {
       "document_id": "tayron-dkvb-actuator",
-      "version": "3",
-      "area_id": "actuator",
+      "version": "4",
       "title": "增压调节机构检查与维修参考-详细版",
       "coverage": "详细检查与维修参考",
       "sources": [
         {
           "file": "15-增压调节机构检查与维修参考-详细版.md"
         }
-      ]
+      ],
+      "source_hashes": {
+        "15-增压调节机构检查与维修参考-详细版.md": "6977a06d40295e02d049faf9a3d41b98def9a413b1f37c3d689decdd34577213"
+      }
     },
     {
       "document_id": "tayron-dkvb-turbo",
-      "version": "3",
-      "area_id": "turbo",
+      "version": "4",
       "title": "涡轮增压器本体检查与维修参考-详细版",
       "coverage": "详细检查与维修参考",
       "sources": [
         {
           "file": "16-涡轮增压器本体检查与维修参考-详细版.md"
         }
-      ]
+      ],
+      "source_hashes": {
+        "16-涡轮增压器本体检查与维修参考-详细版.md": "561fe731097e6ac3b5a7659dca8fd61179b8e471fa65d92fd2704dfdf3d794d1"
+      }
     },
     {
       "document_id": "tayron-dkvb-powertrain",
-      "version": "3",
-      "area_id": "powertrain",
+      "version": "4",
       "title": "其他动力系统方向检查与维修参考-详细版",
       "coverage": "详细检查与维修参考",
       "sources": [
         {
           "file": "17-其他动力系统方向检查与维修参考-详细版.md"
         }
-      ]
+      ],
+      "source_hashes": {
+        "17-其他动力系统方向检查与维修参考-详细版.md": "506283884e96a0aceca3af2f116206ea0e7a7dfa0bb6df3a93a12ba91bbae4e7"
+      }
     }
   ]
 }

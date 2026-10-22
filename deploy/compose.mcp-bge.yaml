@@ -1,7 +1,0 @@
-services:
-  manual-mcp:
-    volumes:
-      - type: bind
-        source: ${MANUAL_MCP_BGE_PATH:?Supply pinned local BGE snapshot}
-        target: /models/bge-m3
-        read_only: true
