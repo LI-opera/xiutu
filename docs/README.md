@@ -10,10 +10,8 @@
 | roadmap/ | 当前能力与缺口，不代表已经安排全部实现 |
 | api/ | 接口契约与生成的 OpenAPI，部分 WP 文档是阶段记录 |
 | adr/ | 架构决策 |
-| implementation/ | 历史阶段实施记录，原运行证据只在本机保留 |
 | runbooks/ | 专项维护说明，执行前核对适用对象 |
-| reference/ | 已有参考材料 |
-| archive/ | 旧首页说明与文档阅读所需历史记录 |
+| archive/ | 旧首页说明、开发证据与已移除功能的说明（[retired-features.md](archive/retired-features.md)） |
 
 建议顺序：
 
@@ -25,4 +23,4 @@
 6. [处理复检与历史](learning/04-repair-retest-and-history.md)
 7. [当前能力与缺口](roadmap/current-capabilities.md)
 
-历史兼容、保留迁移与隔离测试支持不是默认执行路径。GitHub 仓库不含原病例库、本机模型与凭证。
+2026-10 清理第二步删除了旧资料中心、早期诊断流程、MCP 和旧模板，见 [archive/retired-features.md](archive/retired-features.md)。GitHub 仓库不含原病例库、本机模型与凭证。

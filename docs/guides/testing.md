@@ -10,6 +10,6 @@
 
 常用命令见根目录 README。所有数据库测试使用显式 TEST_DATABASE_URL，目标须为 xiutu_test_*；没有该变量不回退开发库。
 
-tests/fixtures 是可重放输入，应上传；docs 下的 evidence 是历史运行产物，应留本机。历史测试如需要旧资料包，使用 resources/legacy 下相应样本；部分旧执行规则已有已记录的历史失败，不能以当前主流程通过声称整个旧测试集全绿。
+旧流程的测试已随旧代码删除（见 docs/archive/retired-features.md），现在的测试只覆盖当前模板工作台。
 
 测试通过证明相应实现范围，不证明真实车辆维修效果。模型 schema 合法也不证明建议技术正确。
