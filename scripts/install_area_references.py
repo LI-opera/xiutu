@@ -16,7 +16,7 @@ from sqlalchemy import create_engine, text  # noqa: E402
 
 from app.infrastructure.db_target import validate_target  # noqa: E402
 from app.infrastructure.schema_version import EXPECTED_REVISION  # noqa: E402
-from scripts.seed_area_references import index, seed  # noqa: E402
+from scripts.seed_area_references import backfill_always_include, bound_versions, index, seed  # noqa: E402
 from scripts.wp15_workbench import STATE, environment  # noqa: E402
 
 KNOWN = {"0019_case_area_rankings", "0020_area_analysis", "0021_area_input_identity",
@@ -36,12 +36,16 @@ def main():
     command.upgrade(Config(str(ROOT / "alembic.ini")), EXPECTED_REVISION)
     with engine.begin() as conn:
         relations = seed(conn)
+        filled = backfill_always_include(conn)
+        targets = bound_versions(conn)
     embedder = None
     if not no_vectors:
         from app.services.reference_ingest import load_embedder
         embedder = load_embedder()
-    indexed = index(engine, {(r["document_id"], r["document_version"]) for r in relations}, embedder)
+    # Index what analyses actually read: every bound version, not only this manifest's.
+    indexed = index(engine, targets, embedder)
     print(json.dumps({"before": before, "after": EXPECTED_REVISION, "bindings": len(relations),
+                      "always_include_filled": filled, "bound_versions": len(targets),
                       "indexed": indexed, "model_calls": 0}, ensure_ascii=False, indent=2))
     engine.dispose()
 

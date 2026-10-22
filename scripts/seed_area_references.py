@@ -64,6 +64,26 @@ def always_include(doc):
     return []
 
 
+def backfill_always_include(conn):
+    """Every stored version whose exact body has reviewed always-sent sections gets them once."""
+    config = json.loads(READING.read_text(encoding="utf-8"))
+    filled = []
+    for entry in config["documents"]:
+        result = conn.execute(update(documents).where(
+            documents.c.document_id == entry["id"], documents.c.version == entry["version"],
+            documents.c.content_hash == entry["content_hash"], documents.c.always_include == [])
+            .values(always_include=entry["always_include"]))
+        if result.rowcount:
+            filled.append(f"{entry['id']} v{entry['version']}")
+    return filled
+
+
+def bound_versions(conn):
+    """Every document version an area currently reads, across all template versions."""
+    return {(row.document_id, row.document_version) for row in conn.execute(
+        select(bindings.c.document_id, bindings.c.document_version).distinct())}
+
+
 def index(engine, documents_seeded, embedder):
     """Chunk (and embed, when a model is given) every seeded version that has no chunks yet."""
     from app.services.reference_ingest import process
