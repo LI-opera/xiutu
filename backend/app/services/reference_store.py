@@ -96,33 +96,60 @@ def load(conn, document, embeddings):
     return source, always
 
 
+# A stored version never changes (a new body is a new version), so its pool can be kept.
+_POOLS = {}
+_POOL_LIMIT = 64
+
+
 def pool(conn, document, embeddings):
     """Stored searchable chunks of a document and their vectors, or None to compute them now."""
+    fingerprint = getattr(embeddings, "fingerprint", None) if embeddings is not None else None
+    key = (document["id"], document.get("version"), document.get("content_hash"), fingerprint)
+    if key in _POOLS:
+        return _POOLS[key]
     source, _ = load(conn, document, embeddings)
     if source is None:
         return None
     if embeddings is None:
-        return source.chunks, None
-    rows = conn.execute(select(vectors.c.ordinal, vectors.c.embedding).where(
-        vectors.c.document_id == document["id"], vectors.c.version == document["version"],
-        vectors.c.fingerprint == source.fingerprint, vectors.c.ordinal.in_(source.ordinals))).all()
-    by_ordinal = {ordinal: [float(x) for x in embedding] for ordinal, embedding in rows}
-    return source.chunks, [by_ordinal[o] for o in source.ordinals]
+        result = (source.chunks, None)
+    else:
+        rows = conn.execute(select(vectors.c.ordinal, vectors.c.embedding).where(
+            vectors.c.document_id == document["id"], vectors.c.version == document["version"],
+            vectors.c.fingerprint == source.fingerprint, vectors.c.ordinal.in_(source.ordinals))).all()
+        by_ordinal = {ordinal: [float(x) for x in embedding] for ordinal, embedding in rows}
+        result = (source.chunks, [by_ordinal[o] for o in source.ordinals])
+    if len(_POOLS) >= _POOL_LIMIT:
+        _POOLS.pop(next(iter(_POOLS)))
+    _POOLS[key] = result
+    return result
+
+
+def vehicle_conditions(vehicle):
+    """Match on what the case knows about its vehicle; a part the case left empty does not filter.
+
+    A case is matched to a template without an engine code, for example, so requiring one here
+    would leave such cases with no manuals. Brand and model must be known.
+    """
+    text = {k: str(vehicle.get(k) or "").strip() for k in ("brand", "model", "engine_code")}
+    if not (text["brand"] and text["model"]):
+        return None
+    conditions = [func.lower(documents.c.vehicle_brand) == text["brand"].lower(),
+                  func.lower(documents.c.vehicle_model) == text["model"].lower()]
+    if text["engine_code"]:
+        conditions.append(func.upper(documents.c.vehicle_engine_code) == text["engine_code"].upper())
+    try:
+        conditions.append(documents.c.vehicle_year == int(vehicle.get("year")))
+    except (TypeError, ValueError):
+        pass
+    return conditions
 
 
 def candidates(conn, vehicle):
     """The latest ready version of every manual for this vehicle, in the analysis document shape."""
-    try:
-        year = int(vehicle.get("year"))
-    except (TypeError, ValueError):
+    conditions = vehicle_conditions(vehicle)
+    if conditions is None:
         return []
-    rows = conn.execute(select(documents).where(
-        documents.c.status == "ready",
-        func.lower(documents.c.vehicle_brand) == str(vehicle.get("brand") or "").strip().lower(),
-        func.lower(documents.c.vehicle_model) == str(vehicle.get("model") or "").strip().lower(),
-        documents.c.vehicle_year == year,
-        func.upper(documents.c.vehicle_engine_code) == str(vehicle.get("engine_code") or "").strip().upper(),
-    )).mappings().all()
+    rows = conn.execute(select(documents).where(documents.c.status == "ready", *conditions)).mappings().all()
     latest = {}
     for row in rows:
         rank = (int(row["version"]) if row["version"].isdigit() else -1, row["created_at"])

@@ -115,3 +115,12 @@ def test_choosing_uses_stored_pools_when_given():
         return computed_pool(document)
     assert choose_documents(manuals, ["检查"], pool=pool) and seen == [m["id"] for m in manuals]
     assert choose_documents([], ["检查"]) == []
+
+
+def test_vehicle_filter_ignores_what_the_case_does_not_know():
+    from app.services.reference_store import vehicle_conditions
+    full = vehicle_conditions({"brand": "大众", "model": "探岳", "year": 2019, "engine_code": "DKVB"})
+    no_engine = vehicle_conditions({"brand": "大众", "model": "探岳", "year": 2019, "engine_code": None})
+    assert len(full) == 4 and len(no_engine) == 3
+    assert len(vehicle_conditions({"brand": "大众", "model": "探岳", "year": "", "engine_code": ""})) == 2
+    assert vehicle_conditions({"brand": None, "model": "虚拟探岳", "year": 2019}) is None

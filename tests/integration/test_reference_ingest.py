@@ -98,6 +98,8 @@ def test_upload_processes_and_versions(docrig, fake_embedder, doc_id):  # noqa: 
         found = reference_store.candidates(conn, {"brand": "大众", "model": "测试车", "year": "2020", "engine_code": "test1"})
         assert [d["id"] for d in found] == [doc_id]
         assert reference_store.candidates(conn, {**VEHICLE, "year": 2021}) == []
+        # A case without an engine code still finds the vehicle's manuals.
+        assert [d["id"] for d in reference_store.candidates(conn, {**VEHICLE, "engine_code": None})] == [doc_id]
 
     again = upload(docrig, doc_id)
     assert again.status_code == 200 and again.json()["reused"] and again.json()["version"] == "1"
