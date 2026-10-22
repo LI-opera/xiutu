@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
-from sqlalchemy import select
+from sqlalchemy import select, update
 from app.infrastructure.orm import area_reference_documents as documents, area_reference_bindings as bindings
 from app.infrastructure.orm import workbench_templates
 
@@ -51,6 +51,34 @@ def build_documents(package, manifest):
             "provenance": {"sources": sources, "coverage": entry["coverage"], "images_sent": False}}
 
 
+READING = ROOT / "backend/app/topics/reading_documents_v1.json"
+
+
+def always_include(doc):
+    """Reviewed always-sent sections for this exact body, carried into the document row."""
+    config = json.loads(READING.read_text(encoding="utf-8"))
+    for entry in config["documents"]:
+        if (entry["id"], entry["version"], entry["content_hash"]) == (
+                doc["document_id"], doc["version"], doc["content_hash"]):
+            return entry["always_include"]
+    return []
+
+
+def index(engine, documents_seeded, embedder):
+    """Chunk (and embed, when a model is given) every seeded version that has no chunks yet."""
+    from app.services.reference_ingest import process
+    done = []
+    for document_id, version in sorted(documents_seeded):
+        with engine.connect() as conn:
+            row = conn.execute(select(documents.c.chunk_count, documents.c.vector_fingerprint).where(
+                documents.c.document_id == document_id, documents.c.version == version)).one()
+        fingerprint = embedder[1] if embedder else None
+        if row.chunk_count is not None and row.vector_fingerprint == fingerprint:
+            continue
+        done.append(process(engine, document_id, version, embedder))
+    return done
+
+
 def seed(conn, package=DEFAULT_PACKAGE, manifest_path=MANIFEST):
     manifest = json.loads(Path(manifest_path).read_text(encoding="utf-8"))
     templates = list(conn.execute(select(workbench_templates).where(
@@ -65,7 +93,11 @@ def seed(conn, package=DEFAULT_PACKAGE, manifest_path=MANIFEST):
         if prior and any(prior[key] != doc[key] for key in doc):
             raise ValueError("Existing document changed: publish a new version")
         if not prior:
-            conn.execute(documents.insert().values(**doc))
+            conn.execute(documents.insert().values(**doc, always_include=always_include(doc)))
+        elif not prior["always_include"] and always_include(doc):
+            # Rows imported before 0024 get their reviewed always-sent sections once.
+            conn.execute(update(documents).where(documents.c.document_id == doc["document_id"],
+                documents.c.version == doc["version"]).values(always_include=always_include(doc)))
         for template in templates:
             if entry["area_id"] not in {a["id"] for a in template["content_json"]["areas"]}:
                 continue
@@ -87,13 +119,25 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--package", type=Path, default=DEFAULT_PACKAGE)
     parser.add_argument("--manifest", type=Path, default=MANIFEST)
+    parser.add_argument("--no-vectors", action="store_true",
+                        help="store chunks only (no local embedding model on this machine)")
     args = parser.parse_args()
     from scripts.wp15_workbench import STATE, environment
     from app.infrastructure.db_target import validate_target
     from sqlalchemy import create_engine
     env = environment(json.loads(STATE.read_text(encoding="utf-8")))
+    # Same settings as the launched API and worker, so vectors use the model they will query with.
+    import os
+    os.environ.update(env)
     target = validate_target(env["DATABASE_URL"], "migration")
     engine = create_engine(target.sqlalchemy_url(), connect_args=target.connect_kwargs())
     with engine.begin() as conn:
-        print(json.dumps(seed(conn, args.package, args.manifest), ensure_ascii=False, indent=2))
+        relations = seed(conn, args.package, args.manifest)
+    print(json.dumps(relations, ensure_ascii=False, indent=2))
+    embedder = None
+    if not args.no_vectors:
+        from app.services.reference_ingest import load_embedder
+        embedder = load_embedder()
+    print(json.dumps(index(engine, {(r["document_id"], r["document_version"]) for r in relations}, embedder),
+                     ensure_ascii=False, indent=2))
     engine.dispose()

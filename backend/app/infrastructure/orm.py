@@ -1,6 +1,6 @@
 import sqlalchemy as sa
 from pgvector.sqlalchemy import Vector
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 
 metadata = sa.MetaData()
 
@@ -11,7 +11,41 @@ area_reference_documents = sa.Table("area_reference_documents", metadata,
     sa.Column("body", sa.Text, nullable=False),
     sa.Column("content_hash", sa.String(64), nullable=False),
     sa.Column("provenance", JSONB, nullable=False),
-    sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False))
+    sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+    # Ingest state (0024): only "ready" versions are ever bound to an area.
+    sa.Column("source_kind", sa.String(16), nullable=False, server_default="seed"),
+    sa.Column("status", sa.String(16), nullable=False, server_default="ready"),
+    sa.Column("error_code", sa.String(80)),
+    sa.Column("chunker_version", sa.String(40)),
+    sa.Column("chunk_count", sa.Integer),
+    sa.Column("vector_fingerprint", sa.String(80)),
+    sa.Column("always_include", JSONB, nullable=False, server_default="[]"),
+    sa.Column("requested_areas", JSONB, nullable=False, server_default="[]"),
+    sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False))
+area_reference_chunks = sa.Table("area_reference_chunks", metadata,
+    sa.Column("document_id", sa.String(100), primary_key=True),
+    sa.Column("version", sa.String(32), primary_key=True),
+    sa.Column("ordinal", sa.Integer, primary_key=True),
+    sa.Column("section", sa.Text, nullable=False),
+    sa.Column("subsection", sa.Text),
+    sa.Column("text", sa.Text, nullable=False),
+    sa.Column("char_start", sa.Integer, nullable=False),
+    sa.Column("char_end", sa.Integer, nullable=False),
+    sa.Column("identifiers", ARRAY(sa.Text), nullable=False, server_default="{}"),
+    sa.Column("searchable", sa.Boolean, nullable=False),
+    sa.Column("search_hash", sa.String(64), nullable=False),
+    sa.ForeignKeyConstraint(["document_id", "version"],
+        ["area_reference_documents.document_id", "area_reference_documents.version"]))
+area_reference_chunk_vectors = sa.Table("area_reference_chunk_vectors", metadata,
+    sa.Column("document_id", sa.String(100), primary_key=True),
+    sa.Column("version", sa.String(32), primary_key=True),
+    sa.Column("ordinal", sa.Integer, primary_key=True),
+    sa.Column("fingerprint", sa.String(80), primary_key=True),
+    sa.Column("search_hash", sa.String(64), nullable=False),
+    sa.Column("embedding", Vector(), nullable=False),
+    sa.ForeignKeyConstraint(["document_id", "version", "ordinal"],
+        ["area_reference_chunks.document_id", "area_reference_chunks.version",
+         "area_reference_chunks.ordinal"], ondelete="CASCADE"))
 area_reference_bindings = sa.Table("area_reference_bindings", metadata,
     sa.Column("template_id", sa.String(100), primary_key=True),
     sa.Column("template_version", sa.String(32), primary_key=True),

@@ -85,6 +85,9 @@ class Worker:
                     result = build_index(self.store, lease, stopped, hook)
                 elif lease.job["kind"] == "ingest":
                     result = parse_ingest(self.store.engine, lease.job["payload"], stopped)
+                elif lease.job["kind"] == "reference_ingest":
+                    from app.services.reference_ingest import run_job
+                    result = run_job(self.store.engine, lease.job["payload"], stopped)
                 elif self.legacy_dispatcher is not None:
                     from app.legacy_worker_handlers import LEGACY_JOB_KINDS
 

@@ -8,6 +8,7 @@ from app.api.auth import router as auth_router
 from app.api.cases import router as cases_router
 from app.api.area_rankings import router as area_rankings_router
 from app.api.area_analyses import router as area_analyses_router
+from app.api.area_references import router as area_references_router
 from app.api.template_repairs import router as template_repairs_router
 from app.api.case_analyses import router as case_analyses_router
 from app.api.client_config import router as client_config_router
@@ -27,6 +28,7 @@ from app.retrieval.service import RetrievalService
 from app.services.area_service import AreaService
 from app.services.area_ranking_service import AreaRankingService
 from app.services.area_analysis_service import AreaAnalysisService
+from app.services.reference_ingest import ReferenceIngestService
 from app.services.template_repair_service import TemplateRepairService
 from app.services.workbench_observation_service import TopicService
 from app.services.case_service import CaseService
@@ -77,6 +79,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.area_ranking_service = AreaRankingService(app.state.case_service, settings)
     app.state.area_analysis_service = AreaAnalysisService(app.state.case_service, settings)
+    app.state.reference_ingest_service = ReferenceIngestService(engine)
     app.state.template_repair_service = TemplateRepairService(
         engine, TopicService(app.state.case_service))
     app.state.run_service = RunService(engine)
@@ -102,6 +105,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(cases_router, responses=errors)
     app.include_router(area_rankings_router, responses=errors)
     app.include_router(area_analyses_router, responses=errors)
+    app.include_router(area_references_router, responses=errors)
     app.include_router(template_repairs_router, responses=errors)
     app.include_router(case_analyses_router, responses=errors)
     app.include_router(client_config_router, responses=errors)

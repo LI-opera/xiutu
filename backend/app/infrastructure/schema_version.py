@@ -1,1 +1,1 @@
-EXPECTED_REVISION = "0023_template_repair_retest"
+EXPECTED_REVISION = "0024_reference_ingest"
