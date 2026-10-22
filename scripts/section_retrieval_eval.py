@@ -2,10 +2,13 @@
 
 No model API call. Queries are "question title (without its ID): option label"; the gold
 answer is the reviewed question-to-section table, minus sections that are always sent.
-Search runs inside the question's own area document, as the analysis would.
+Search runs inside the question's own area document, as the analysis does today; with
+--scope library it runs over every document of the vehicle at once (no area-to-document
+assignment), and a hit only counts in the question's own document.
 
     uv run python -B scripts/section_retrieval_eval.py            # all channels, needs local E5
     uv run python -B scripts/section_retrieval_eval.py --no-dense # keyword/exact only
+    uv run python -B scripts/section_retrieval_eval.py --scope library
 
 Results: .local-data/evals/section-retrieval/<time>/report.md and results.json.
 """
@@ -80,9 +83,14 @@ def load_queries(config, documents, *, with_ids=False):
     return queries
 
 
-def hits(chunk, gold):
-    """Gold IDs a chunk covers: a ## gold by any chunk inside it, a ### gold only by itself."""
+def hits(chunk, gold, doc_id=None):
+    """Gold IDs a chunk covers: a ## gold by any chunk inside it, a ### gold only by itself.
+
+    doc_id: the gold's document; a chunk of another document never covers it.
+    """
     covered = set()
+    if doc_id is not None and chunk.document_id != doc_id:
+        return covered
     for item in gold:
         heading = item["heading"]
         if heading.startswith("### ") and chunk.subsection == heading:
@@ -93,43 +101,52 @@ def hits(chunk, gold):
 
 
 def section_ranking(ranking, chunks):
-    """Whole ## sections in the order their best chunk ranks: what the analysis would send."""
+    """Whole ## sections (per document) in the order their best chunk ranks: what would be sent."""
     order = []
     for index in ranking:
-        if chunks[index].section not in order:
-            order.append(chunks[index].section)
+        key = (chunks[index].document_id, chunks[index].section)
+        if key not in order:
+            order.append(key)
     return order
 
 
-def section_hits(section, gold, parents):
+def section_hits(key, gold, parents, doc_id=None):
     """A ## gold is covered by its own section; a ### gold by the section that contains it."""
+    document, section = key
+    if doc_id is not None and document != doc_id:
+        return set()
     return {g["id"] for g in gold if g["heading"] == section or parents.get(g["heading"]) == section}
 
 
-def score_sections(ranking, chunks, gold, top_k):
-    parents = {c.subsection: c.section for c in chunks if c.subsection}
+def score_sections(ranking, chunks, gold, top_k, doc_id=None):
+    parents = {c.subsection: c.section for c in chunks
+               if c.subsection and (doc_id is None or c.document_id == doc_id)}
     order = section_ranking(ranking, chunks)
     result = {}
     for k in top_k:
         found = set()
-        for section in order[:k]:
-            found |= section_hits(section, gold, parents)
+        for key in order[:k]:
+            found |= section_hits(key, gold, parents, doc_id)
         result[f"recall@{k}"] = len(found) / len(gold)
-    first = next((pos for pos, section in enumerate(order, 1) if section_hits(section, gold, parents)), None)
+    first = next((pos for pos, key in enumerate(order, 1) if section_hits(key, gold, parents, doc_id)), None)
     result["rr"] = 1 / first if first else 0.0
     result["first_hit"] = first
-    result["top"] = [section.lstrip("# ") for section in order[:5]]
+    result["top"] = [(section.lstrip("# ") if doc_id is None or document == doc_id
+                      else f"[{document}] {section.lstrip('# ')}")
+                     for document, section in order[:5]]
+    result["other_documents_in_top"] = sum(1 for document, _ in order[:5]
+                                           if doc_id is not None and document != doc_id)
     return result
 
 
-def score(ranking, chunks, gold, top_k):
+def score(ranking, chunks, gold, top_k, doc_id=None):
     result = {}
     for k in top_k:
         found = set()
         for index in ranking[:k]:
-            found |= hits(chunks[index], gold)
+            found |= hits(chunks[index], gold, doc_id)
         result[f"recall@{k}"] = len(found) / len(gold)
-    first = next((pos for pos, index in enumerate(ranking, 1) if hits(chunks[index], gold)), None)
+    first = next((pos for pos, index in enumerate(ranking, 1) if hits(chunks[index], gold, doc_id)), None)
     result["rr"] = 1 / first if first else 0.0
     result["first_hit"] = first
     return result
@@ -158,10 +175,18 @@ def cached_vectors(model, texts, cache_path):
     return [cache[k] for k in keys]
 
 
-def evaluate(config, documents, queries, *, skip_navigation, model=None):
+def evaluate(config, documents, queries, *, skip_navigation, model=None, scope="area"):
     skip = config["navigation_sections"] if skip_navigation else []
     chunks_by_doc = {doc_id: split(doc_id, doc["body"], skip) for doc_id, doc in documents.items()}
-    indexes = {doc_id: BM25([c.search_text for c in chunks]) for doc_id, chunks in chunks_by_doc.items()}
+    counts = {doc_id: len(chunks) for doc_id, chunks in chunks_by_doc.items()}
+    if scope == "library":
+        # One pool: every document of the vehicle, searched together.
+        pooled = [c for doc_id in sorted(chunks_by_doc) for c in chunks_by_doc[doc_id]]
+        shared = BM25([c.search_text for c in pooled])
+        chunks_by_doc = {doc_id: pooled for doc_id in chunks_by_doc}
+        indexes = {doc_id: shared for doc_id in chunks_by_doc}
+    else:
+        indexes = {doc_id: BM25([c.search_text for c in chunks]) for doc_id, chunks in chunks_by_doc.items()}
     vectors = {}
     if model is not None:
         for doc_id, chunks in chunks_by_doc.items():
@@ -171,7 +196,7 @@ def evaluate(config, documents, queries, *, skip_navigation, model=None):
     for query in queries:
         doc_id = query["document_id"]
         chunks = chunks_by_doc[doc_id]
-        reachable = [g for g in query["gold"] if any(hits(c, [g]) for c in chunks)]
+        reachable = [g for g in query["gold"] if any(hits(c, [g], doc_id) for c in chunks)]
         rankings = {"exact": exact_rank(query["text"], chunks), "bm25": indexes[doc_id].rank(query["text"])}
         if model is not None:
             rankings["dense"] = dense_rank(model.embed_query(query["text"]), vectors[doc_id])
@@ -182,11 +207,11 @@ def evaluate(config, documents, queries, *, skip_navigation, model=None):
                "channels": {}, "chunk_channels": {}}
         for name, ranking in rankings.items():
             # Main unit (v2): whole ## sections. Chunk-level (v1) is kept for comparison.
-            row["channels"][name] = score_sections(ranking, chunks, query["gold"], config["top_k"])
-            row["chunk_channels"][name] = score(ranking, chunks, query["gold"], config["top_k"])
+            row["channels"][name] = score_sections(ranking, chunks, query["gold"], config["top_k"], doc_id)
+            row["chunk_channels"][name] = score(ranking, chunks, query["gold"], config["top_k"], doc_id)
             row["chunk_channels"][name]["top"] = [chunks[i].path for i in ranking[:5]]
         rows.append(row)
-    return rows, {doc_id: len(chunks) for doc_id, chunks in chunks_by_doc.items()}
+    return rows, counts
 
 
 def summarize(rows, channels, top_k, key="channels"):
@@ -226,18 +251,20 @@ def table(summary, top_k):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--no-dense", action="store_true", help="skip the vector channel (no local model needed)")
+    parser.add_argument("--scope", choices=["area", "library"], default="area",
+                        help="area: search the question's own document (today); library: all documents together")
     args = parser.parse_args()
     config = json.loads(CONFIG.read_text(encoding="utf-8"))
     documents = load_documents()
     model = None if args.no_dense else embedder()
     queries = load_queries(config, documents)
-    rows, chunk_counts = evaluate(config, documents, queries, skip_navigation=True, model=model)
+    rows, chunk_counts = evaluate(config, documents, queries, skip_navigation=True, model=model, scope=args.scope)
     channels = list(rows[0]["channels"])
     summary = summarize(rows, channels, config["top_k"])
     chunk_summary = summarize(rows, channels, config["top_k"], key="chunk_channels")
     # Comparison only: question IDs in the query and navigation tables searchable.
     leak_rows, _ = evaluate(config, documents, load_queries(config, documents, with_ids=True),
-                            skip_navigation=False, model=model)
+                            skip_navigation=False, model=model, scope=args.scope)
     leak_summary = summarize(leak_rows, channels, config["top_k"])
 
     main_channel = config["main_channel"] if config["main_channel"] in channels else "exact+bm25"
@@ -247,7 +274,7 @@ def main():
     passed = overall >= config["pass"]["overall"] and all(v >= config["pass"]["each_document"] for v, _ in per_doc.values())
 
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    folder = OUT_DIR / stamp
+    folder = OUT_DIR / (stamp if args.scope == "area" else f"{stamp}-library")
     folder.mkdir(parents=True, exist_ok=True)
     unreachable = [r for r in rows if r["unreachable"]]
     misses = sorted((r for r in rows if r["channels"][main_channel][f"recall@{k}"] < 1),
@@ -255,6 +282,8 @@ def main():
     lines = [f"# 资料章节检索评测 {stamp}", "",
         f"- 题集：{config['version']}；查询 {len(rows)} 条（题目去掉题号 + 选项）；资料块 {sum(chunk_counts.values())} 个（{chunk_counts}）",
         "- 排名单位：整个 `##` 章节（同一章节的多个小节只占一个名额）；标准答案是 `###` 小节时，包含它的章节进前 k 即算命中",
+        f"- 检索范围：{'每题只在本区域的资料里检索（现在的做法）' if args.scope == 'area' else '全部资料一起检索，不按区域分资料；命中必须在本题的资料里才算'}",
+        f"- 前 5 里平均有几章来自别的资料：{round(sum(r['channels'][main_channel]['other_documents_in_top'] for r in rows) / len(rows), 2) if args.scope == 'library' else '—'}",
         f"- 向量模型：{'未使用（--no-dense）' if model is None else model.fingerprint + '（项目配置，与分析时相同）'}",
         f"- 及格线（事先写定）：{main_channel} 前 {k} 召回率 ≥ {config['pass']['overall']}，每份资料 ≥ {config['pass']['each_document']}",
         f"- **结果：{main_channel} 前 {k} 召回率 {overall}，{'达到' if passed else '未达到'}及格线**", "",

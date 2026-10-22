@@ -109,11 +109,34 @@ def test_every_gold_section_is_reachable_after_skipping_navigation():
 
 def test_section_ranking_counts_each_section_once_and_parent_covers_subsection_gold():
     chunks = split("doc", DOC)  # 0: ## 1 lead, 1: 1.1, 2: 1.2, 3: 2.1
-    assert ev.section_ranking([1, 2, 0, 3], chunks) == ["## 1. 接头座合", "## 2. 检漏"]
+    assert ev.section_ranking([1, 2, 0, 3], chunks) == [("doc", "## 1. 接头座合"), ("doc", "## 2. 检漏")]
     gold = [{"id": "s1.2", "heading": "### 1.2 卡箍"}, {"id": "s2", "heading": "## 2. 检漏"}]
-    result = ev.score_sections([1, 2, 0, 3], chunks, gold, [1, 2])
+    result = ev.score_sections([1, 2, 0, 3], chunks, gold, [1, 2], "doc")
     # Section 1 fills one slot however many of its subsections rank first, and contains 1.2.
     assert result["recall@1"] == 0.5 and result["recall@2"] == 1
     assert result["first_hit"] == 1 and result["top"] == ["1. 接头座合", "2. 检漏"]
-    chunk_level = ev.score([1, 2, 0, 3], chunks, gold, [2])
+    chunk_level = ev.score([1, 2, 0, 3], chunks, gold, [2], "doc")
     assert chunk_level["recall@2"] == 0.5  # chunk ranking spends both slots inside section 1
+
+
+def test_library_scope_only_counts_hits_in_the_questions_own_document():
+    own, other = split("doc", DOC), split("other", DOC)  # same headings, different documents
+    pooled = own + other
+    gold = [{"id": "s2", "heading": "## 2. 检漏"}]
+    ranking = [len(own) + 3, 3]  # the other document's "## 2" ranks first
+    result = ev.score_sections(ranking, pooled, gold, [1, 2], "doc")
+    assert result["recall@1"] == 0 and result["recall@2"] == 1
+    assert result["top"] == ["[other] 2. 检漏", "2. 检漏"]
+    assert result["other_documents_in_top"] == 1
+    assert ev.hits(other[3], gold, "doc") == set() and ev.hits(own[3], gold, "doc") == {"s2"}
+
+
+def test_library_scope_searches_one_pool_and_keeps_per_document_counts():
+    config = json.loads(ev.CONFIG.read_text(encoding="utf-8"))
+    documents = ev.load_documents()
+    queries = ev.load_queries(config, documents)[:20]
+    area, area_counts = ev.evaluate(config, documents, queries, skip_navigation=True)
+    library, library_counts = ev.evaluate(config, documents, queries, skip_navigation=True, scope="library")
+    assert area_counts == library_counts
+    assert all(not row["unreachable"] for row in library)
+    assert [r["question_id"] for r in area] == [r["question_id"] for r in library]
