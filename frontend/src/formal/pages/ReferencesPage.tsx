@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api-client';
 import { ColumnHeader } from '../components/ColumnHeader';
@@ -7,9 +7,7 @@ import {
   groupReferences, isWorking, MAX_REFERENCE_CHARS, REFERENCE_ID, referenceIdFrom, sectionHeadings,
   statusLabel, statusTone, targetKey,
 } from '../references';
-import type { AreaTarget, ReferenceChunkList, ReferenceList, ReferenceTargets } from '../types';
-
-type Selected = { documentId: string; version: string };
+import type { AreaTarget, ReferenceChunkList, ReferenceItem, ReferenceList, ReferenceTargets } from '../types';
 
 function areaNames(targets: ReferenceTargets | undefined) {
   const names = new Map<string, string>();
@@ -19,14 +17,14 @@ function areaNames(targets: ReferenceTargets | undefined) {
 }
 
 export function ReferencesPage() {
-  const [selected, setSelected] = useState<Selected | null>(null);
+  const [query, setQuery] = useState('');
+  const [expanded, setExpanded] = useState<string | null>(null);
   const [newVersionOf, setNewVersionOf] = useState<string | null>(null);
-  const [onlySearchable, setOnlySearchable] = useState(true);
 
   const list = useQuery({
     queryKey: ['area-references'],
     queryFn: ({ signal }) => apiClient.request<ReferenceList>('/area-references', { signal }),
-    refetchInterval: query => (query.state.data?.items.some(item => isWorking(item.status)) ? 1_500 : false),
+    refetchInterval: q => (q.state.data?.items.some(item => isWorking(item.status)) ? 1_500 : false),
   });
   const targets = useQuery({
     queryKey: ['area-reference-targets'],
@@ -34,77 +32,98 @@ export function ReferencesPage() {
   });
   const groups = useMemo(() => groupReferences(list.data?.items ?? []), [list.data]);
   const names = useMemo(() => areaNames(targets.data), [targets.data]);
-  const current = list.data?.items.find(i => i.document_id === selected?.documentId && i.version === selected?.version) ?? null;
-  const chunks = useQuery({
-    queryKey: ['area-reference-chunks', selected?.documentId, selected?.version],
-    queryFn: ({ signal }) => apiClient.request<ReferenceChunkList>(
-      `/area-references/${encodeURIComponent(selected!.documentId)}/versions/${encodeURIComponent(selected!.version)}/chunks`, { signal }),
-    enabled: !!selected && current?.status === 'ready',
-  });
-  const shownChunks = (chunks.data?.items ?? []).filter(c => !onlySearchable || c.searchable);
-  const label = (target: AreaTarget) => names.get(targetKey(target)) ?? targetKey(target);
+  const needle = query.trim().toLowerCase();
+  const shown = groups.filter(g => !needle || g.title.toLowerCase().includes(needle) || g.documentId.includes(needle));
+  const toggle = (id: string) => setExpanded(expanded === id ? null : id);
 
   return <div className="references-page">
     <section className="page-card upload-card"><ColumnHeader eyebrow="UPLOAD" title="上传资料" />
       <UploadForm />
     </section>
-    <div className="documents-layout">
-      <section className="page-card document-sidebar"><ColumnHeader eyebrow="MANUALS" title="维修资料" />
-        <p className="section-note">选择一个版本，右侧查看处理状态和切块。资料有更新时，在它下面上传新版本。</p>
-        {list.isPending && <LoadingState />}{list.error && <ErrorState error={list.error} onRetry={() => list.refetch()} />}
-        {list.data && !groups.length && <EmptyState title="还没有资料">在上方上传第一份 Markdown 资料。</EmptyState>}
-        <div className="document-list reference-list">{groups.map(group => <div key={group.documentId} className="reference-group">
-          <div className="reference-group-head">
-            <span><strong>{group.title}</strong><small>{group.documentId}</small></span>
-            <button type="button" className="secondary small" aria-expanded={newVersionOf === group.documentId}
-              onClick={() => setNewVersionOf(newVersionOf === group.documentId ? null : group.documentId)}>上传新版本</button>
-          </div>
-          {newVersionOf === group.documentId && <NewVersionForm title={group.title} onClose={() => setNewVersionOf(null)} />}
-          {group.versions.map(v => <button type="button" key={v.version}
-            className={selected?.documentId === v.document_id && selected.version === v.version ? 'selected' : ''}
-            onClick={() => setSelected({ documentId: v.document_id, version: v.version })}>
-            <span>第 {v.version} 版 <StatusBadge value={statusLabel[v.status] ?? v.status} tone={statusTone(v.status)} /></span>
-            <small>{v.chunk_count !== null ? `${v.chunk_count} 块` : '尚未切块'} · {v.created_at.slice(0, 10)}</small>
-          </button>)}
-        </div>)}</div>
-      </section>
-      <section className="page-card document-detail"><ColumnHeader eyebrow="VERSION" title="版本与切块" />
-        {!selected && <EmptyState title="尚未选择资料">选择左侧的某个版本，查看处理状态和切块结果。</EmptyState>}
-        {selected && !current && list.data && <EmptyState title="找不到这个版本">列表里已没有它，请重新选择。</EmptyState>}
-        {current && <>
-          <h3>{current.title} · 第 {current.version} 版</h3>
-          <div className="badge-row">
-            <StatusBadge value={statusLabel[current.status] ?? current.status} tone={statusTone(current.status)} />
-            <StatusBadge value={current.source_kind === 'upload' ? '页面上传' : '脚本导入'} />
-            {current.chunk_count !== null && <StatusBadge value={`${current.chunk_count} 块`} />}
-            <StatusBadge value={current.vector_fingerprint ? `向量 ${current.vector_fingerprint}` : '没有向量'} tone={current.vector_fingerprint ? 'good' : 'warn'} />
-          </div>
-          {current.status === 'failed' && <div className="callout" role="alert">处理失败：<code>{current.error_code}</code>。修正后重新上传同一份内容即可重试。</div>}
-          {isWorking(current.status) && <LoadingState label="后台正在切块、计算向量" />}
-          <dl className="version-meta">
-            <dt>资料编号</dt><dd>{current.document_id}</dd>
-            <dt>字数</dt><dd>{current.chars}</dd>
-            <dt>适用车型</dt><dd>（后端改完后显示）</dd>
-            <dt>目前用于</dt><dd>{current.bound_areas.length ? current.bound_areas.map(label).join('；') : '—'}</dd>
-            <dt>必带章节</dt><dd>{current.always_include.length ? current.always_include.join('；') : '无'}</dd>
-          </dl>
-          {current.status === 'ready' && <>
-            <div className="chunk-toolbar"><h3>切块（{chunks.data?.items.length ?? '…'}）</h3>
-              <label className="inline-check"><input type="checkbox" checked={onlySearchable} onChange={e => setOnlySearchable(e.target.checked)} />只看参与检索的</label></div>
-            {chunks.isPending && <LoadingState />}{chunks.error && <ErrorState error={chunks.error} onRetry={() => chunks.refetch()} />}
-            {shownChunks.map(chunk => <article className="chunk" key={chunk.ordinal}>
-              <small>#{chunk.ordinal} · {chunk.section}{chunk.subsection ? ` › ${chunk.subsection}` : ''}</small>
-              <div className="badge-row">
-                {!chunk.searchable && <StatusBadge value="导航章节，不参与检索" tone="warn" />}
-                {chunk.searchable && <StatusBadge value={chunk.has_vector ? '有向量' : '缺向量'} tone={chunk.has_vector ? 'good' : 'bad'} />}
-                {chunk.identifiers.map(code => <StatusBadge key={code} value={code} />)}
-              </div>
-              <details><summary>正文（{chunk.text.length} 字）</summary><p>{chunk.text}</p></details>
-            </article>)}
-          </>}
-        </>}
-      </section>
+    <section className="page-card reference-card">
+      <ColumnHeader eyebrow="MANUALS" title="维修资料" action={
+        <input className="reference-search" type="search" aria-label="搜索资料" placeholder="搜索资料名称或编号"
+          value={query} onChange={e => setQuery(e.target.value)} />} />
+      {list.isPending && <LoadingState />}{list.error && <ErrorState error={list.error} onRetry={() => list.refetch()} />}
+      {list.data && !groups.length && <EmptyState title="还没有资料">在上方上传第一份 Markdown 资料。</EmptyState>}
+      {list.data && groups.length > 0 && !shown.length && <EmptyState title="没有匹配的资料">换个关键词试试。</EmptyState>}
+      {shown.length > 0 && <table className="reference-table">
+        <thead><tr><th>资料名称</th><th>版本</th><th>状态</th><th className="optional">块数</th><th className="optional">更新日期</th><th aria-label="操作" /></tr></thead>
+        <tbody>{shown.map(group => {
+          const latest = group.versions[0];
+          const open = expanded === group.documentId;
+          return <Fragment key={group.documentId}>
+            <tr className={open ? 'open' : ''}>
+              <td><button type="button" className="row-toggle" aria-expanded={open} onClick={() => toggle(group.documentId)}>
+                <span aria-hidden="true">{open ? '▾' : '▸'}</span>
+                <span><strong>{group.title}</strong><small>{group.documentId}</small></span>
+              </button></td>
+              <td>第 {latest.version} 版</td>
+              <td><StatusBadge value={statusLabel[latest.status] ?? latest.status} tone={statusTone(latest.status)} /></td>
+              <td className="optional">{latest.chunk_count ?? '—'}</td>
+              <td className="optional">{latest.updated_at.slice(0, 10)}</td>
+              <td><button type="button" className="secondary small" aria-expanded={newVersionOf === group.documentId}
+                onClick={() => setNewVersionOf(newVersionOf === group.documentId ? null : group.documentId)}>上传新版本</button></td>
+            </tr>
+            {newVersionOf === group.documentId && <tr className="reference-expanded"><td colSpan={6}>
+              <NewVersionForm title={group.title} onClose={() => setNewVersionOf(null)} />
+            </td></tr>}
+            {open && <tr className="reference-expanded"><td colSpan={6}>
+              <ReferenceDetail versions={group.versions} label={target => names.get(targetKey(target)) ?? targetKey(target)} />
+            </td></tr>}
+          </Fragment>;
+        })}</tbody>
+      </table>}
+    </section>
+  </div>;
+}
+
+/** One manual opened in the table: the chosen version (latest by default), its details and chunks. */
+function ReferenceDetail({ versions, label }: { versions: ReferenceItem[]; label: (target: AreaTarget) => string }) {
+  const [version, setVersion] = useState(versions[0].version);
+  const [onlySearchable, setOnlySearchable] = useState(true);
+  const current = versions.find(v => v.version === version) ?? versions[0];
+  const chunks = useQuery({
+    queryKey: ['area-reference-chunks', current.document_id, current.version],
+    queryFn: ({ signal }) => apiClient.request<ReferenceChunkList>(
+      `/area-references/${encodeURIComponent(current.document_id)}/versions/${encodeURIComponent(current.version)}/chunks`, { signal }),
+    enabled: current.status === 'ready',
+  });
+  const shownChunks = (chunks.data?.items ?? []).filter(c => !onlySearchable || c.searchable);
+  return <div className="reference-detail">
+    <div className="detail-head">
+      <h3>第 {current.version} 版</h3>
+      <div className="badge-row">
+        <StatusBadge value={statusLabel[current.status] ?? current.status} tone={statusTone(current.status)} />
+        <StatusBadge value={current.source_kind === 'upload' ? '页面上传' : '脚本导入'} />
+        <StatusBadge value={current.vector_fingerprint ? `向量 ${current.vector_fingerprint}` : '没有向量'} tone={current.vector_fingerprint ? 'good' : 'warn'} />
+      </div>
+      {versions.length > 1 && <div className="history" role="group" aria-label="历史版本"><span className="muted">全部版本：</span>
+        {versions.map(v => <button type="button" key={v.version} className={`text-button${v.version === current.version ? ' current' : ''}`}
+          aria-pressed={v.version === current.version} onClick={() => setVersion(v.version)}>第 {v.version} 版</button>)}</div>}
     </div>
+    {current.status === 'failed' && <div className="callout" role="alert">处理失败：<code>{current.error_code}</code>。修正后重新上传同一份内容即可重试。</div>}
+    {isWorking(current.status) && <LoadingState label="后台正在切块、计算向量" />}
+    <dl className="detail-grid">
+      <div><dt>字数</dt><dd>{current.chars}</dd></div>
+      <div><dt>适用车型</dt><dd>（后端改完后显示）</dd></div>
+      <div><dt>目前用于</dt><dd>{current.bound_areas.length ? current.bound_areas.map(label).join('；') : '—'}</dd></div>
+      <div><dt>必带章节</dt><dd>{current.always_include.length ? current.always_include.map(h => h.replace(/^## +/, '')).join('；') : '无'}</dd></div>
+    </dl>
+    {current.status === 'ready' && <details className="chunk-panel">
+      <summary>切块（{current.chunk_count ?? chunks.data?.items.length ?? '…'}）</summary>
+      <label className="inline-check"><input type="checkbox" checked={onlySearchable} onChange={e => setOnlySearchable(e.target.checked)} />只看参与检索的</label>
+      {chunks.isPending && <LoadingState />}{chunks.error && <ErrorState error={chunks.error} onRetry={() => chunks.refetch()} />}
+      {shownChunks.map(chunk => <article className="chunk" key={chunk.ordinal}>
+        <small>#{chunk.ordinal} · {chunk.section}{chunk.subsection ? ` › ${chunk.subsection}` : ''}</small>
+        <div className="badge-row">
+          {!chunk.searchable && <StatusBadge value="导航章节，不参与检索" tone="warn" />}
+          {chunk.searchable && <StatusBadge value={chunk.has_vector ? '有向量' : '缺向量'} tone={chunk.has_vector ? 'good' : 'bad'} />}
+          {chunk.identifiers.map(code => <StatusBadge key={code} value={code} />)}
+        </div>
+        <details><summary>正文（{chunk.text.length} 字）</summary><p>{chunk.text}</p></details>
+      </article>)}
+    </details>}
   </div>;
 }
 

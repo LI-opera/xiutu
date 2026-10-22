@@ -59,3 +59,18 @@
 .new-version-form{border:1px dashed var(--x-line);border-radius:10px;padding:10px 12px;display:grid;gap:8px}
 @media (max-width:1000px){.upload-row.three{grid-template-columns:repeat(2,minmax(0,1fr))}.vehicle-row{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:700px){.upload-row.three,.vehicle-row{grid-template-columns:1fr 1fr}}
+.reference-card{max-width:none;margin:0}.reference-search{max-width:280px}
+.reference-table{width:100%;border-collapse:collapse;font-size:14px}
+.reference-table th{text-align:left;font-size:12px;color:var(--x-muted);font-weight:700;padding:8px 12px;border-bottom:1px solid var(--x-line)}
+.reference-table td{padding:10px 12px;border-bottom:1px solid var(--x-line);vertical-align:middle}
+.reference-table tr.open td{background:#f4f8f6;border-bottom-color:transparent}
+.reference-table td:last-child{text-align:right}
+.formal-app .row-toggle{display:flex;align-items:flex-start;gap:10px;background:none;border:0;padding:0;color:var(--x-ink);text-align:left;cursor:pointer}
+.row-toggle span:last-child{display:flex;flex-direction:column;gap:2px}.row-toggle small{color:var(--x-muted);font-weight:500}
+.reference-expanded>td{background:#f4f8f6;padding:4px 16px 18px 36px}
+.reference-detail{display:grid;gap:12px}.detail-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}.detail-head h3{margin:0}.detail-head .badge-row{margin:0}
+.history{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-left:auto}.formal-app .history .text-button.current{font-weight:800;text-decoration:underline}
+.detail-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 20px;margin:0}.detail-grid dt{font-size:12px;color:var(--x-muted);font-weight:700}.detail-grid dd{margin:4px 0 0}
+.chunk-panel{border-top:1px solid var(--x-line);padding-top:10px}.chunk-panel>summary{font-weight:750;cursor:pointer}.chunk-panel>label{margin:10px 0}
+@media (max-width:1000px){.detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){.reference-table .optional{display:none}.reference-expanded>td{padding:4px 8px 14px}.detail-grid{grid-template-columns:1fr}.reference-search{max-width:none}.column-header{flex-wrap:wrap}}

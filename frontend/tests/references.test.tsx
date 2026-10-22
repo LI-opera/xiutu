@@ -47,7 +47,7 @@ describe('reference helpers', () => {
 });
 
 describe('ReferencesPage', () => {
-  it('shows versions with status and the chunks of a ready version', async () => {
+  it('lists one row per manual and opens its latest version, history and chunks in place', async () => {
     vi.spyOn(apiClient, 'request').mockImplementation(async (path: string) => {
       if (path === '/area-references') return { items: [item('1', 'ready'), item('2', 'failed', { error_code: 'MODEL_PATH_UNAVAILABLE' })] } as never;
       if (path === '/area-references/targets') return targets as never;
@@ -55,15 +55,30 @@ describe('ReferencesPage', () => {
       throw new Error(path);
     });
     mount();
-    await userEvent.click(await screen.findByRole('button', { name: /第 2 版/ }));
+    const row = await screen.findByRole('button', { name: /增压空气通路/ });
+    expect(screen.getByText('第 2 版')).toBeTruthy();  // the latest version is the row's version
+    await userEvent.click(row);
     expect(screen.getByRole('alert').textContent).toContain('MODEL_PATH_UNAVAILABLE');
-    await userEvent.click(screen.getByRole('button', { name: /第 1 版/ }));
+    await userEvent.click(screen.getByRole('button', { name: '第 1 版' }));
+    expect(screen.getByText('增压不足初始排查 v2 · 增压空气通路')).toBeTruthy();
+    await userEvent.click(screen.getByText(/^切块/));
     expect(await screen.findByText(/2\. 检查接头/)).toBeTruthy();
-    expect(screen.getByText('增压不足初始排查 v2 · 增压空气通路', { selector: 'dd' })).toBeTruthy();
-    // Navigation sections are hidden until asked for.
     expect(screen.queryByText('导航章节，不参与检索')).toBeNull();
     await userEvent.click(screen.getByLabelText('只看参与检索的'));
     expect(screen.getByText('导航章节，不参与检索')).toBeTruthy();
+  });
+
+  it('filters manuals by name or number', async () => {
+    vi.spyOn(apiClient, 'request').mockImplementation(async (path: string) => {
+      if (path === '/area-references') return { items: [item('1', 'ready'), item('1', 'ready', { document_id: 'turbo-manual', title: '涡轮增压器本体' })] } as never;
+      if (path === '/area-references/targets') return targets as never;
+      throw new Error(path);
+    });
+    mount();
+    await screen.findByRole('button', { name: /涡轮增压器本体/ });
+    await userEvent.type(screen.getByLabelText('搜索资料'), 'turbo');
+    expect(screen.queryByRole('button', { name: /增压空气通路/ })).toBeNull();
+    expect(screen.getByRole('button', { name: /涡轮增压器本体/ })).toBeTruthy();
   });
 
   it('asks for the file, title and vehicle only, with no template or area choices', async () => {
