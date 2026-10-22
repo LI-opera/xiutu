@@ -295,6 +295,16 @@ class ReferenceIngestService:
                  "area_id": b["area_id"]})
         return {"items": [_summary(r, by_version.get((r["document_id"], r["version"]), [])) for r in rows]}
 
+    def targets(self):
+        with self.engine.connect() as conn:
+            rows = conn.execute(select(workbench_templates.c.template_id, workbench_templates.c.version,
+                                       workbench_templates.c.title, workbench_templates.c.content_json)
+                                .order_by(workbench_templates.c.template_id, workbench_templates.c.version)).all()
+        return {"templates": [
+            {"template_id": template_id, "version": version, "title": title,
+             "areas": [{"id": a["id"], "title": a.get("title") or a["id"]} for a in content.get("areas", [])]}
+            for template_id, version, title, content in rows if content.get("areas")]}
+
     def chunks(self, document_id, version):
         with self.engine.connect() as conn:
             row = _row(conn, document_id, version)

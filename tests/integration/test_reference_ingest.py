@@ -164,3 +164,14 @@ def test_unknown_area_is_refused(docrig, doc_id):  # noqa: F811
     area = {**first_area(docrig), "area_id": "no-such-area"}
     response = upload(docrig, doc_id, areas=[area])
     assert response.status_code == 422 and response.json()["error"]["code"] == "AREA_NOT_FOUND"
+
+
+def test_targets_list_templates_with_their_areas(docrig):  # noqa: F811
+    response = docrig.client.get("/api/v2/area-references/targets")
+    assert response.status_code == 200
+    templates = response.json()["templates"]
+    area = first_area(docrig)
+    match = next(t for t in templates if (t["template_id"], t["version"]) ==
+                 (area["template_id"], area["template_version"]))
+    assert match["title"] and area["area_id"] in {a["id"] for a in match["areas"]}
+    assert all(a["title"] for t in templates for a in t["areas"])
