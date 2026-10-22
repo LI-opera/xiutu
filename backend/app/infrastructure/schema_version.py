@@ -1,1 +1,1 @@
-EXPECTED_REVISION = "0024_reference_ingest"
+EXPECTED_REVISION = "0025_reference_vehicle"

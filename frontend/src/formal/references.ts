@@ -1,4 +1,4 @@
-import type { AreaTarget, ReferenceItem } from './types';
+import type { ReferenceItem, StoredVehicle } from './types';
 
 export const REFERENCE_ID = /^[a-z0-9][a-z0-9-]{1,99}$/;
 export const MAX_REFERENCE_CHARS = 2_000_000;
@@ -39,4 +39,10 @@ export function groupReferences(items: ReferenceItem[]): ReferenceGroup[] {
   });
 }
 
-export const targetKey = (target: AreaTarget) => `${target.template_id}@${target.template_version}:${target.area_id}`;
+/** "大众 探岳 2019 DKVB"; unknown parts are left out. */
+export const vehicleText = (vehicle: StoredVehicle) =>
+  [vehicle.brand, vehicle.model, vehicle.year, vehicle.engine_code].filter(v => v !== null && v !== '').join(' ') || '未填写';
+
+/** Distinct values of one vehicle field, for typing suggestions. */
+export const suggestions = (vehicles: StoredVehicle[], field: keyof StoredVehicle) =>
+  [...new Set(vehicles.map(v => v[field]).filter((v): v is string | number => v !== null && v !== '').map(String))].sort();

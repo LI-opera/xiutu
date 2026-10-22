@@ -103,15 +103,26 @@ def test_zero_vectors_and_stop_requests_fail_the_ingest():
     assert raised.value.code == "REFERENCE_INGEST_STOPPED"
 
 
-def test_upload_body_rejects_unknown_fields():
-    from app.api.area_references import ReferenceUpload
-    base = {"document_id": "demo-doc", "title": "演示", "content": "x",
-            "areas": [{"template_id": "t", "template_version": "1", "area_id": "a"}]}
+def test_upload_body_needs_a_vehicle_and_no_areas():
+    from app.api.area_references import ReferenceUpload, ReferenceVersionUpload
+    vehicle = {"brand": "大众", "model": "探岳", "year": 2019, "engine_code": "DKVB"}
+    base = {"document_id": "demo-doc", "title": "演示", "content": "x", "vehicle": vehicle}
     assert ReferenceUpload.model_validate(base).always_include == []
+    for broken in ({**base, "vehicle": {**vehicle, "year": 1800}}, {k: v for k, v in base.items() if k != "vehicle"},
+                   {**base, "areas": [{"template_id": "t", "template_version": "1", "area_id": "a"}]}):
+        with pytest.raises(Exception):
+            ReferenceUpload.model_validate(broken)
+    # A new version only brings the file: title, vehicle and sections carry over.
     with pytest.raises(Exception):
-        ReferenceUpload.model_validate({**base, "status": "ready"})
-    with pytest.raises(Exception):
-        ReferenceUpload.model_validate({**base, "areas": []})
+        ReferenceVersionUpload.model_validate({"content": "x", "title": "改名"})
+
+
+def test_vehicle_is_trimmed_and_engine_code_upper_cased():
+    assert ri.normalize_vehicle({"brand": " 大众 ", "model": "探岳", "year": 2019, "engine_code": "dkvb"}) == {
+        "vehicle_brand": "大众", "vehicle_model": "探岳", "vehicle_year": 2019, "vehicle_engine_code": "DKVB"}
+    with pytest.raises(DomainError) as raised:
+        ri.normalize_vehicle({"brand": "大众", "model": "  ", "year": 2019, "engine_code": "DKVB"})
+    assert raised.value.code == "REFERENCE_VEHICLE_REQUIRED"
 
 
 def test_reading_config_still_matches_seeded_bodies():

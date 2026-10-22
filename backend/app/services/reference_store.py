@@ -96,6 +96,47 @@ def load(conn, document, embeddings):
     return source, always
 
 
+def pool(conn, document, embeddings):
+    """Stored searchable chunks of a document and their vectors, or None to compute them now."""
+    source, _ = load(conn, document, embeddings)
+    if source is None:
+        return None
+    if embeddings is None:
+        return source.chunks, None
+    rows = conn.execute(select(vectors.c.ordinal, vectors.c.embedding).where(
+        vectors.c.document_id == document["id"], vectors.c.version == document["version"],
+        vectors.c.fingerprint == source.fingerprint, vectors.c.ordinal.in_(source.ordinals))).all()
+    by_ordinal = {ordinal: [float(x) for x in embedding] for ordinal, embedding in rows}
+    return source.chunks, [by_ordinal[o] for o in source.ordinals]
+
+
+def candidates(conn, vehicle):
+    """The latest ready version of every manual for this vehicle, in the analysis document shape."""
+    try:
+        year = int(vehicle.get("year"))
+    except (TypeError, ValueError):
+        return []
+    rows = conn.execute(select(documents).where(
+        documents.c.status == "ready",
+        func.lower(documents.c.vehicle_brand) == str(vehicle.get("brand") or "").strip().lower(),
+        func.lower(documents.c.vehicle_model) == str(vehicle.get("model") or "").strip().lower(),
+        documents.c.vehicle_year == year,
+        func.upper(documents.c.vehicle_engine_code) == str(vehicle.get("engine_code") or "").strip().upper(),
+    )).mappings().all()
+    latest = {}
+    for row in rows:
+        rank = (int(row["version"]) if row["version"].isdigit() else -1, row["created_at"])
+        if row["document_id"] not in latest or rank > latest[row["document_id"]][0]:
+            latest[row["document_id"]] = (rank, row)
+    result = []
+    for _, row in sorted(latest.values(), key=lambda item: item[1]["document_id"]):
+        if content_hash(row["body"]) != row["content_hash"]:
+            continue  # a body that no longer matches its hash is never sent
+        result.append({"id": row["document_id"], "version": row["version"], "title": row["title"],
+                       "body": row["body"], "content_hash": row["content_hash"], "provenance": row["provenance"]})
+    return result
+
+
 def provider(conn, embeddings):
     """For enrich(): look up stored search data per document inside the caller's transaction."""
     return lambda document: load(conn, document, embeddings)

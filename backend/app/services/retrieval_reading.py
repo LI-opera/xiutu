@@ -122,6 +122,42 @@ def route_documents(texts, rank, chunks, *, depth=ROUTE_DEPTH, keep=ROUTE_KEEP):
     return [(document, round(score, 4)) for document, score in ordered if score >= keep * best]
 
 
+def area_texts(area, questions):
+    """What describes an area for choosing its manuals: title and description, each question title."""
+    texts = [f"{area['title']}：{area.get('description') or ''}"]
+    return texts + [plain_title(q["title"]) for q in questions if q.get("area_id") == area["id"]]
+
+
+def computed_pool(document, embeddings=None):
+    """Searchable chunks of a document split now, with vectors when a model is given."""
+    pieces = split(document["id"], document["body"], NAVIGATION)
+    return pieces, (embeddings.documents([c.search_text for c in pieces]) if embeddings is not None else None)
+
+
+def choose_documents(documents, texts, *, embeddings=None, pool=None):
+    """Step one for an area: which of the candidate manuals to read, best first, with scores.
+
+    pool(document) -> (chunks, vectors or None) supplies stored data; without it (or when it
+    returns None) the document is split and embedded now.
+    """
+    chunks, vectors = [], []
+    for document in documents:
+        stored = pool(document) if pool is not None else None
+        pieces, piece_vectors = stored if stored is not None else computed_pool(document, embeddings)
+        chunks.extend(pieces)
+        vectors = None if vectors is None or piece_vectors is None else vectors + list(piece_vectors)
+    if not chunks:
+        return []
+    index = BM25([c.search_text for c in chunks])
+
+    def rank(text):
+        rankings = [exact_rank(text, chunks), index.rank(text)]
+        if embeddings is not None and vectors is not None:
+            rankings.append(dense_rank(embeddings.query(text), vectors))
+        return rrf(rankings)
+    return route_documents(texts, rank, chunks)
+
+
 class ComputedSections:
     """Search one document by splitting its body now; vectors from the model (disk-cached).
 

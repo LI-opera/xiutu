@@ -89,3 +89,29 @@ def test_warm_loads_the_model_once_and_never_raises():
     def broken():
         raise RuntimeError("MODEL_PATH_UNAVAILABLE")
     Embeddings(broken).warm()  # left for the search to report
+
+
+def test_each_area_chooses_its_own_manual_among_all_of_the_vehicle():
+    """Two-step retrieval, step one, offline: no table says which manual belongs to which area."""
+    from app.services.retrieval_reading import area_texts, choose_documents
+    from scripts.build_analysis_context import RELATIONS
+    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    assigned = {entry["area_id"]: entry["document_id"] for entry in manifest["documents"]}
+    manuals = [{"id": d["document_id"], "version": d["version"], "body": d["body"]} for d in DOCUMENTS]
+    relation = json.loads(RELATIONS.read_text(encoding="utf-8"))["relations"][0]
+    topic = json.loads((RELATIONS.parent / relation["content_file"]).read_text(encoding="utf-8"))
+    for area in topic["areas"]:
+        chosen = choose_documents(manuals, area_texts(area, topic["questions"]))
+        assert chosen[0][0] == assigned[area["id"]], area["id"]
+
+
+def test_choosing_uses_stored_pools_when_given():
+    from app.services.retrieval_reading import choose_documents, computed_pool
+    manuals = [{"id": d["document_id"], "version": d["version"], "body": d["body"]} for d in DOCUMENTS[:2]]
+    seen = []
+
+    def pool(document):
+        seen.append(document["id"])
+        return computed_pool(document)
+    assert choose_documents(manuals, ["检查"], pool=pool) and seen == [m["id"] for m in manuals]
+    assert choose_documents([], ["检查"]) == []

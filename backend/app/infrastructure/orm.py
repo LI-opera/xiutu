@@ -20,7 +20,11 @@ area_reference_documents = sa.Table("area_reference_documents", metadata,
     sa.Column("chunk_count", sa.Integer),
     sa.Column("vector_fingerprint", sa.String(80)),
     sa.Column("always_include", JSONB, nullable=False, server_default="[]"),
-    sa.Column("requested_areas", JSONB, nullable=False, server_default="[]"),
+    # 0025: the vehicle a manual applies to; analyses find manuals by it.
+    sa.Column("vehicle_brand", sa.String(100)),
+    sa.Column("vehicle_model", sa.String(100)),
+    sa.Column("vehicle_year", sa.Integer),
+    sa.Column("vehicle_engine_code", sa.String(64)),
     sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False))
 area_reference_chunks = sa.Table("area_reference_chunks", metadata,
     sa.Column("document_id", sa.String(100), primary_key=True),

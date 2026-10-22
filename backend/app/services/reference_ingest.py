@@ -1,11 +1,12 @@
-"""Area reference ingest: upload Markdown -> sections -> identifiers -> vectors -> bound to areas.
+"""Manual ingest: upload Markdown -> sections -> identifiers -> vectors, for one vehicle.
 
 One version of a document is one row of area_reference_documents. Uploading creates the row
-as "queued" and schedules a worker job; the job splits the body exactly as section retrieval
-does (### chunks under ## sections), stores the chunks with their identifiers, embeds each
-chunk with the configured local model, and only then marks the version "ready" and points the
-requested areas at it. A version that is still processing or failed is never bound, so an
-analysis never reads half-processed material. The seed script uses the same processing.
+as "queued" with the vehicle it applies to and schedules a worker job; the job splits the body
+exactly as section retrieval does (### chunks under ## sections), stores the chunks with their
+identifiers, embeds each chunk with the configured local model, and marks the version "ready".
+Analyses then find manuals by the case's vehicle and choose among them by content (two-step
+retrieval); nothing ties a manual to a template or an area. The seed script uses the same
+processing.
 """
 import hashlib
 import os
@@ -13,15 +14,13 @@ import re
 from datetime import datetime, timezone
 
 from sqlalchemy import func, select, update
-from sqlalchemy.dialects.postgresql import insert
 
 from app.domain.documents import IngestError
 from app.domain.policies import DomainError
-from app.infrastructure.orm import area_reference_bindings as bindings
 from app.infrastructure.orm import area_reference_chunk_vectors as vectors
 from app.infrastructure.orm import area_reference_chunks as chunks
 from app.infrastructure.orm import area_reference_documents as documents
-from app.infrastructure.orm import workbench_templates
+from app.infrastructure.orm import workbench_template_matches
 from app.infrastructure.uow import UnitOfWork
 from app.retrieval.section_search import split
 from app.services.retrieval_reading import NAVIGATION, section_ranges
@@ -131,17 +130,6 @@ def _set_status(engine, document_id, version, status, error_code=None):
                      .values(status=status, error_code=error_code, updated_at=func.now()))
 
 
-def activate(conn, document_id, version, areas):
-    """Point each requested area at this version (replacing an older version of the same document)."""
-    for area in areas:
-        statement = insert(bindings).values(
-            template_id=area["template_id"], template_version=area["template_version"],
-            area_id=area["area_id"], document_id=document_id, document_version=version)
-        conn.execute(statement.on_conflict_do_update(
-            index_elements=["template_id", "template_version", "area_id", "document_id"],
-            set_={"document_version": version}))
-
-
 def store(conn, document_id, version, built, vectors_by_ordinal, fingerprint):
     """Replace this version's chunks and vectors (a retry rewrites them whole)."""
     conn.execute(vectors.delete().where(vectors.c.document_id == document_id,
@@ -190,7 +178,6 @@ def process(engine, document_id, version, embedder, stopped=None):
                          .values(status="ready", error_code=None, chunker_version=CHUNKER_VERSION,
                                  chunk_count=len(built), vector_fingerprint=fingerprint,
                                  updated_at=func.now()))
-            activate(conn, document_id, version, current["requested_areas"])
     except Exception as exc:
         code = getattr(exc, "code", None) or type(exc).__name__
         _set_status(engine, document_id, version, "failed", str(code)[:80])
@@ -212,22 +199,30 @@ def run_job(engine, payload, stopped):
 
 # ---------------------------------------------------------------- service (API)
 
-def _template_areas(conn, template_id, version):
-    row = conn.execute(select(workbench_templates.c.content_json).where(
-        workbench_templates.c.template_id == template_id,
-        workbench_templates.c.version == version)).scalar_one_or_none()
-    if row is None:
-        raise DomainError("TEMPLATE_NOT_FOUND", f"找不到模板 {template_id} v{version}。", 422)
-    return {area["id"] for area in row.get("areas", [])}
+VEHICLE_FIELDS = ("brand", "model", "year", "engine_code")
 
 
-def _summary(row, bound):
+def vehicle_of(row):
+    """The vehicle a stored version applies to, as the API shows it (None for unknown parts)."""
+    return {"brand": row["vehicle_brand"], "model": row["vehicle_model"], "year": row["vehicle_year"],
+            "engine_code": row["vehicle_engine_code"]}
+
+
+def normalize_vehicle(vehicle):
+    brand, model, engine = (vehicle[k].strip() for k in ("brand", "model", "engine_code"))
+    if not (brand and model and engine):
+        raise DomainError("REFERENCE_VEHICLE_REQUIRED", "请填写适用车型：品牌、车型、年款和发动机代码。", 422)
+    return {"vehicle_brand": brand, "vehicle_model": model, "vehicle_year": int(vehicle["year"]),
+            "vehicle_engine_code": engine.upper()}
+
+
+def _summary(row):
     return {"document_id": row["document_id"], "version": row["version"], "title": row["title"],
             "status": row["status"], "error_code": row["error_code"], "source_kind": row["source_kind"],
             "content_hash": row["content_hash"], "chars": len(row["body"]),
             "chunk_count": row["chunk_count"], "chunker_version": row["chunker_version"],
             "vector_fingerprint": row["vector_fingerprint"], "always_include": row["always_include"],
-            "requested_areas": row["requested_areas"], "bound_areas": bound,
+            "vehicle": vehicle_of(row),
             "created_at": row["created_at"].isoformat(), "updated_at": row["updated_at"].isoformat()}
 
 
@@ -235,75 +230,102 @@ class ReferenceIngestService:
     def __init__(self, engine):
         self.engine = engine
 
-    def upload(self, actor, data):
-        """Register a version and queue its processing. Same content again returns that version."""
+    def _queue(self, conn, actor, document_id, values, body):
+        """Insert one queued version (numbered after the existing ones) and schedule its job."""
         from app.services.run_service import enqueue
+        existing = conn.execute(select(documents.c.version).where(
+            documents.c.document_id == document_id)).scalars().all()
+        version = next_version(existing)
+        conn.execute(documents.insert().values(
+            document_id=document_id, version=version, body=body, content_hash=content_hash(body),
+            source_kind="upload", status="queued", **values))
+        _, run = enqueue(conn, actor, JOB_KIND, {"document_id": document_id, "version": version})
+        return 202, {"document_id": document_id, "version": version, "status": "queued",
+                     "reused": False, "run_id": run["run_id"]}
+
+    def _reuse(self, conn, actor, row):
+        """Same content again: return that version; a failed one is queued again (retry)."""
+        from app.services.run_service import enqueue
+        run = None
+        if row["status"] == "failed":
+            conn.execute(update(documents).where(documents.c.document_id == row["document_id"],
+                                                 documents.c.version == row["version"])
+                         .values(status="queued", error_code=None, updated_at=func.now()))
+            _, run = enqueue(conn, actor, JOB_KIND, {"document_id": row["document_id"], "version": row["version"]})
+        return 200, {"document_id": row["document_id"], "version": row["version"],
+                     "status": "queued" if run else row["status"], "reused": True,
+                     "run_id": run["run_id"] if run else None}
+
+    @staticmethod
+    def _lock(conn, document_id):
+        # One upload of a document at a time: versions are numbered in order.
+        conn.execute(select(func.pg_advisory_xact_lock(func.hashtext(document_id))))
+
+    def upload(self, actor, data):
+        """A new manual. An existing document number must be updated through add_version."""
         body = normalize(data.content)
         validate_content(body, data.always_include)
         if not DOCUMENT_ID.fullmatch(data.document_id):
             raise DomainError("REFERENCE_ID_INVALID", "资料编号只能用小写字母、数字和连字符，2～100 个字符。", 422)
-        areas = [area.model_dump() for area in data.areas]
-        digest = content_hash(body)
+        vehicle = normalize_vehicle(data.vehicle.model_dump())
         with UnitOfWork(self.engine) as u:
             conn = u.connection
-            for area in areas:
-                if area["area_id"] not in _template_areas(conn, area["template_id"], area["template_version"]):
-                    raise DomainError("AREA_NOT_FOUND", f"模板里没有区域 {area['area_id']}。", 422)
-            # One upload of a document at a time: versions are numbered in order.
-            conn.execute(select(func.pg_advisory_xact_lock(func.hashtext(data.document_id))))
+            self._lock(conn, data.document_id)
             existing = conn.execute(select(documents).where(
                 documents.c.document_id == data.document_id)).mappings().all()
-            same = next((r for r in existing if r["content_hash"] == digest), None)
+            same = next((r for r in existing if r["content_hash"] == content_hash(body)), None)
             if same is not None:
-                merged = same["requested_areas"] + [a for a in areas if a not in same["requested_areas"]]
-                values = {"requested_areas": merged, "updated_at": func.now()}
-                requeue = same["status"] == "failed"
-                if requeue:
-                    values.update(status="queued", error_code=None)
-                conn.execute(update(documents).where(documents.c.document_id == same["document_id"],
-                                                     documents.c.version == same["version"]).values(**values))
-                if same["status"] == "ready":
-                    activate(conn, same["document_id"], same["version"], merged)
-                run = None
-                if requeue:
-                    _, run = enqueue(conn, actor, JOB_KIND, {"document_id": same["document_id"],
-                                                             "version": same["version"]})
-                return 200, {"document_id": same["document_id"], "version": same["version"],
-                             "status": "queued" if requeue else same["status"], "reused": True,
-                             "run_id": run["run_id"] if run else None}
-            version = next_version([r["version"] for r in existing])
-            conn.execute(documents.insert().values(
-                document_id=data.document_id, version=version, title=data.title.strip(), body=body,
-                content_hash=digest, source_kind="upload", status="queued",
-                always_include=data.always_include, requested_areas=areas,
-                provenance={"upload": {"filename": data.filename, "uploaded_by": str(actor),
-                                       "uploaded_at": datetime.now(timezone.utc).isoformat()},
-                            "images_sent": False}))
-            _, run = enqueue(conn, actor, JOB_KIND, {"document_id": data.document_id, "version": version})
-            return 202, {"document_id": data.document_id, "version": version, "status": "queued",
-                         "reused": False, "run_id": run["run_id"]}
+                return self._reuse(conn, actor, same)
+            if existing:
+                raise DomainError("REFERENCE_EXISTS", "已有同编号的资料。要更新它，请在资料列表里点“上传新版本”。", 409)
+            return self._queue(conn, actor, data.document_id, {
+                "title": data.title.strip(), "always_include": data.always_include, **vehicle,
+                "provenance": {"upload": {"filename": data.filename, "uploaded_by": str(actor),
+                                          "uploaded_at": datetime.now(timezone.utc).isoformat()},
+                               "images_sent": False}}, body)
+
+    def add_version(self, actor, document_id, data):
+        """A new version of an existing manual: title and vehicle carry over from the latest one."""
+        body = normalize(data.content)
+        with UnitOfWork(self.engine) as u:
+            conn = u.connection
+            self._lock(conn, document_id)
+            existing = conn.execute(select(documents).where(documents.c.document_id == document_id)
+                                    .order_by(documents.c.created_at)).mappings().all()
+            if not existing:
+                raise DomainError("REFERENCE_NOT_FOUND", "找不到这份资料。", 404)
+            latest = max(existing, key=lambda r: (int(r["version"]) if r["version"].isdigit() else -1,
+                                                  r["created_at"]))
+            # Always-sent sections carry over where the new body still has them.
+            always = [h for h in latest["always_include"] if h in set(headings(body))]
+            validate_content(body, always)
+            same = next((r for r in existing if r["content_hash"] == content_hash(body)), None)
+            if same is not None:
+                return self._reuse(conn, actor, same)
+            return self._queue(conn, actor, document_id, {
+                "title": latest["title"], "always_include": always,
+                **{k: latest[k] for k in ("vehicle_brand", "vehicle_model", "vehicle_year", "vehicle_engine_code")},
+                "provenance": {"upload": {"filename": data.filename, "uploaded_by": str(actor),
+                                          "uploaded_at": datetime.now(timezone.utc).isoformat(),
+                                          "previous_version": latest["version"]},
+                               "images_sent": False}}, body)
 
     def list(self):
         with self.engine.connect() as conn:
             rows = conn.execute(select(documents).order_by(
                 documents.c.document_id, documents.c.created_at)).mappings().all()
-            bound = conn.execute(select(bindings)).mappings().all()
-        by_version = {}
-        for b in bound:
-            by_version.setdefault((b["document_id"], b["document_version"]), []).append(
-                {"template_id": b["template_id"], "template_version": b["template_version"],
-                 "area_id": b["area_id"]})
-        return {"items": [_summary(r, by_version.get((r["document_id"], r["version"]), [])) for r in rows]}
+        return {"items": [_summary(r) for r in rows]}
 
-    def targets(self):
+    def vehicles(self):
+        """Vehicles already known (templates and manuals), to suggest while typing."""
         with self.engine.connect() as conn:
-            rows = conn.execute(select(workbench_templates.c.template_id, workbench_templates.c.version,
-                                       workbench_templates.c.title, workbench_templates.c.content_json)
-                                .order_by(workbench_templates.c.template_id, workbench_templates.c.version)).all()
-        return {"templates": [
-            {"template_id": template_id, "version": version, "title": title,
-             "areas": [{"id": a["id"], "title": a.get("title") or a["id"]} for a in content.get("areas", [])]}
-            for template_id, version, title, content in rows if content.get("areas")]}
+            known = {(r.brand, r.model, r.year_from, r.engine_code) for r in conn.execute(select(
+                workbench_template_matches.c.brand, workbench_template_matches.c.model,
+                workbench_template_matches.c.year_from, workbench_template_matches.c.engine_code))}
+            known |= {tuple(r) for r in conn.execute(select(
+                documents.c.vehicle_brand, documents.c.vehicle_model, documents.c.vehicle_year,
+                documents.c.vehicle_engine_code).where(documents.c.vehicle_brand.is_not(None)))}
+        return {"vehicles": [dict(zip(VEHICLE_FIELDS, v)) for v in sorted(known, key=lambda v: tuple(map(str, v)))]}
 
     def chunks(self, document_id, version):
         with self.engine.connect() as conn:

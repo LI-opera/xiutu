@@ -7,22 +7,38 @@ from app.api.dependencies import authenticated, writing
 router = APIRouter(prefix="/api/v2/area-references", tags=["area-references"])
 
 
-class AreaTarget(BaseModel):
+class ReferenceVehicle(BaseModel):
+    """The vehicle a manual applies to; analyses only read manuals of the case's vehicle."""
     model_config = ConfigDict(extra="forbid")
-    template_id: str = Field(min_length=1, max_length=100)
-    template_version: str = Field(min_length=1, max_length=32)
-    area_id: str = Field(min_length=1, max_length=80)
+    brand: str = Field(min_length=1, max_length=100)
+    model: str = Field(min_length=1, max_length=100)
+    year: int = Field(ge=1950, le=2100)
+    engine_code: str = Field(min_length=1, max_length=64)
+
+
+class StoredVehicle(BaseModel):
+    brand: str | None
+    model: str | None
+    year: int | None
+    engine_code: str | None
 
 
 class ReferenceUpload(BaseModel):
-    """A Markdown manual for one or more workbench areas. Same document_id adds a version."""
+    """A new Markdown manual. Nothing ties it to a template or an area."""
     model_config = ConfigDict(extra="forbid")
     document_id: str = Field(min_length=2, max_length=100)
     title: str = Field(min_length=1, max_length=200)
     filename: str = Field(default="", max_length=255)
     content: str = Field(min_length=1, max_length=2_000_000)
-    areas: list[AreaTarget] = Field(min_length=1, max_length=50)
+    vehicle: ReferenceVehicle
     always_include: list[str] = Field(default_factory=list, max_length=50)
+
+
+class ReferenceVersionUpload(BaseModel):
+    """A new version of an existing manual; title, vehicle and always-sent sections carry over."""
+    model_config = ConfigDict(extra="forbid")
+    filename: str = Field(default="", max_length=255)
+    content: str = Field(min_length=1, max_length=2_000_000)
 
 
 class ReferenceUploadResult(BaseModel):
@@ -46,8 +62,7 @@ class ReferenceItem(BaseModel):
     chunker_version: str | None
     vector_fingerprint: str | None
     always_include: list[str]
-    requested_areas: list[AreaTarget]
-    bound_areas: list[AreaTarget]
+    vehicle: StoredVehicle
     created_at: str
     updated_at: str
 
@@ -76,20 +91,8 @@ class ReferenceChunkList(BaseModel):
     items: list[ReferenceChunk]
 
 
-class TargetArea(BaseModel):
-    id: str
-    title: str
-
-
-class TargetTemplate(BaseModel):
-    template_id: str
-    version: str
-    title: str
-    areas: list[TargetArea]
-
-
-class ReferenceTargets(BaseModel):
-    templates: list[TargetTemplate]
+class KnownVehicles(BaseModel):
+    vehicles: list[StoredVehicle]
 
 
 @router.post("", status_code=202, response_model=ReferenceUploadResult,
@@ -104,10 +107,18 @@ def list_references(request: Request, principal=Depends(authenticated)):
     return request.app.state.reference_ingest_service.list()
 
 
-@router.get("/targets", response_model=ReferenceTargets)
-def reference_targets(request: Request, principal=Depends(authenticated)):
-    """Templates and their areas a manual can be bound to."""
-    return request.app.state.reference_ingest_service.targets()
+@router.get("/vehicles", response_model=KnownVehicles)
+def known_vehicles(request: Request, principal=Depends(authenticated)):
+    """Vehicles already known from templates and manuals, suggested while typing."""
+    return request.app.state.reference_ingest_service.vehicles()
+
+
+@router.post("/{document_id}/versions", status_code=202, response_model=ReferenceUploadResult,
+             responses={200: {"model": ReferenceUploadResult, "description": "Same content: existing version"}})
+def upload_reference_version(document_id: str, body: ReferenceVersionUpload, request: Request,
+                             principal=Depends(writing)):
+    status, result = request.app.state.reference_ingest_service.add_version(principal.actor_id, document_id, body)
+    return JSONResponse(status_code=status, content=result)
 
 
 @router.get("/{document_id}/versions/{version}/chunks", response_model=ReferenceChunkList)

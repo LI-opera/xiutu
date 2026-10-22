@@ -18,13 +18,13 @@ from app.infrastructure.model_gateway import (
     structured_schema_instruction,
 )
 from app.infrastructure.orm import area_analysis_attempts as attempts
-from app.infrastructure.orm import area_reference_bindings as bindings
-from app.infrastructure.orm import area_reference_documents as documents
 from app.infrastructure.orm import template_repair_rounds as repair_rounds
 from app.infrastructure.uow import UnitOfWork
 from app.services.analysis_context import enrich, model_payload
+from app.services.reference_store import candidates as stored_candidates
+from app.services.reference_store import pool as stored_pool
 from app.services.reference_store import provider as stored_sections
-from app.services.retrieval_reading import Embeddings
+from app.services.retrieval_reading import Embeddings, area_texts, choose_documents
 from app.services.run_service import lock_case
 from app.services.workbench_observation_service import TopicService
 from app.services.workbench_templates import is_template
@@ -61,23 +61,6 @@ SYSTEM_PROMPT = "你是维修排查助手。仅分析本次指定区域，结合
 MATCHED_SYSTEM_PROMPT = """你是维修排查助手。一次分析本次病例中有已保存检查记录的区域，结合车辆、主诉、跨区域证据和分别提供的资料形成整体建议。
 未参与区域没有检查记录，不对它们下正常、异常或排除结论；参与区域中未记录的问题仍是未知，不要求填满所有区域才分析。
 """ + ANALYSIS_PRINCIPLES
-
-
-def load_documents(conn, binding, area_id):
-    rows = conn.execute(select(documents).join(bindings,
-        (documents.c.document_id == bindings.c.document_id) &
-        (documents.c.version == bindings.c.document_version)).where(
-        bindings.c.template_id == binding["template_id"],
-        bindings.c.template_version == binding["version"],
-        bindings.c.area_id == area_id).order_by(documents.c.document_id)).mappings().all()
-    result = []
-    for row in rows:
-        if hashlib.sha256(row["body"].encode()).hexdigest() != row["content_hash"]:
-            raise DomainError("REFERENCE_VERSION_CHANGED", "资料版本正文不一致，请检查资料登记。", 409)
-        result.append({"id": row["document_id"], "version": row["version"],
-                       "title": row["title"], "body": row["body"],
-                       "content_hash": row["content_hash"], "provenance": row["provenance"]})
-    return result
 
 
 def load_repair_rounds(conn, case_id):
@@ -277,18 +260,39 @@ class AreaAnalysisService:
     def _payload(self, conn, view, area_id):
         view = {**view, "repair_rounds": load_repair_rounds(conn, UUID(str(view["case"]["id"])))}
         if area_id == MATCHED_SCOPE_ID:
-            binding = view["case"]["intake_snapshot"]["template_binding"]
             effective_ids = {record["question_id"] for record in view["observations"] if record["effective"]}
             recorded_areas = {question["area_id"] for question in view["topic"]["questions"]
                               if question["id"] in effective_ids}
             recorded_areas |= {item["area_id"] for item in view["repair_rounds"]}
-            references = {area["id"]: load_documents(conn, binding, area["id"])
-                          for area in view["topic"]["areas"] if area["id"] in recorded_areas}
-            return build_matched_input(view, references, self.reading_embeddings,
-                                       stored_sections(conn, self.reading_embeddings))
-        refs = load_documents(conn, view["case"]["intake_snapshot"]["template_binding"], area_id)
-        return build_input(view, area_id, refs, self.reading_embeddings,
-                           stored_sections(conn, self.reading_embeddings))
+            references, routing = self._references(conn, view, recorded_areas)
+            payload = build_matched_input(view, references, self.reading_embeddings,
+                                          stored_sections(conn, self.reading_embeddings))
+            payload["document_routing"] = routing
+            return payload
+        references, routing = self._references(conn, view, {area_id})
+        payload = build_input(view, area_id, references.get(area_id, []), self.reading_embeddings,
+                              stored_sections(conn, self.reading_embeddings))
+        payload["document_routing"] = routing
+        return payload
+
+    def _references(self, conn, view, area_ids):
+        """Two-step retrieval, step one: the case vehicle's manuals, chosen per area by content.
+
+        No table assigns manuals to areas: each area's title, description and question titles
+        vote among the vehicle's manuals (see retrieval_reading.route_documents).
+        """
+        manuals = stored_candidates(conn, view["case"]["vehicle"])
+        references, routing = {}, {}
+        for area in view["topic"]["areas"]:
+            if area["id"] not in area_ids:
+                continue
+            chosen = choose_documents(manuals, area_texts(area, view["topic"]["questions"]),
+                                      embeddings=self.reading_embeddings,
+                                      pool=lambda document: stored_pool(conn, document, self.reading_embeddings))
+            by_id = {m["id"]: m for m in manuals}
+            references[area["id"]] = [by_id[document_id] for document_id, _ in chosen]
+            routing[area["id"]] = [{"document_id": d, "score": s} for d, s in chosen]
+        return references, routing
 
     def get(self, actor, case_id, area_id):
         self.reading_embeddings.warm()  # load the model before the case row is locked

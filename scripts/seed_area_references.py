@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
 from sqlalchemy import select, update
 from app.infrastructure.orm import area_reference_documents as documents, area_reference_bindings as bindings
-from app.infrastructure.orm import workbench_templates
+from app.infrastructure.orm import workbench_template_matches, workbench_templates
 
 MANIFEST = ROOT / "backend/app/topics/area_reference_manifest_v1.json"
 DEFAULT_PACKAGE = ROOT / "resources/knowledge/tayron"
@@ -78,10 +78,14 @@ def backfill_always_include(conn):
     return filled
 
 
-def bound_versions(conn):
-    """Every document version an area currently reads, across all template versions."""
-    return {(row.document_id, row.document_version) for row in conn.execute(
-        select(bindings.c.document_id, bindings.c.document_version).distinct())}
+def latest_versions(conn):
+    """The version of every manual analyses read: its latest one."""
+    latest = {}
+    for row in conn.execute(select(documents.c.document_id, documents.c.version, documents.c.created_at)):
+        rank = (int(row.version) if row.version.isdigit() else -1, row.created_at)
+        if row.document_id not in latest or rank > latest[row.document_id][0]:
+            latest[row.document_id] = (rank, row.version)
+    return {(document_id, version) for document_id, (_, version) in latest.items()}
 
 
 def index(engine, documents_seeded, embedder):
@@ -106,6 +110,13 @@ def seed(conn, package=DEFAULT_PACKAGE, manifest_path=MANIFEST):
         workbench_templates.c.version == manifest["template_version"])).mappings())
     if len(templates) != len(manifest["template_ids"]):
         raise ValueError("Install the matching templates first")
+    # The manuals apply to the vehicle these templates are for.
+    match = conn.execute(select(workbench_template_matches).where(
+        workbench_template_matches.c.template_id.in_(manifest["template_ids"]),
+        workbench_template_matches.c.version == manifest["template_version"])
+        .order_by(workbench_template_matches.c.id)).mappings().first()
+    vehicle = {"vehicle_brand": match["brand"], "vehicle_model": match["model"],
+               "vehicle_year": match["year_from"], "vehicle_engine_code": match["engine_code"]} if match else {}
     result = []
     for entry, doc in build_documents(package, manifest):
         prior = conn.execute(select(documents).where(documents.c.document_id == doc["document_id"],
@@ -113,7 +124,7 @@ def seed(conn, package=DEFAULT_PACKAGE, manifest_path=MANIFEST):
         if prior and any(prior[key] != doc[key] for key in doc):
             raise ValueError("Existing document changed: publish a new version")
         if not prior:
-            conn.execute(documents.insert().values(**doc, always_include=always_include(doc)))
+            conn.execute(documents.insert().values(**doc, always_include=always_include(doc), **vehicle))
         elif not prior["always_include"] and always_include(doc):
             # Rows imported before 0024 get their reviewed always-sent sections once.
             conn.execute(update(documents).where(documents.c.document_id == doc["document_id"],

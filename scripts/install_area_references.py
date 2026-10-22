@@ -16,11 +16,12 @@ from sqlalchemy import create_engine, text  # noqa: E402
 
 from app.infrastructure.db_target import validate_target  # noqa: E402
 from app.infrastructure.schema_version import EXPECTED_REVISION  # noqa: E402
-from scripts.seed_area_references import backfill_always_include, bound_versions, index, seed  # noqa: E402
+from scripts.seed_area_references import backfill_always_include, index, latest_versions, seed  # noqa: E402
 from scripts.wp15_workbench import STATE, environment  # noqa: E402
 
 KNOWN = {"0019_case_area_rankings", "0020_area_analysis", "0021_area_input_identity",
-         "0022_area_analysis_failed_retry", "0023_template_repair_retest", EXPECTED_REVISION}
+         "0022_area_analysis_failed_retry", "0023_template_repair_retest", "0024_reference_ingest",
+         EXPECTED_REVISION}
 
 
 def main():
@@ -37,15 +38,15 @@ def main():
     with engine.begin() as conn:
         relations = seed(conn)
         filled = backfill_always_include(conn)
-        targets = bound_versions(conn)
+        targets = latest_versions(conn)
     embedder = None
     if not no_vectors:
         from app.services.reference_ingest import load_embedder
         embedder = load_embedder()
-    # Index what analyses actually read: every bound version, not only this manifest's.
+    # Index what analyses read: the latest version of every manual.
     indexed = index(engine, targets, embedder)
     print(json.dumps({"before": before, "after": EXPECTED_REVISION, "bindings": len(relations),
-                      "always_include_filled": filled, "bound_versions": len(targets),
+                      "always_include_filled": filled, "latest_versions": len(targets),
                       "indexed": indexed, "model_calls": 0}, ensure_ascii=False, indent=2))
     engine.dispose()
 
