@@ -10,6 +10,7 @@
 | 原机器已登记实例 | wp15_workbench.py start/stop/status |
 | 依赖环境 | bootstrap.ps1 |
 | 模板与资料校验/登记 | seed_workbench_templates.py、seed_area_references.py |
+| 本机升级数据库并导入、切块、计算资料向量 | install_area_references.py（先 `wp15_workbench stop`） |
 | 原 WP15 受控发布 | publish_independent_templates.py，默认预检 |
 | API 类型 | export_frontend_openapi.py |
 | 专项测试与探针 | test.ps1、probes/、verify_* |

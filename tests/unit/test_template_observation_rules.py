@@ -51,7 +51,7 @@ def test_focus_conflict_and_gate_are_consistent_in_saved_view_and_ai_preview():
         "plan": case["intake_snapshot"]["topic_plan"],
         "observations": [{"id": str(row["id"]), "question_id": row["payload"]["question_id"],
                           "payload": row["payload"], "effective": True} for row in records]}
-    with patch("app.services.area_analysis_service.enrich", side_effect=lambda value, *_: {
+    with patch("app.services.area_analysis_service.enrich", side_effect=lambda value, *_, **__: {
         **value, "unrecorded_decision_question_ids": [], "reference_reading_guide": {}}):
         payload = build_matched_input(full_view, {"cooling": [], "electrical": []})
     assert {entry["id"] for entry in payload["questions"]} == {"SOURCE", "CHECK", "SECOND"}

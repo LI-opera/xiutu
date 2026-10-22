@@ -22,7 +22,7 @@ from app.infrastructure.orm import jobs, runs
 from app.infrastructure.uow import make_engine
 
 
-RUNTIME_JOB_KINDS = frozenset({"no_op", "ingest", "index"})
+RUNTIME_JOB_KINDS = frozenset({"no_op", "ingest", "index", "reference_ingest"})
 
 
 class LeaseLost(Exception):

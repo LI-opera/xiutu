@@ -3,7 +3,7 @@
 from uuid import uuid4
 
 import pytest
-from app.infrastructure.orm import area_reference_bindings
+from app.infrastructure.orm import area_reference_documents
 from sqlalchemy import select
 
 from test_document_ingest import docrig  # Reuse the isolated API/auth process fixture.
@@ -60,14 +60,13 @@ def test_two_templates_save_correct_analysis_input_repair_retest_and_reload(
     first, second = topic["areas"][:2]
     question = simple_question(topic, first["id"])
     other = simple_question(topic, second["id"])
-    binding = view["case"]["intake_snapshot"]["template_binding"]
-
-    def reference_ids(area_ids):
+    def vehicle_manuals():
+        """Ready manuals of this case's vehicle: analyses choose among these by content."""
         with docrig.store.engine.connect() as conn:
-            rows = conn.execute(select(area_reference_bindings.c.document_id).where(
-                area_reference_bindings.c.template_id == binding["template_id"],
-                area_reference_bindings.c.template_version == binding["version"],
-                area_reference_bindings.c.area_id.in_(area_ids),
+            rows = conn.execute(select(area_reference_documents.c.document_id).where(
+                area_reference_documents.c.status == "ready",
+                area_reference_documents.c.vehicle_model == "探岳",
+                area_reference_documents.c.vehicle_engine_code == "DKVB",
             )).all()
         return {row[0] for row in rows}
 
@@ -88,7 +87,7 @@ def test_two_templates_save_correct_analysis_input_repair_retest_and_reload(
     analysis = get(docrig, base + "/matched-areas/analysis")
     assert analysis["recorded"] == 1
     assert [a["id"] for a in analysis["areas"]] == [first["id"]]
-    assert {d["id"] for d in analysis["documents"]} == reference_ids([first["id"]])
+    assert {d["id"] for d in analysis["documents"]} <= vehicle_manuals()
 
     new_id = answer(question, question["options"][1]["id"], original=old_id)
     answer(other, other["options"][0]["id"])
@@ -97,9 +96,7 @@ def test_two_templates_save_correct_analysis_input_repair_retest_and_reload(
     assert {a["id"] for a in analysis["areas"]} == {first["id"], second["id"]}
     assert {o["id"] for o in analysis["observations"]}.isdisjoint({old_id})
     assert new_id in {o["id"] for o in analysis["observations"]}
-    assert {d["id"] for d in analysis["documents"]} == reference_ids([
-        first["id"], second["id"],
-    ])
+    assert {d["id"] for d in analysis["documents"]} <= vehicle_manuals()
 
     before = get(docrig, base + "/workbench-v2")
     repairs = post(docrig, base + "/template-repairs", {

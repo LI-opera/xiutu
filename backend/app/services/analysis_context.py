@@ -70,11 +70,15 @@ def _always_include(document, reading_config):
     return []
 
 
-def enrich(payload, topic, embeddings=None, *, roles_config=None, reading_config=None, top_k=TOP_K):
+def enrich(payload, topic, embeddings=None, *, roles_config=None, reading_config=None, top_k=TOP_K,
+           sections=None):
     """Add record roles and a retrieved-section reading guide, preserving every original value.
 
     embeddings=None searches with exact codes and keywords only (offline tests); the service
-    passes local vectors. If search cannot run for a document, its full body is sent.
+    passes local vectors. sections(document) -> (stored source or None, always-included
+    sections or None) lets the service search chunks and vectors stored at ingest; without
+    it (or when nothing is stored) the body is split and embedded now, with the same result.
+    If search cannot run for a document, its full body is sent.
     """
     roles_config = roles_config if roles_config is not None else _load(ROLES_CONFIG)
     reading_config = reading_config if reading_config is not None else _load(READING_CONFIG)
@@ -89,8 +93,11 @@ def enrich(payload, topic, embeddings=None, *, roles_config=None, reading_config
         document.pop("analysis_extracts", None)  # never reuse extracts from an earlier call
         entry = {"document_id": document["id"], "status": "full_body_retained", "sections": []}
         try:
+            source, always = sections(document) if sections is not None else (None, None)
+            if always is None:
+                always = _always_include(document, reading_config)
             chosen = select_sections(document, queries, top_k=top_k, embeddings=embeddings,
-                                     always_include=_always_include(document, reading_config))
+                                     always_include=always, source=source)
         except Exception as error:  # search unavailable (e.g. local model): send everything
             entry["status"] = "retrieval_unavailable_full_body_retained"
             entry["error"] = getattr(error, "code", type(error).__name__)
