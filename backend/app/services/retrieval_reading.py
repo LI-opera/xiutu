@@ -98,6 +98,30 @@ class Embeddings:
         return self.queries[text]
 
 
+ROUTE_DEPTH = 10   # chunks per text that vote for their document
+ROUTE_KEEP = 0.6   # documents scoring at least this share of the best one are read too
+
+
+def route_documents(texts, rank, chunks, *, depth=ROUTE_DEPTH, keep=ROUTE_KEEP):
+    """Step one of two-step retrieval: which documents an area should read.
+
+    Each text describing the area (its title and description, each question title) ranks the
+    chunks of every candidate document; its top `depth` chunks vote 1/(60+position) for their
+    document. Returns [(document_id, score)] best first, cut to the documents scoring at least
+    `keep` times the best. No table says which manual belongs to which area.
+    """
+    votes = {}
+    for text in texts:
+        for position, index in enumerate(rank(text)[:depth], 1):
+            document = chunks[index].document_id
+            votes[document] = votes.get(document, 0.0) + 1 / (60 + position)
+    if not votes:
+        return []
+    best = max(votes.values())
+    ordered = sorted(votes.items(), key=lambda item: (-item[1], item[0]))
+    return [(document, round(score, 4)) for document, score in ordered if score >= keep * best]
+
+
 class ComputedSections:
     """Search one document by splitting its body now; vectors from the model (disk-cached).
 

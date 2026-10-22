@@ -140,3 +140,27 @@ def test_library_scope_searches_one_pool_and_keeps_per_document_counts():
     assert area_counts == library_counts
     assert all(not row["unreachable"] for row in library)
     assert [r["question_id"] for r in area] == [r["question_id"] for r in library]
+
+
+def test_routing_votes_for_documents_and_keeps_close_runners_up():
+    from app.services.retrieval_reading import route_documents
+    chunks = split("a", DOC) + split("b", DOC)
+    a, b = list(range(len(chunks) // 2)), list(range(len(chunks) // 2, len(chunks)))
+    # Every text ranks document a's chunks first: only a's chunks vote, only a is read.
+    assert [d for d, _ in route_documents(["x", "y"], lambda _: a + b, chunks, depth=2)] == ["a"]
+    # Votes split evenly: both are read, best first by name on a tie.
+    split_votes = route_documents(["x", "y"], lambda t: a + b if t == "x" else b + a, chunks, depth=2)
+    assert [d for d, _ in split_votes] == ["a", "b"]
+    assert route_documents(["x"], lambda _: [], chunks) == []
+    # A runner-up close to the best (all chunks voting, b just behind) is read as well.
+    assert [d for d, _ in route_documents(["x"], lambda _: a + b, chunks)] == ["a", "b"]
+
+
+def test_routed_scope_picks_each_areas_own_document_offline():
+    config = json.loads(ev.CONFIG.read_text(encoding="utf-8"))
+    documents = ev.load_documents()
+    routing = {}
+    rows, _ = ev.evaluate(config, documents, ev.load_queries(config, documents), skip_navigation=True,
+                          scope="routed", routing=routing)
+    assert routing and all(v["assigned"] in [d for d, _ in v["chosen"]] for v in routing.values())
+    assert all(not row["unreachable"] for row in rows)
