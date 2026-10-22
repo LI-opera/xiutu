@@ -78,8 +78,8 @@ describe('ReferencesPage', () => {
     expect(await screen.findByLabelText('2. 怎样确认')).toBeTruthy();
     expect((screen.getByLabelText('资料编号') as HTMLInputElement).value).toBe('boost-v3');
     expect((screen.getByLabelText('标题') as HTMLInputElement).value).toBe('Boost v3');
-    for (const name of ['品牌', '车型', '年款从', '年款到', '发动机代码']) expect(screen.getByLabelText(name)).toBeTruthy();
-    expect(screen.getByText('请填写适用车型（至少品牌和车型）')).toBeTruthy();
+    for (const name of ['品牌', '车型', '年款', '发动机代码']) expect(screen.getByLabelText(name)).toBeTruthy();
+    expect(screen.queryByText(/请填写适用车型/)).toBeNull();  // optional
     expect(screen.queryByText('用于哪些区域 *')).toBeNull();
     expect(screen.queryByText('新资料还是新版本')).toBeNull();
     expect((screen.getByRole('button', { name: '上传并处理' }) as HTMLButtonElement).disabled).toBe(true);

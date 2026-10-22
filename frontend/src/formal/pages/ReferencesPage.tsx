@@ -116,7 +116,7 @@ function UploadForm() {
   const [content, setContent] = useState('');
   const [documentId, setDocumentId] = useState('');
   const [title, setTitle] = useState('');
-  const [vehicle, setVehicle] = useState({ brand: '', model: '', yearFrom: '', yearTo: '', engineCode: '' });
+  const [vehicle, setVehicle] = useState({ brand: '', model: '', year: '', engineCode: '' });
   const [always, setAlways] = useState<string[]>([]);
   const headings = useMemo(() => sectionHeadings(content), [content]);
 
@@ -135,22 +135,20 @@ function UploadForm() {
     content.length > MAX_REFERENCE_CHARS && `资料超过 ${MAX_REFERENCE_CHARS} 字`,
     !title.trim() && '请填写标题',
     !REFERENCE_ID.test(documentId) && '资料编号只能用小写字母、数字和连字符（2～100 个字符）',
-    !(vehicle.brand.trim() && vehicle.model.trim()) && '请填写适用车型（至少品牌和车型）',
   ].filter(Boolean) as string[];
 
   return <div className="upload-form">
-    <p className="section-note">上传 Markdown 资料并写明适用车型。后台自动切块、计算向量；分析时按病例的车型找资料，再按题目检索章节。</p>
+    <p className="section-note">上传 Markdown 资料，知道适用车型的话可以填上。后台自动切块、计算向量，分析时按题目检索章节。</p>
     <div className="upload-row three">
       <label>Markdown 文件<input type="file" accept=".md,.markdown" onChange={e => chooseFile(e.target.files?.[0] ?? null)} /></label>
       <label>标题<input value={title} maxLength={200} onChange={e => setTitle(e.target.value)} /></label>
       <label>资料编号<input value={documentId} maxLength={100} placeholder="选文件后自动生成" onChange={e => setDocumentId(e.target.value)} /></label>
     </div>
-    <fieldset className="choice-group"><legend>适用车型 *</legend>
+    <fieldset className="choice-group"><legend>适用车型（可不填）</legend>
       <div className="vehicle-row">
         <label>品牌<input {...field('brand')} placeholder="如 大众" /></label>
         <label>车型<input {...field('model')} placeholder="如 探岳" /></label>
-        <label>年款从<input {...field('yearFrom')} inputMode="numeric" placeholder="如 2019" /></label>
-        <label>年款到<input {...field('yearTo')} inputMode="numeric" placeholder="不填表示至今" /></label>
+        <label>年款<input {...field('year')} inputMode="numeric" placeholder="如 2019" /></label>
         <label>发动机代码<input {...field('engineCode')} placeholder="如 DKVB" /></label>
       </div>
     </fieldset>
