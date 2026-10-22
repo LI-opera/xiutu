@@ -99,7 +99,7 @@ def test_final_driver_parameters_and_scopes():
 
 @pytest.mark.parametrize(
     "entry",
-    ["migrations/env.py", "scripts/probes/graph_worker.py", "scripts/probes/prepare_database.py"],
+    ["migrations/env.py", "scripts/probes/prepare_database.py"],
 )
 @pytest.mark.parametrize(
     "query", ["?hostaddr=192.0.2.10", "?dbname=other&host=192.0.2.10&port=5544"]
@@ -107,15 +107,11 @@ def test_final_driver_parameters_and_scopes():
 def test_real_entrypoints_reject_before_engine(monkeypatch, entry, query):
     engine = Mock(side_effect=AssertionError("Engine must not be created"))
     monkeypatch.setattr(sqlalchemy, "create_engine", engine)
-    db = "xiutu_test_gate" if "graph_worker" in entry else "xiutu_dev"
+    db = "xiutu_dev"
     monkeypatch.setenv("DATABASE_URL", GOOD.replace("xiutu_test_gate", db) + query)
     monkeypatch.setenv("TEST_DATABASE_URL", GOOD + query)
     monkeypatch.setenv("DATA_PATH", str(ROOT / ".test-runs"))
-    argv = (
-        [entry, "start", "workflow", "wp01_gate"]
-        if "graph_worker" in entry
-        else [entry, "--name", "xiutu_test_gate"]
-    )
+    argv = [entry, "--name", "xiutu_test_gate"]
     monkeypatch.setattr(sys, "argv", argv)
     with pytest.raises(ValueError):
         runpy.run_path(str(ROOT / entry), run_name="__main__")

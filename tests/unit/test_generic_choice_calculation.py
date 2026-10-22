@@ -33,15 +33,15 @@ def test_derived_choice_uses_effective_saved_records_and_correction():
     case = {"intake_snapshot": {"topic_plan": build_plan(config, {})}}
     first = row("A", "yes")
     second = row("B", "yes")
-    empty = project_template(case, [], {}, config)
+    empty = project_template(case, [], config)
     assert empty["derived"]["RESULT"]["option_id"] is None
     assert empty["derived"]["RESULT"]["detail"]["evidence_state"] == "awaiting_input"
-    computed = project_template(case, [first, second], {}, config)
+    computed = project_template(case, [first, second], config)
     assert computed["question_states"]["RESULT"]["option_ids"] == ["confirmed"]
     assert computed["question_states"]["RESULT"]["status"] == "derived"
     assert set(computed["derived"]["RESULT"]["basis_observation_ids"]) == {str(first["id"]), str(second["id"])}
     correction = row("A", "no", supersedes=first["id"])
-    updated = project_template(case, [first, second, correction], {}, config)
+    updated = project_template(case, [first, second, correction], config)
     assert updated["derived"]["RESULT"]["option_id"] == "not_confirmed"
     assert str(first["id"]) not in updated["derived"]["RESULT"]["basis_observation_ids"]
     assert not updated["ai_readiness"]["repair_conclusion_supported"]
@@ -50,9 +50,9 @@ def test_derived_choice_uses_effective_saved_records_and_correction():
 def test_unmatched_and_incomplete_inputs_stay_unknown():
     config = topic()
     case = {"intake_snapshot": {"topic_plan": build_plan(config, {})}}
-    one = project_template(case, [row("A", "no")], {}, config)
+    one = project_template(case, [row("A", "no")], config)
     assert one["derived"]["RESULT"]["option_id"] is None
-    unmatched = project_template(case, [row("A", "yes"), row("B", "no")], {}, config)
+    unmatched = project_template(case, [row("A", "yes"), row("B", "no")], config)
     assert unmatched["derived"]["RESULT"]["option_id"] is None
     assert unmatched["derived"]["RESULT"]["detail"]["evidence_state"] == "no_matching_rule"
 

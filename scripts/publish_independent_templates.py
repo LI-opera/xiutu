@@ -1,7 +1,8 @@
-"""Validate and atomically add independent template versions with references.
+"""Validate and atomically add template versions (resources/templates/<bundle>/relations.json).
 
-Dry-run is the default. --apply uses only the owned WP-15 local database target.
-Existing template versions, bindings and case snapshots are never updated.
+Dry-run is the default. --apply uses only the owned local workbench database target.
+Existing template versions and case snapshots are never updated. Manuals are installed
+separately (install_area_references.py); they are not tied to templates.
 """
 import argparse
 import json
@@ -11,36 +12,24 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from scripts.seed_area_references import build_documents  # noqa: E402
-from scripts.seed_area_references import seed as seed_references  # noqa: E402
 from scripts.seed_workbench_templates import build_templates  # noqa: E402
 from scripts.seed_workbench_templates import seed as seed_templates  # noqa: E402
 
 
-def preflight(config_path, manifest_path, package):
+def preflight(config_path):
     candidates = list(build_templates(config_path))
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    if (set(manifest["template_ids"]) != {relation["template_id"] for relation, _ in candidates} or
-            {manifest["template_version"]} != {relation["version"] for relation, _ in candidates}):
-        raise ValueError("Reference manifest and template versions differ")
-    documents = list(build_documents(package, manifest))
-    areas = {area["id"] for _, topic in candidates for area in topic["areas"]}
-    if {entry["area_id"] for entry, _ in documents} != areas:
-        raise ValueError("Reference coverage differs from template areas")
     return {"templates": [{"template_id": relation["template_id"], "version": relation["version"],
                             "areas": len(topic["areas"]), "questions": len(topic["questions"])}
                            for relation, topic in candidates],
-            "documents": len(documents), "database_writes": False}
+            "database_writes": False}
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, required=True)
-    parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--package", type=Path, required=True)
     parser.add_argument("--apply", action="store_true")
     args = parser.parse_args()
-    result = preflight(args.config.resolve(), args.manifest.resolve(), args.package.resolve())
+    result = preflight(args.config.resolve())
     if not args.apply:
         print(json.dumps(result, ensure_ascii=False, indent=2))
         return
@@ -57,9 +46,8 @@ def main():
     try:
         with engine.begin() as conn:
             installed = seed_templates(conn, args.config.resolve())
-            references = seed_references(conn, args.package.resolve(), args.manifest.resolve())
-        print(json.dumps({"database": target.database, "templates": installed,
-                          "reference_bindings": len(references)}, ensure_ascii=False, indent=2))
+        print(json.dumps({"database": target.database, "templates": installed},
+                         ensure_ascii=False, indent=2))
     finally:
         engine.dispose()
 

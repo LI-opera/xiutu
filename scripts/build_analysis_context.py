@@ -28,7 +28,6 @@ from app.services.analysis_context import ROLES, ROLES_CONFIG, digest  # noqa: E
 
 BUNDLE = ROOT / "resources/templates/tayron-v2"
 RELATIONS = BUNDLE / "relations.json"
-MANIFEST = BUNDLE / "area_reference_manifest_v2.json"
 FROM_VERSION = "1"
 
 

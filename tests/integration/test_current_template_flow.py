@@ -6,7 +6,6 @@ import pytest
 from app.infrastructure.orm import area_reference_documents
 from sqlalchemy import select
 
-from test_document_ingest import docrig  # Reuse the isolated API/auth process fixture.
 
 pytestmark = pytest.mark.database
 
@@ -41,9 +40,9 @@ def simple_question(topic, area_id):
 
 @pytest.mark.parametrize("fault_code,expected_areas", [("P0299", 5), ("P0236", 3)])
 def test_two_templates_save_correct_analysis_input_repair_retest_and_reload(
-    docrig, fault_code, expected_areas,
+    api_rig, fault_code, expected_areas,
 ):
-    case = post(docrig, "/api/v2/cases", {
+    case = post(api_rig, "/api/v2/cases", {
         "workbench_flow": "template-match-v1",
         "vehicle": {"brand": "大众", "model": "探岳", "year": 2019, "engine_code": "DKVB"},
         "fault_description": f"隔离回归 {fault_code} {uuid4().hex}",
@@ -51,18 +50,18 @@ def test_two_templates_save_correct_analysis_input_repair_retest_and_reload(
     })
     case_id = case["id"]
     base = f"/api/v2/cases/{case_id}"
-    view = get(docrig, base + "/workbench-v2")
+    view = get(api_rig, base + "/workbench-v2")
     topic = view["topic"]
     assert len(topic["areas"]) == expected_areas
     assert view["case"]["intake_snapshot"]["template_binding"]["template_id"]
-    assert get(docrig, base + "/matched-areas/analysis")["recorded"] == 0
+    assert get(api_rig, base + "/matched-areas/analysis")["recorded"] == 0
 
     first, second = topic["areas"][:2]
     question = simple_question(topic, first["id"])
     other = simple_question(topic, second["id"])
     def vehicle_manuals():
         """Ready manuals of this case's vehicle: analyses choose among these by content."""
-        with docrig.store.engine.connect() as conn:
+        with api_rig.store.engine.connect() as conn:
             rows = conn.execute(select(area_reference_documents.c.document_id).where(
                 area_reference_documents.c.status == "ready",
                 area_reference_documents.c.vehicle_model == "探岳",
@@ -75,7 +74,7 @@ def test_two_templates_save_correct_analysis_input_repair_retest_and_reload(
         path = base + "/topic-observations"
         if original:
             path += f"/{original}/correct"
-        result = post(docrig, path, {
+        result = post(api_rig, path, {
             "expected_revision": view["case"]["revision"],
             "topic_version": topic["version"],
             "question_id": q["id"], "option_ids": [option_id],
@@ -84,28 +83,28 @@ def test_two_templates_save_correct_analysis_input_repair_retest_and_reload(
         return result["observation_id"]
 
     old_id = answer(question, question["options"][0]["id"])
-    analysis = get(docrig, base + "/matched-areas/analysis")
+    analysis = get(api_rig, base + "/matched-areas/analysis")
     assert analysis["recorded"] == 1
     assert [a["id"] for a in analysis["areas"]] == [first["id"]]
     assert {d["id"] for d in analysis["documents"]} <= vehicle_manuals()
 
     new_id = answer(question, question["options"][1]["id"], original=old_id)
     answer(other, other["options"][0]["id"])
-    analysis = get(docrig, base + "/matched-areas/analysis")
+    analysis = get(api_rig, base + "/matched-areas/analysis")
     assert analysis["recorded"] == 2
     assert {a["id"] for a in analysis["areas"]} == {first["id"], second["id"]}
     assert {o["id"] for o in analysis["observations"]}.isdisjoint({old_id})
     assert new_id in {o["id"] for o in analysis["observations"]}
     assert {d["id"] for d in analysis["documents"]} <= vehicle_manuals()
 
-    before = get(docrig, base + "/workbench-v2")
-    repairs = post(docrig, base + "/template-repairs", {
+    before = get(api_rig, base + "/workbench-v2")
+    repairs = post(api_rig, base + "/template-repairs", {
         "expected_revision": before["case"]["revision"],
         "area_id": first["id"], "repair_action": "隔离回归：记录已完成的处理动作",
     })
     assert len(repairs["rounds"]) == 1
     round_id = repairs["rounds"][0]["id"]
-    retested = post(docrig, base + f"/template-repairs/{round_id}/retest", {
+    retested = post(api_rig, base + f"/template-repairs/{round_id}/retest", {
         "expected_revision": repairs["revision"],
         "retest_condition": "same", "retest_outcome": "uncertain",
         "retest_evidence": "隔离回归：复检结果仍需后续确认",
@@ -116,8 +115,8 @@ def test_two_templates_save_correct_analysis_input_repair_retest_and_reload(
     assert retested["rounds"][0]["next_area_id"] == second["id"]
     assert retested["rounds"][0]["retest_outcome"] == "uncertain"
 
-    reloaded = get(docrig, base + "/workbench-v2")
-    history = get(docrig, base + "/topic-observations/history")
+    reloaded = get(api_rig, base + "/workbench-v2")
+    history = get(api_rig, base + "/topic-observations/history")
     assert reloaded["case"]["revision"] == retested["revision"]
     # The re-check supersedes the pre-repair answer instead of hiding in free text.
     recheck = next(o for o in reloaded["observations"]
@@ -127,9 +126,9 @@ def test_two_templates_save_correct_analysis_input_repair_retest_and_reload(
     assert recheck["payload"]["repair_round_id"] == round_id
     assert recheck["payload"]["option_ids"] == [question["options"][0]["id"]]
     assert {o["id"] for o in history["items"]} >= {old_id, new_id, recheck["id"]}
-    sent = next(o for o in get(docrig, base + "/matched-areas/analysis")["observations"]
+    sent = next(o for o in get(api_rig, base + "/matched-areas/analysis")["observations"]
                 if o["question_id"] == question["id"])
     assert sent["after_repair_round_id"] == round_id
     assert sent["before_repair"]["id"] == new_id
-    assert get(docrig, base + "/template-repairs")["rounds"][0]["id"] == round_id
-    assert get(docrig, base + "/matched-areas/analysis")["recorded"] == 2
+    assert get(api_rig, base + "/template-repairs")["rounds"][0]["id"] == round_id
+    assert get(api_rig, base + "/matched-areas/analysis")["recorded"] == 2

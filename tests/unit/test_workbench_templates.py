@@ -5,7 +5,8 @@ from uuid import uuid4
 import pytest
 from app.domain.policies import DomainError
 from app.domain.schemas import CreateCase
-from app.services.workbench_b01_service import TopicAnswer, TopicService
+from app.services.workbench_answer_validation import validate_answer
+from app.services.workbench_observation_service import TopicAnswer
 from app.services.workbench_templates import (
     FrozenTemplate,
     content_hash,
@@ -28,7 +29,7 @@ class Connection:
     def execute(self, statement):
         if 'FROM workbench_template_matches' in str(statement):
             return Result([self.relation])
-        return Result([dict(template_id=self.relation['template_id'], version='1',
+        return Result([dict(template_id=self.relation['template_id'], version=self.relation['version'],
                             title=self.relation['title'], content_hash=content_hash(self.topic), content_json=self.topic)])
 
 
@@ -55,18 +56,17 @@ def test_complete_frozen_hierarchy_and_projection(code, count):
             for qid in cards[card_id]['questionIds']:
                 assert questions[qid]['cardId'] == card_id
                 assert questions[qid]['options']
-    view = template_projection(case, [], {}, loaded)
+    view = template_projection(case, [], loaded)
     assert len(view['areas']) == count
     assert set(view['question_states']) == set(questions)
-    assert not view['question_states']['IN-08']['option_ids']
     assert snap['topic_plan']['intake']['safety_gate'] == 'unprovided'
     assert not view['synthesis']['facts']
-    assert not view['recommendation_rule']
     if code == 'P0236':
-        assert not any(q.startswith(('TUR-', 'X-', 'RET-')) for q in questions)
+        assert not any(q.startswith(('TUR-', 'X-')) for q in questions)
         with pytest.raises(DomainError):
-            TopicService._validate_answer(loaded, snap['topic_plan'], [], TopicAnswer(
-                expected_revision=1, topic_version=loaded['version'], question_id='TUR-01', option_ids=['normal']))
+            validate_answer(loaded, snap['topic_plan'], [], TopicAnswer(
+                expected_revision=1, topic_version=loaded['version'], question_id='TUR-01',
+                option_ids=['normal']), effective=lambda *args: None)
     original = deepcopy(snap)
     loaded['questions'][0]['title'] = 'changed'
     with pytest.raises(DomainError):
@@ -113,26 +113,25 @@ def test_multiple_engine_relations_to_same_template_remain_unambiguous():
 
 def test_new_case_chooses_newest_version_of_same_applicability_and_preserves_old_snapshot():
     relation, old_topic = next(build_templates())
-    newer = {**relation, 'id': relation['id'].replace('-v1', '-v2'), 'version': '2'}
+    newer = {**relation, 'id': relation['id'].replace('-v2', '-v3'), 'version': '3'}
     new_topic = deepcopy(old_topic)
-    new_topic['version'] = relation['template_id'] + '-v2'
-    new_topic.pop('calculation_catalog', None)
+    new_topic['version'] = relation['template_id'] + '-v3'
 
     class Versioned(Connection):
         def execute(self, statement):
             if 'FROM workbench_template_matches' in str(statement):
                 return Result([relation, newer])
-            return Result([dict(template_id=relation['template_id'], version='2',
+            return Result([dict(template_id=relation['template_id'], version='3',
                                 title=newer['title'], content_hash=content_hash(new_topic),
                                 content_json=new_topic)])
 
     for engine in ('DKVB', None):
         with patch('app.services.workbench_templates.build_plan', return_value={'version': 1}):
             snap = frozen_snapshot(Versioned(relation, old_topic), body(engine=engine))
-        assert snap['template_binding']['version'] == '2'
+        assert snap['template_binding']['version'] == '3'
         assert snap['vehicle']['engine_code'] == engine
     old_snap = frozen_snapshot(Connection(relation, old_topic), body())
-    assert FrozenTemplate({'intake_snapshot': old_snap}).catalog()[0]['version'].endswith('-v1')
+    assert FrozenTemplate({'intake_snapshot': old_snap}).catalog()[0]['version'].endswith('-v2')
 
 
 def test_ordinary_answer_and_correction_projection():
@@ -141,12 +140,12 @@ def test_ordinary_answer_and_correction_projection():
     q = next(q for q in topic['questions'] if q['id'] == 'AIR-01')
     payload = dict(question_id=q['id'], option_ids=[q['options'][0]['id']], fields={}, round_id=None)
     rows = [dict(id=uuid4(), payload=payload, supersedes_id=None, created_revision=2)]
-    view = template_projection({'intake_snapshot': snap}, rows, {}, topic)
+    view = template_projection({'intake_snapshot': snap}, rows, topic)
     assert view['question_states']['AIR-01']['status'] == 'saved'
     assert view['areas'][0]['recorded'] == 1
     rows.append(dict(id=uuid4(), payload={**payload, 'option_ids': [q['options'][1]['id']]},
                      supersedes_id=rows[0]['id'], created_revision=3))
-    changed = template_projection({'intake_snapshot': snap}, rows, {}, topic)
+    changed = template_projection({'intake_snapshot': snap}, rows, topic)
     assert changed['question_states']['AIR-01']['option_ids'] == [q['options'][1]['id']]
     assert changed['areas'][0]['recorded'] == 1
 
@@ -154,20 +153,15 @@ def test_ordinary_answer_and_correction_projection():
 def test_template_synthesis_keeps_current_facts_issues_and_in_scope_conflicts():
     relation, topic = next((r, t) for r, t in build_templates() if r['fault_code'] == 'P0236')
     snap = frozen_snapshot(Connection(relation, topic), body('P0236'))
-    intake_option = next(q for q in topic['questions'] if q['id'] == 'IN-08')['options'][2]['id']
     rows = [
         dict(id=uuid4(), payload=dict(question_id='AIR-07', option_ids=['seated'], fields={}, round_id=None),
              supersedes_id=None, created_revision=2),
         dict(id=uuid4(), payload=dict(question_id='AIR-08', option_ids=['pulls_out'], fields={}, round_id=None),
              supersedes_id=None, created_revision=3),
-        dict(id=uuid4(), payload=dict(question_id='IN-08', option_ids=[intake_option], fields={}, round_id=None),
-             supersedes_id=None, created_revision=4),
     ]
-    synthesis = template_projection({'intake_snapshot': snap}, rows, {}, topic)['synthesis']
+    synthesis = template_projection({'intake_snapshot': snap}, rows, topic)['synthesis']
     assert any(item['question_id'] == 'AIR-07' for item in synthesis['facts'])
     assert any(item['question_id'] == 'AIR-08' for item in synthesis['issues'])
-    assert [item['id'] for item in synthesis['conflicts']] == ['C-AIR-07-08']
-    assert not any(item['question_id'] == 'IN-08' for name in ('facts', 'issues', 'unavailable')
-                   for item in synthesis[name])
+    assert [item['id'] for item in synthesis['conflicts']] == ['joint-seating-tension']
     assert all(item['question_id'] in {q['id'] for q in topic['questions']}
                for name in ('facts', 'issues', 'unavailable') for item in synthesis[name])

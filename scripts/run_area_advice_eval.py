@@ -30,7 +30,7 @@ OUT_DIR = ROOT / ".local-data/evals/area-advice"
 
 
 def wire_chars(payload):
-    from app.domain.case_analysis import AreaAdviceV3
+    from app.domain.area_advice import AreaAdviceV3
     from app.infrastructure.model_gateway import structured_schema_instruction
     from app.services.area_analysis_service import messages_for
     return sum(len(m.content) for m in messages_for(payload)) + len(
@@ -54,7 +54,7 @@ def ledger_rows(turn_id):
 
 
 def call_model(settings, payload, turn_id):
-    from app.domain.case_analysis import AreaAdviceV3
+    from app.domain.area_advice import AreaAdviceV3
     from app.infrastructure.model_gateway import DeepSeekGateway, ModelError
     from app.services.area_analysis_service import messages_for
     meta = {}

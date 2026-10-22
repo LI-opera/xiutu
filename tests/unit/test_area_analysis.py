@@ -1,10 +1,9 @@
 from copy import deepcopy
-import json
 import pytest
 from app.domain.policies import DomainError
 from app.services.area_analysis_service import (build_input, build_matched_input,
     input_identity, messages_for, MATCHED_PROMPT_VERSION, SYSTEM_PROMPT)
-from scripts.seed_area_references import build_documents, DEFAULT_PACKAGE, MANIFEST, extract_sections
+from scripts.seed_area_references import build_documents, DEFAULT_PACKAGE, extract_sections, load_manuals
 
 
 def view():
@@ -93,20 +92,19 @@ def test_source_sections_are_exact_and_missing_is_not_silently_ignored():
         extract_sections("## A\none", ["## B"])
 
 
-def test_manifest_has_five_independent_documents():
-    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    entries = list(build_documents(DEFAULT_PACKAGE, manifest))
+def test_manual_list_has_five_independent_documents():
+    entries = list(build_documents(DEFAULT_PACKAGE, load_manuals()))
     assert len(entries) == 5
     assert len({record["document_id"] for _, record in entries}) == 5
     assert all(record["body"] and len(record["content_hash"]) == 64 for _, record in entries)
-    actuator = next(record for entry, record in entries if entry["area_id"] == "actuator")
+    actuator = next(record for _, record in entries if record["document_id"] == "tayron-dkvb-actuator")
     assert actuator["body"] == (DEFAULT_PACKAGE / "15-增压调节机构检查与维修参考-详细版.md").read_text(encoding="utf-8")
 
 
-def test_versioned_reference_manifest_rejects_changed_source(tmp_path):
+def test_manual_list_rejects_changed_source(tmp_path):
     source = tmp_path / "sample.md"
     source.write_text("初始资料", encoding="utf-8")
-    entry = {"document_id": "sample", "version": "2", "area_id": "sample",
+    entry = {"document_id": "sample", "version": "2",
              "title": "资料", "coverage": "检查", "sources": [{"file": "sample.md"}],
              "source_hashes": {"sample.md": "0" * 64}}
     with pytest.raises(ValueError, match="Source changed"):
@@ -115,7 +113,7 @@ def test_versioned_reference_manifest_rejects_changed_source(tmp_path):
 
 
 def test_action_schema_requires_titles_in_current_and_conditional_steps():
-    from app.domain.case_analysis import AreaAdviceV3, CaseAdviceOpenV2
+    from app.domain.area_advice import AreaAdviceV3, CaseAdviceOpenV2
     from pydantic import ValidationError
     old = {"summary": "需要确认", "steps": [{"kind": "check", "action": "测量连接点"}]}
     assert CaseAdviceOpenV2.model_validate(old).steps[0].action == "测量连接点"

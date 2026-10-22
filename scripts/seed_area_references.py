@@ -1,4 +1,8 @@
-"""Explicit versioned import. Runtime reads DB bodies, never these source paths."""
+"""Install the repository's manuals (resources/knowledge/tayron/manuals.json) into the manual table.
+
+Each manual is stored with the vehicle it applies to; nothing ties it to a template or area.
+Runtime reads the stored bodies, never these source paths.
+"""
 import argparse
 import hashlib
 import json
@@ -9,11 +13,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
 from sqlalchemy import select, update
-from app.infrastructure.orm import area_reference_documents as documents, area_reference_bindings as bindings
-from app.infrastructure.orm import workbench_template_matches, workbench_templates
+from app.infrastructure.orm import area_reference_documents as documents
 
-MANIFEST = ROOT / "backend/app/topics/area_reference_manifest_v1.json"
 DEFAULT_PACKAGE = ROOT / "resources/knowledge/tayron"
+MANUALS = DEFAULT_PACKAGE / "manuals.json"
 
 
 def extract_sections(body, headings=None):
@@ -27,9 +30,14 @@ def extract_sections(body, headings=None):
     return "\n\n".join(by_heading[heading] for heading in headings)
 
 
-def build_documents(package, manifest):
+def load_manuals(path=MANUALS):
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+def build_documents(package, manuals):
+    """(list entry, document row) for every manual; source files must match their recorded hashes."""
     package = package.resolve()
-    for entry in manifest["documents"]:
+    for entry in manuals["documents"]:
         pieces = []
         sources = []
         for source in entry["sources"]:
@@ -103,53 +111,32 @@ def index(engine, documents_seeded, embedder):
     return done
 
 
-def seed(conn, package=DEFAULT_PACKAGE, manifest_path=MANIFEST):
-    manifest = json.loads(Path(manifest_path).read_text(encoding="utf-8"))
-    templates = list(conn.execute(select(workbench_templates).where(
-        workbench_templates.c.template_id.in_(manifest["template_ids"]),
-        workbench_templates.c.version == manifest["template_version"])).mappings())
-    if len(templates) != len(manifest["template_ids"]):
-        raise ValueError("Install the matching templates first")
-    # The manuals apply to the vehicle these templates are for.
-    match = conn.execute(select(workbench_template_matches).where(
-        workbench_template_matches.c.template_id.in_(manifest["template_ids"]),
-        workbench_template_matches.c.version == manifest["template_version"])
-        .order_by(workbench_template_matches.c.id)).mappings().first()
-    vehicle = {"vehicle_brand": match["brand"], "vehicle_model": match["model"],
-               "vehicle_year": match["year_from"], "vehicle_engine_code": match["engine_code"]} if match else {}
+def seed(conn, package=DEFAULT_PACKAGE, manuals_path=MANUALS):
+    """Insert every listed manual version that is not stored yet; never change a stored one."""
+    manuals = load_manuals(manuals_path)
+    vehicle = manuals["vehicle"]
+    values = {"vehicle_brand": vehicle["brand"], "vehicle_model": vehicle["model"],
+              "vehicle_year": vehicle.get("year"), "vehicle_engine_code": vehicle.get("engine_code")}
     result = []
-    for entry, doc in build_documents(package, manifest):
+    for _, doc in build_documents(package, manuals):
         prior = conn.execute(select(documents).where(documents.c.document_id == doc["document_id"],
             documents.c.version == doc["version"])).mappings().first()
         if prior and any(prior[key] != doc[key] for key in doc):
             raise ValueError("Existing document changed: publish a new version")
         if not prior:
-            conn.execute(documents.insert().values(**doc, always_include=always_include(doc), **vehicle))
+            conn.execute(documents.insert().values(**doc, always_include=always_include(doc), **values))
         elif not prior["always_include"] and always_include(doc):
-            # Rows imported before 0024 get their reviewed always-sent sections once.
             conn.execute(update(documents).where(documents.c.document_id == doc["document_id"],
                 documents.c.version == doc["version"]).values(always_include=always_include(doc)))
-        for template in templates:
-            if entry["area_id"] not in {a["id"] for a in template["content_json"]["areas"]}:
-                continue
-            relation = {"template_id": template["template_id"], "template_version": template["version"],
-                "area_id": entry["area_id"], "document_id": doc["document_id"], "document_version": doc["version"]}
-            prior_binding = conn.execute(select(bindings).where(*[
-                bindings.c[key] == relation[key] for key in ("template_id", "template_version", "area_id", "document_id")
-            ])).mappings().first()
-            if prior_binding and dict(prior_binding) != relation:
-                raise ValueError("Binding changed: explicit version update required")
-            if not prior_binding:
-                conn.execute(bindings.insert().values(**relation))
-            result.append({**relation, "title": doc["title"], "chars": len(doc["body"]),
-                           "coverage": entry["coverage"]})
+        result.append({"document_id": doc["document_id"], "version": doc["version"],
+                       "title": doc["title"], "chars": len(doc["body"]), "new": prior is None})
     return result
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--package", type=Path, default=DEFAULT_PACKAGE)
-    parser.add_argument("--manifest", type=Path, default=MANIFEST)
+    parser.add_argument("--manuals", type=Path, default=MANUALS)
     parser.add_argument("--no-vectors", action="store_true",
                         help="store chunks only (no local embedding model on this machine)")
     args = parser.parse_args()
@@ -163,12 +150,12 @@ if __name__ == "__main__":
     target = validate_target(env["DATABASE_URL"], "migration")
     engine = create_engine(target.sqlalchemy_url(), connect_args=target.connect_kwargs())
     with engine.begin() as conn:
-        relations = seed(conn, args.package, args.manifest)
-    print(json.dumps(relations, ensure_ascii=False, indent=2))
+        installed = seed(conn, args.package, args.manuals)
+    print(json.dumps(installed, ensure_ascii=False, indent=2))
     embedder = None
     if not args.no_vectors:
         from app.services.reference_ingest import load_embedder
         embedder = load_embedder()
-    print(json.dumps(index(engine, {(r["document_id"], r["document_version"]) for r in relations}, embedder),
+    print(json.dumps(index(engine, {(r["document_id"], r["version"]) for r in installed}, embedder),
                      ensure_ascii=False, indent=2))
     engine.dispose()

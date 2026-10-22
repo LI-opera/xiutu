@@ -7,7 +7,7 @@ from sqlalchemy import select, update, func
 from app.domain.policies import DomainError
 from app.infrastructure.orm import cases, template_repair_rounds as rounds
 from app.infrastructure.uow import UnitOfWork
-from app.services.run_service import lock_case
+from app.services.write_guards import lock_case
 from app.services.workbench_templates import is_template
 
 
@@ -104,7 +104,7 @@ class TemplateRepairService:
             raise DomainError("RETEST_BATCH_UNSUPPORTED",
                               "成组采集的读数暂不支持在复检中单项重录，请写入复检证据。", 422)
         rows = self.topic_service._rows(conn, case["id"], module.TOPIC_VERSION)
-        existing = workflow_for(topic, template_bound=True).effective(rows, q["id"], None)
+        existing = workflow_for(topic).effective(rows, q["id"], None)
         answer = TopicAnswer(expected_revision=case["revision"], topic_version=topic["version"],
                              question_id=q["id"], option_ids=item.option_ids, fields=item.fields,
                              note=item.note, unavailable_reason=item.unavailable_reason,

@@ -14,13 +14,15 @@ from app.services.analysis_context import (
 )
 from app.services.retrieval_reading import section_ranges
 
-from scripts.build_analysis_context import MANIFEST, RELATIONS, ReviewRequired, build, derive_template
-from scripts.seed_area_references import DEFAULT_PACKAGE, build_documents
+from scripts.build_analysis_context import RELATIONS, ReviewRequired, build, derive_template
+from scripts.seed_area_references import DEFAULT_PACKAGE, build_documents, load_manuals
+from scripts.section_retrieval_eval import AREA_DOCUMENTS
 
 ROLES_DATA = json.loads(ROLES_CONFIG.read_text(encoding="utf-8"))
 READING_DATA = json.loads(READING_CONFIG.read_text(encoding="utf-8"))
 RELATION_LIST = json.loads(RELATIONS.read_text(encoding="utf-8"))["relations"]
-DOCUMENTS = list(build_documents(DEFAULT_PACKAGE, json.loads(MANIFEST.read_text(encoding="utf-8"))))
+DOCUMENTS = list(build_documents(DEFAULT_PACKAGE, load_manuals()))
+AREA_OF = {doc: area for area, doc in json.loads(AREA_DOCUMENTS.read_text(encoding="utf-8"))["areas"].items()}
 
 
 def topic_of(relation):
@@ -36,7 +38,7 @@ def area_payload(relation, topic, area_id, answered=()):
                      "option_labels": [qmap[qid]["options"][0]["label"]]} for qid in answered]
     documents = [{"id": doc["document_id"], "version": doc["version"], "title": doc["title"],
                   "body": doc["body"], "content_hash": doc["content_hash"]}
-                 for entry, doc in DOCUMENTS if entry["area_id"] == area_id]
+                 for _, doc in DOCUMENTS if AREA_OF[doc["document_id"]] == area_id]
     return {"template_binding": {"template_id": relation["template_id"],
                                  "version": relation["version"], "content_hash": digest(topic)},
             "questions": [{"id": q["id"], "title": q["title"]} for q in questions],

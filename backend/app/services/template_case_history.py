@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from sqlalchemy import select, update, func
 from app.infrastructure.orm import cases, observations, template_repair_rounds
 from app.infrastructure.uow import UnitOfWork
-from app.services.run_service import lock_case
+from app.services.write_guards import lock_case
 from app.services.workbench_templates import is_template
 from app.domain.policies import DomainError
 

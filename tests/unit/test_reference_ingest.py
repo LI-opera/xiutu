@@ -3,16 +3,15 @@ import json
 import threading
 
 import pytest
-from app.domain.documents import IngestError
 from app.domain.policies import DomainError
 from app.retrieval.section_search import split
 from app.services import reference_ingest as ri
+from app.services.reference_ingest import IngestError
 from app.services.retrieval_reading import NAVIGATION
 
-from scripts.build_analysis_context import MANIFEST
-from scripts.seed_area_references import DEFAULT_PACKAGE, READING, always_include, build_documents
+from scripts.seed_area_references import DEFAULT_PACKAGE, READING, always_include, build_documents, load_manuals
 
-DOCUMENTS = [doc for _, doc in build_documents(DEFAULT_PACKAGE, json.loads(MANIFEST.read_text(encoding="utf-8")))]
+DOCUMENTS = [doc for _, doc in build_documents(DEFAULT_PACKAGE, load_manuals())]
 
 
 @pytest.mark.parametrize("doc", DOCUMENTS, ids=[d["document_id"] for d in DOCUMENTS])

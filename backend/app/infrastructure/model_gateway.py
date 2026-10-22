@@ -1,6 +1,5 @@
 """DeepSeek gateway: native tool IDs, bounded JSON repair and shared paid ledger."""
 
-import hashlib
 import json
 import re
 import time
@@ -8,7 +7,7 @@ from copy import deepcopy
 from uuid import uuid4
 
 import httpx
-from langchain_core.messages import HumanMessage, SystemMessage, ToolMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.messages.utils import convert_to_messages, convert_to_openai_messages
 from langchain_deepseek import ChatDeepSeek
 from openai import (
@@ -365,86 +364,3 @@ class DeepSeekGateway:
                 "rule_id": "response.structure", "field_path": path[:160],
                 "expected": (schema_override or schema.model_json_schema()).get("title", "冻结输出契约")[:120],
                 "actual": str(issue.get("type", "invalid"))[:80]}) from None
-
-    def run_tools(
-        self, messages, schema, executor, context, *, allowed_tools, skill=None,
-        tool_round_limit=3, structured_repair=True
-    ):
-
-        from app.tools.schemas import INPUTS
-
-        permitted = set(allowed_tools)
-        if skill is not None:
-            permitted &= set(skill["allowed_tools"])
-        if not permitted <= set(INPUTS):
-            raise ModelError("TOOL_ALLOWLIST_INVALID")
-        tools = [
-            {
-                "type": "function",
-                "function": {
-                    "name": n,
-                    "description": "Authorized bounded business tool",
-                    "parameters": INPUTS[n].model_json_schema(),
-                },
-            }
-            for n in sorted(permitted)
-        ]
-        if type(tool_round_limit) is not int or not 1 <= tool_round_limit <= 3:
-            raise ModelError("TOOL_ROUNDS_INVALID")
-        history = list(messages)
-        seen = set()
-        records = []
-        self.tool_records = records
-        searches = 0
-        rounds = 0
-
-        def parse_without_repair(current):
-            final = self.request(current, response_format={"type": "json_object"})
-            try:
-                if final.tool_calls:
-                    raise ValueError()
-                return schema.model_validate_json(final.content, strict=True), records
-            except (ValidationError, ValueError, TypeError):
-                raise ModelError("MODEL_SCHEMA_INVALID") from None
-
-        while True:
-            answer = self.invoke_with_tools(history, tools)
-            if not answer.tool_calls:
-                if structured_repair:
-                    return self.generate_structured(schema, history + [answer]), records
-                return parse_without_repair(history + [answer])
-            history.append(answer)
-            rounds += 1
-            for call in answer.tool_calls:
-                cid = call["id"]
-                name = call["name"]
-                if not cid or cid in seen:
-                    raise ModelError("TOOL_CALL_ID_INVALID")
-                seen.add(cid)
-                searches += int(name == "search_manuals")
-                if len(seen) > 6 or searches > 3:
-                    raise ModelError("TOOL_TURN_BUDGET_EXHAUSTED")
-                if name not in permitted:
-                    raise ModelError("TOOL_FORBIDDEN")
-                # Trusted context supplied by application, never constructed from model arguments.
-                key = "model-" + hashlib.sha256((self.turn + ":" + cid).encode()).hexdigest()
-                if time.monotonic() - self.started >= 120:
-                    raise ModelError("MODEL_TURN_TIMEOUT")
-                data = executor.execute(context, name, call["args"], key)
-                records.append(
-                    dict(
-                        tool_call_id=cid,
-                        name=name,
-                        call_key=key,
-                        ok=data["ok"],
-                        provenance=data["provenance"],
-                    )
-                )
-                history.append(
-                    ToolMessage(content=json.dumps(data, ensure_ascii=False), tool_call_id=cid)
-                )
-
-            if rounds >= tool_round_limit:
-                if structured_repair:
-                    return self.generate_structured(schema, history), records
-                return parse_without_repair(history)

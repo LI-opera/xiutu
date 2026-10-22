@@ -96,6 +96,14 @@ class AreaRankingService:
                 "requested_at": row["created_at"].isoformat(),
                 "finished_at": row["updated_at"].isoformat()}
 
+    def _isolated_database(self):
+        from app.infrastructure.db_target import validate_target
+        try:
+            validate_target(self.settings.database_url.get_secret_value(), "test")
+        except (ValueError, AttributeError):
+            return False
+        return True
+
     def _authorized(self, case_id):
         if (os.environ.get("XIUTU_AREA_RANKING_PAID_AUTHORIZED") != "1"
                 or not self.settings.deepseek_api_key):
@@ -107,7 +115,7 @@ class AreaRankingService:
         # the unique case row limits each case to one provider attempt.
         return (os.environ.get("XIUTU_AREA_RANKING_LOCAL_TESTING") == "1"
                 and self.settings.app_mode == "test"
-                and self.settings.retrieval_profile == "synthetic"
+                and self._isolated_database()
                 and self.settings.local_dev_auto_identity
                 and self.settings.app_origin == "http://localhost:5215")
 

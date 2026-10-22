@@ -2,27 +2,21 @@
 
 import hashlib
 import random
-import re
 import threading
 from dataclasses import dataclass, field
 
 from sqlalchemy import and_, create_engine, or_, select, text, update
 from sqlalchemy.pool import NullPool
 
-from app.domain.documents import IngestError
 from app.domain.policies import DomainError
 from app.domain.tasks import TERMINAL
-from app.infrastructure import index_state
 from app.infrastructure.db_target import validate_target
-from app.infrastructure.embedding_gateway import EmbeddingError
 from app.infrastructure.event_store import append_event
-from app.infrastructure.ingest_state import publish as publish_ingest
-from app.infrastructure.ingest_state import state as ingest_state
 from app.infrastructure.orm import jobs, runs
 from app.infrastructure.uow import make_engine
 
 
-RUNTIME_JOB_KINDS = frozenset({"no_op", "ingest", "index", "reference_ingest"})
+RUNTIME_JOB_KINDS = frozenset({"no_op", "reference_ingest"})
 
 
 class LeaseLost(Exception):
@@ -81,17 +75,11 @@ class JobStore:
         self.locks.dispose()
 
     def claim(self, worker, hook=None, run_id=None, allowed_kinds=None):
-        """Claim current runtime jobs; an omitted filter never includes retired jobs."""
+        """Claim the next due job of a kind this worker handles."""
         kinds = RUNTIME_JOB_KINDS if allowed_kinds is None else frozenset(allowed_kinds)
         if not kinds.issubset(RUNTIME_JOB_KINDS):
-            raise ValueError("Retired job kinds require explicit isolated legacy claiming")
+            raise ValueError("Unknown job kind")
         return self._claim(worker, hook, run_id, kinds)
-
-    def claim_legacy(self, worker, hook=None, run_id=None, allowed_kinds=None):
-        """Explicit replay seam; never available on a development/production database."""
-        if not re.fullmatch(r"xiutu_test_[a-z0-9_]{1,40}", self.engine.url.database or ""):
-            raise ValueError("Legacy job claiming requires an isolated test database")
-        return self._claim(worker, hook, run_id, allowed_kinds)
 
     def _claim(self, worker, hook=None, run_id=None, allowed_kinds=None):
         allowed_kinds = None if allowed_kinds is None else frozenset(allowed_kinds)
@@ -174,8 +162,6 @@ class JobStore:
                         .where(runs.c.id == job["run_id"])
                         .values(status="running", error_json={})
                     )
-                    if job["kind"] == "ingest":
-                        ingest_state(c, job["run_id"], "parsing")
                     append_event(c, job["run_id"], "run.started", {"attempt": updated["attempt"]})
                     if hook:
                         hook("before_claim_commit", dict(updated))
@@ -254,29 +240,7 @@ class JobStore:
         ):
             raise LeaseLost()
 
-    def stage_index(self, lease, batch):
-        with lease.mutex:
-            try:
-                with lease.connection.begin():
-                    job, run = self._valid(lease)
-                    if run["status"] != "running":
-                        raise IngestError("INDEX_INTERRUPTED")
-                    index_state.stage(lease.connection, job, batch)
-                    self._finish_valid(lease, job["lease_until"])
-            except BaseException as exc:
-                # A rolled-back input/SQL error does not itself lose the physical
-                # session. finish can publish a safe failure/cancel after revalidation.
-                if (
-                    isinstance(exc, LeaseLost)
-                    or lease.connection.closed
-                    or lease.connection.invalidated
-                ):
-                    lease.lost = True
-                raise
-
     def finish(self, lease, error=None, transient=False, result=None):
-        if lease.job["kind"] in {"diagnosis", "report", "case_analysis"}:
-            return self._legacy_support().finish(lease, error, transient, result)
         with lease.mutex:
             try:
                 with lease.connection.begin():
@@ -285,21 +249,7 @@ class JobStore:
                     if run["status"] == "cancel_requested":
                         self._terminal(c, job, "cancelled", {})
                     elif error is None:
-                        if job["kind"] == "ingest":
-                            publish_ingest(
-                                c, job, result, validate_lease=lambda: self._valid(lease)
-                            )
-                        if job["kind"] == "index":
-                            try:
-                                index_state.publish(c, job, lambda: self._valid(lease))
-                            except (IngestError, EmbeddingError) as exc:
-                                self._terminal(
-                                    c, job, "failed", {"code": exc.code, "retryable": False}
-                                )
-                            else:
-                                self._terminal(c, job, "succeeded", {})
-                        else:
-                            self._terminal(c, job, "succeeded", {})
+                        self._terminal(c, job, "succeeded", {})
                     elif transient and job["attempt"] < min(3, job["max_attempts"]):
                         delay = (2, 8)[job["attempt"] - 1] + random.uniform(0, 0.25)
                         c.execute(
@@ -319,8 +269,6 @@ class JobStore:
                             .where(runs.c.id == job["run_id"])
                             .values(status="queued", error_json={"code": error, "retryable": True})
                         )
-                        if job["kind"] == "ingest":
-                            ingest_state(c, job["run_id"], "pending")
                         append_event(
                             c,
                             job["run_id"],
@@ -351,44 +299,10 @@ class JobStore:
                 lease.lost = True
                 raise
 
-
-    def _legacy_support(self):
-        if not re.fullmatch(r"xiutu_test_[a-z0-9_]{1,40}", self.engine.url.database or ""):
-            raise ValueError("Legacy job support requires an isolated test database")
-        from app.infrastructure.legacy_job_support import LegacyJobSupport
-
-        return LegacyJobSupport(self)
-
     def _cancel_claim(self, c, job):
-        if job["kind"] in {"diagnosis", "report", "case_analysis"}:
-            return self._legacy_support().cancel_claim(c, job)
         self._terminal(c, job, "cancelled", {})
 
-    def staged_diagnosis(self, lease):
-        return self._legacy_support().staged_diagnosis(lease)
-
-    def reconcile_wait(self, run_id):
-        return self._legacy_support().reconcile_wait(run_id)
-
-    def reconcile_pending(self):
-        return self._legacy_support().reconcile_pending()
-
-    def published(self, run_id):
-        return self._legacy_support().published(run_id)
-
-    def stage_diagnosis(self, lease, result):
-        return self._legacy_support().stage_diagnosis(lease, result)
-
-    def reserve_diagnosis_repair(self, lease):
-        return self._legacy_support().reserve_diagnosis_repair(lease)
-
     def _terminal(self, c, job, status, error):
-        if job["kind"] in {"diagnosis", "report", "case_analysis"}:
-            return self._legacy_support()._terminal(c, job, status, error)
-        if job["kind"] == "index" and status != "succeeded":
-            index_state.state(c, job["run_id"], error or {"code": status, "retryable": False})
-        if job["kind"] == "ingest" and status != "succeeded":
-            ingest_state(c, job["run_id"], status, error)
         c.execute(
             update(jobs)
             .where(jobs.c.id == job["id"])

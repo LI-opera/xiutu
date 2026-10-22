@@ -1,1 +1,1 @@
-EXPECTED_REVISION = "0025_reference_vehicle"
+EXPECTED_REVISION = "0026_retire_legacy"
