@@ -217,36 +217,6 @@
         "title": "AreaConclusionView",
         "type": "object"
       },
-      "AreaTarget": {
-        "additionalProperties": false,
-        "properties": {
-          "area_id": {
-            "maxLength": 80,
-            "minLength": 1,
-            "title": "Area Id",
-            "type": "string"
-          },
-          "template_id": {
-            "maxLength": 100,
-            "minLength": 1,
-            "title": "Template Id",
-            "type": "string"
-          },
-          "template_version": {
-            "maxLength": 32,
-            "minLength": 1,
-            "title": "Template Version",
-            "type": "string"
-          }
-        },
-        "required": [
-          "template_id",
-          "template_version",
-          "area_id"
-        ],
-        "title": "AreaTarget",
-        "type": "object"
-      },
       "AuthSession": {
         "additionalProperties": false,
         "properties": {
@@ -1934,6 +1904,22 @@
         "title": "FinalReportGate",
         "type": "object"
       },
+      "KnownVehicles": {
+        "properties": {
+          "vehicles": {
+            "items": {
+              "$ref": "#/components/schemas/StoredVehicle"
+            },
+            "title": "Vehicles",
+            "type": "array"
+          }
+        },
+        "required": [
+          "vehicles"
+        ],
+        "title": "KnownVehicles",
+        "type": "object"
+      },
       "LifecycleInput": {
         "additionalProperties": false,
         "properties": {
@@ -2371,13 +2357,6 @@
             "title": "Always Include",
             "type": "array"
           },
-          "bound_areas": {
-            "items": {
-              "$ref": "#/components/schemas/AreaTarget"
-            },
-            "title": "Bound Areas",
-            "type": "array"
-          },
           "chars": {
             "title": "Chars",
             "type": "integer"
@@ -2427,13 +2406,6 @@
             ],
             "title": "Error Code"
           },
-          "requested_areas": {
-            "items": {
-              "$ref": "#/components/schemas/AreaTarget"
-            },
-            "title": "Requested Areas",
-            "type": "array"
-          },
           "source_kind": {
             "title": "Source Kind",
             "type": "string"
@@ -2461,6 +2433,9 @@
             ],
             "title": "Vector Fingerprint"
           },
+          "vehicle": {
+            "$ref": "#/components/schemas/StoredVehicle"
+          },
           "version": {
             "title": "Version",
             "type": "string"
@@ -2479,8 +2454,7 @@
           "chunker_version",
           "vector_fingerprint",
           "always_include",
-          "requested_areas",
-          "bound_areas",
+          "vehicle",
           "created_at",
           "updated_at"
         ],
@@ -2503,25 +2477,9 @@
         "title": "ReferenceList",
         "type": "object"
       },
-      "ReferenceTargets": {
-        "properties": {
-          "templates": {
-            "items": {
-              "$ref": "#/components/schemas/TargetTemplate"
-            },
-            "title": "Templates",
-            "type": "array"
-          }
-        },
-        "required": [
-          "templates"
-        ],
-        "title": "ReferenceTargets",
-        "type": "object"
-      },
       "ReferenceUpload": {
         "additionalProperties": false,
-        "description": "A Markdown manual for one or more workbench areas. Same document_id adds a version.",
+        "description": "A new Markdown manual. Nothing ties it to a template or an area.",
         "properties": {
           "always_include": {
             "items": {
@@ -2529,15 +2487,6 @@
             },
             "maxItems": 50,
             "title": "Always Include",
-            "type": "array"
-          },
-          "areas": {
-            "items": {
-              "$ref": "#/components/schemas/AreaTarget"
-            },
-            "maxItems": 50,
-            "minItems": 1,
-            "title": "Areas",
             "type": "array"
           },
           "content": {
@@ -2563,13 +2512,16 @@
             "minLength": 1,
             "title": "Title",
             "type": "string"
+          },
+          "vehicle": {
+            "$ref": "#/components/schemas/ReferenceVehicle"
           }
         },
         "required": [
           "document_id",
           "title",
           "content",
-          "areas"
+          "vehicle"
         ],
         "title": "ReferenceUpload",
         "type": "object"
@@ -2612,6 +2564,67 @@
           "run_id"
         ],
         "title": "ReferenceUploadResult",
+        "type": "object"
+      },
+      "ReferenceVehicle": {
+        "additionalProperties": false,
+        "description": "The vehicle a manual applies to; analyses only read manuals of the case's vehicle.",
+        "properties": {
+          "brand": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Brand",
+            "type": "string"
+          },
+          "engine_code": {
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Engine Code",
+            "type": "string"
+          },
+          "model": {
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Model",
+            "type": "string"
+          },
+          "year": {
+            "maximum": 2100.0,
+            "minimum": 1950.0,
+            "title": "Year",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "brand",
+          "model",
+          "year",
+          "engine_code"
+        ],
+        "title": "ReferenceVehicle",
+        "type": "object"
+      },
+      "ReferenceVersionUpload": {
+        "additionalProperties": false,
+        "description": "A new version of an existing manual; title, vehicle and always-sent sections carry over.",
+        "properties": {
+          "content": {
+            "maxLength": 2000000,
+            "minLength": 1,
+            "title": "Content",
+            "type": "string"
+          },
+          "filename": {
+            "default": "",
+            "maxLength": 255,
+            "title": "Filename",
+            "type": "string"
+          }
+        },
+        "required": [
+          "content"
+        ],
+        "title": "ReferenceVersionUpload",
         "type": "object"
       },
       "ReindexInput": {
@@ -3479,6 +3492,62 @@
         "title": "StartDiagnosis",
         "type": "object"
       },
+      "StoredVehicle": {
+        "properties": {
+          "brand": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brand"
+          },
+          "engine_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Engine Code"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "brand",
+          "model",
+          "year",
+          "engine_code"
+        ],
+        "title": "StoredVehicle",
+        "type": "object"
+      },
       "SubmitObservation": {
         "additionalProperties": false,
         "properties": {
@@ -3623,55 +3692,6 @@
           "kind"
         ],
         "title": "SubmitObservation",
-        "type": "object"
-      },
-      "TargetArea": {
-        "properties": {
-          "id": {
-            "title": "Id",
-            "type": "string"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "title"
-        ],
-        "title": "TargetArea",
-        "type": "object"
-      },
-      "TargetTemplate": {
-        "properties": {
-          "areas": {
-            "items": {
-              "$ref": "#/components/schemas/TargetArea"
-            },
-            "title": "Areas",
-            "type": "array"
-          },
-          "template_id": {
-            "title": "Template Id",
-            "type": "string"
-          },
-          "title": {
-            "title": "Title",
-            "type": "string"
-          },
-          "version": {
-            "title": "Version",
-            "type": "string"
-          }
-        },
-        "required": [
-          "template_id",
-          "version",
-          "title",
-          "areas"
-        ],
-        "title": "TargetTemplate",
         "type": "object"
       },
       "TopicAnswer": {
@@ -4815,16 +4835,16 @@
         ]
       }
     },
-    "/api/v2/area-references/targets": {
+    "/api/v2/area-references/vehicles": {
       "get": {
-        "description": "Templates and their areas a manual can be bound to.",
-        "operationId": "reference_targets_api_v2_area_references_targets_get",
+        "description": "Vehicles already known from templates and manuals, suggested while typing.",
+        "operationId": "known_vehicles_api_v2_area_references_vehicles_get",
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReferenceTargets"
+                  "$ref": "#/components/schemas/KnownVehicles"
                 }
               }
             },
@@ -4941,7 +4961,169 @@
             "description": "Service Unavailable"
           }
         },
-        "summary": "Reference Targets",
+        "summary": "Known Vehicles",
+        "tags": [
+          "area-references"
+        ]
+      }
+    },
+    "/api/v2/area-references/{document_id}/versions": {
+      "post": {
+        "operationId": "upload_reference_version_api_v2_area_references__document_id__versions_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReferenceVersionUpload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceUploadResult"
+                }
+              }
+            },
+            "description": "Same content: existing version"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceUploadResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Upload Reference Version",
         "tags": [
           "area-references"
         ]

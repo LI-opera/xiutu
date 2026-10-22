@@ -22,7 +22,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v2/area-references/targets": {
+    "/api/v2/area-references/vehicles": {
         parameters: {
             query?: never;
             header?: never;
@@ -30,12 +30,29 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Reference Targets
-         * @description Templates and their areas a manual can be bound to.
+         * Known Vehicles
+         * @description Vehicles already known from templates and manuals, suggested while typing.
          */
-        get: operations["reference_targets_api_v2_area_references_targets_get"];
+        get: operations["known_vehicles_api_v2_area_references_vehicles_get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/area-references/{document_id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload Reference Version */
+        post: operations["upload_reference_version_api_v2_area_references__document_id__versions_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1085,15 +1102,6 @@ export interface components {
             /** Needs Review */
             needs_review: boolean;
         };
-        /** AreaTarget */
-        AreaTarget: {
-            /** Area Id */
-            area_id: string;
-            /** Template Id */
-            template_id: string;
-            /** Template Version */
-            template_version: string;
-        };
         /** AuthSession */
         AuthSession: {
             /**
@@ -1696,6 +1704,11 @@ export interface components {
             /** Graph Epoch */
             graph_epoch: number;
         };
+        /** KnownVehicles */
+        KnownVehicles: {
+            /** Vehicles */
+            vehicles: components["schemas"]["StoredVehicle"][];
+        };
         /** LifecycleInput */
         LifecycleInput: {
             /** Closed */
@@ -1857,8 +1870,6 @@ export interface components {
         ReferenceItem: {
             /** Always Include */
             always_include: string[];
-            /** Bound Areas */
-            bound_areas: components["schemas"]["AreaTarget"][];
             /** Chars */
             chars: number;
             /** Chunk Count */
@@ -1873,8 +1884,6 @@ export interface components {
             document_id: string;
             /** Error Code */
             error_code: string | null;
-            /** Requested Areas */
-            requested_areas: components["schemas"]["AreaTarget"][];
             /** Source Kind */
             source_kind: string;
             /** Status */
@@ -1885,6 +1894,7 @@ export interface components {
             updated_at: string;
             /** Vector Fingerprint */
             vector_fingerprint: string | null;
+            vehicle: components["schemas"]["StoredVehicle"];
             /** Version */
             version: string;
         };
@@ -1893,20 +1903,13 @@ export interface components {
             /** Items */
             items: components["schemas"]["ReferenceItem"][];
         };
-        /** ReferenceTargets */
-        ReferenceTargets: {
-            /** Templates */
-            templates: components["schemas"]["TargetTemplate"][];
-        };
         /**
          * ReferenceUpload
-         * @description A Markdown manual for one or more workbench areas. Same document_id adds a version.
+         * @description A new Markdown manual. Nothing ties it to a template or an area.
          */
         ReferenceUpload: {
             /** Always Include */
             always_include?: string[];
-            /** Areas */
-            areas: components["schemas"]["AreaTarget"][];
             /** Content */
             content: string;
             /** Document Id */
@@ -1918,6 +1921,7 @@ export interface components {
             filename: string;
             /** Title */
             title: string;
+            vehicle: components["schemas"]["ReferenceVehicle"];
         };
         /** ReferenceUploadResult */
         ReferenceUploadResult: {
@@ -1931,6 +1935,33 @@ export interface components {
             status: string;
             /** Version */
             version: string;
+        };
+        /**
+         * ReferenceVehicle
+         * @description The vehicle a manual applies to; analyses only read manuals of the case's vehicle.
+         */
+        ReferenceVehicle: {
+            /** Brand */
+            brand: string;
+            /** Engine Code */
+            engine_code: string;
+            /** Model */
+            model: string;
+            /** Year */
+            year: number;
+        };
+        /**
+         * ReferenceVersionUpload
+         * @description A new version of an existing manual; title, vehicle and always-sent sections carry over.
+         */
+        ReferenceVersionUpload: {
+            /** Content */
+            content: string;
+            /**
+             * Filename
+             * @default
+             */
+            filename: string;
         };
         /** ReindexInput */
         ReindexInput: {
@@ -2273,6 +2304,17 @@ export interface components {
             /** Expected Revision */
             expected_revision: number;
         };
+        /** StoredVehicle */
+        StoredVehicle: {
+            /** Brand */
+            brand: string | null;
+            /** Engine Code */
+            engine_code: string | null;
+            /** Model */
+            model: string | null;
+            /** Year */
+            year: number | null;
+        };
         /** SubmitObservation */
         SubmitObservation: {
             /** Choice Index */
@@ -2311,24 +2353,6 @@ export interface components {
             topic_question_id?: string | null;
             /** Topic Version */
             topic_version?: string | null;
-        };
-        /** TargetArea */
-        TargetArea: {
-            /** Id */
-            id: string;
-            /** Title */
-            title: string;
-        };
-        /** TargetTemplate */
-        TargetTemplate: {
-            /** Areas */
-            areas: components["schemas"]["TargetArea"][];
-            /** Template Id */
-            template_id: string;
-            /** Title */
-            title: string;
-            /** Version */
-            version: string;
         };
         /** TopicAnswer */
         TopicAnswer: {
@@ -2874,7 +2898,7 @@ export interface operations {
             };
         };
     };
-    reference_targets_api_v2_area_references_targets_get: {
+    known_vehicles_api_v2_area_references_vehicles_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -2889,7 +2913,141 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ReferenceTargets"];
+                    "application/json": components["schemas"]["KnownVehicles"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Request Entity Too Large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unsupported Media Type */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Internal Server Error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Bad Gateway */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorEnvelope"];
+                };
+            };
+        };
+    };
+    upload_reference_version_api_v2_area_references__document_id__versions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReferenceVersionUpload"];
+            };
+        };
+        responses: {
+            /** @description Same content: existing version */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReferenceUploadResult"];
+                };
+            };
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReferenceUploadResult"];
                 };
             };
             /** @description Bad Request */
