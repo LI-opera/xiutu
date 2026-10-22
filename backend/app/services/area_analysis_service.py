@@ -23,6 +23,7 @@ from app.infrastructure.orm import area_reference_documents as documents
 from app.infrastructure.orm import template_repair_rounds as repair_rounds
 from app.infrastructure.uow import UnitOfWork
 from app.services.analysis_context import enrich, model_payload
+from app.services.reference_store import provider as stored_sections
 from app.services.retrieval_reading import Embeddings
 from app.services.run_service import lock_case
 from app.services.workbench_observation_service import TopicService
@@ -116,7 +117,7 @@ def derived_results(view, questions):
     return result
 
 
-def build_input(view, area_id, references, embeddings=None):
+def build_input(view, area_id, references, embeddings=None, sections=None):
     """The same function for any catalog area; never infer unrecorded answers."""
     area = next((a for a in view["topic"]["areas"] if a["id"] == area_id), None)
     if not area:
@@ -173,10 +174,10 @@ def build_input(view, area_id, references, embeddings=None):
         for item in payload["questions"]:
             item["suggested_focus"] = item["id"] in focused
             item["execution_blockers"] = view["view"]["question_states"][item["id"]].get("condition_blockers", [])
-    return enrich(payload, view["topic"], embeddings)
+    return enrich(payload, view["topic"], embeddings, sections=sections)
 
 
-def build_matched_input(view, references_by_area, embeddings=None):
+def build_matched_input(view, references_by_area, embeddings=None, sections=None):
     """Build one frozen request from matched areas with effective saved observations."""
     areas = []
     documents = {}
@@ -189,7 +190,7 @@ def build_matched_input(view, references_by_area, embeddings=None):
     guides = []
     for area in view["topic"]["areas"]:
         area_id = area["id"]
-        scoped = build_input(view, area_id, references_by_area.get(area_id, []), embeddings)
+        scoped = build_input(view, area_id, references_by_area.get(area_id, []), embeddings, sections)
         if not scoped["observations"] and not scoped["repair_rounds"]:
             continue
         refs = scoped["documents"]
@@ -283,11 +284,14 @@ class AreaAnalysisService:
             recorded_areas |= {item["area_id"] for item in view["repair_rounds"]}
             references = {area["id"]: load_documents(conn, binding, area["id"])
                           for area in view["topic"]["areas"] if area["id"] in recorded_areas}
-            return build_matched_input(view, references, self.reading_embeddings)
+            return build_matched_input(view, references, self.reading_embeddings,
+                                       stored_sections(conn, self.reading_embeddings))
         refs = load_documents(conn, view["case"]["intake_snapshot"]["template_binding"], area_id)
-        return build_input(view, area_id, refs, self.reading_embeddings)
+        return build_input(view, area_id, refs, self.reading_embeddings,
+                           stored_sections(conn, self.reading_embeddings))
 
     def get(self, actor, case_id, area_id):
+        self.reading_embeddings.warm()  # load the model before the case row is locked
         with UnitOfWork(self.engine) as uow:
             view = self._view(uow.connection, actor, case_id)
             payload = self._payload(uow.connection, view, area_id)
@@ -316,6 +320,7 @@ class AreaAnalysisService:
             "max_output_tokens": self.settings.area_analysis_max_output_tokens})
 
     def start(self, actor, case_id, area_id, expected_revision):
+        self.reading_embeddings.warm()
         with UnitOfWork(self.engine) as uow:
             view = self._view(uow.connection, actor, case_id, expected_revision)
             payload = self._payload(uow.connection, view, area_id)
