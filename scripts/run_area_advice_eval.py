@@ -233,8 +233,10 @@ def main():
             recorded = ledger_rows(turn_id)
             sent = any(row.get("status") != "not_sent" for row in recorded)
             usage = meta.get("usage") or next((row["usage"] for row in recorded if row.get("usage")), None)
-            # Not in the ledger = refused before sending: costs nothing. Sent without usage: assume the upper bound.
-            spent_now = cost(usage) if usage else (upper[key] if sent else Decimal(0))
+            # Not in the ledger = refused before sending: costs nothing. 402 = the provider refused for lack
+            # of balance: not billed. Other sent calls without usage: assume the upper bound.
+            no_balance = bool(error) and "HTTP_402" in error
+            spent_now = cost(usage) if usage else (upper[key] if sent and not no_balance else Decimal(0))
             spent += spent_now
             if usage:
                 observed.append(spent_now)
@@ -249,6 +251,9 @@ def main():
             print(f"  {seconds} 秒，约 {spent_now:.4f} 元：{status}")
             if error and not sent:
                 print("请求在发出前被拒绝（配置或账本问题），后面的调用也会同样失败，停止。")
+                break
+            if no_balance:
+                print("模型账户余额不足（HTTP 402），没有计费；后面的调用也会同样失败，停止。请充值后再跑。")
                 break
         else:
             continue
