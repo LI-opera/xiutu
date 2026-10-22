@@ -44,11 +44,16 @@ export function ReferencesPage() {
   const shownChunks = (chunks.data?.items ?? []).filter(c => !onlySearchable || c.searchable);
   const label = (target: AreaTarget) => names.get(targetKey(target)) ?? targetKey(target);
 
-  return <div className="documents-layout">
+  return <div className="references-page">
+    <section className="page-card upload-card"><ColumnHeader eyebrow="UPLOAD" title="上传资料" />
+      <UploadPanel targets={targets.data} targetsError={targets.error} groups={groups.map(g => ({ id: g.documentId, title: g.title }))}
+        onUploaded={result => { setSelected({ documentId: result.document_id, version: result.version }); client.invalidateQueries({ queryKey: ['area-references'] }); }} />
+    </section>
+    <div className="documents-layout">
     <section className="page-card document-sidebar"><ColumnHeader eyebrow="MANUALS" title="维修资料" />
-      <p className="section-note">AI 分析按区域读取这里的资料：上传后自动切块、计算向量，处理完成后所选区域改用新版本。</p>
+      <p className="section-note">AI 分析按区域读取这里的资料。选择一个版本，右侧查看处理状态和切块。</p>
       {list.isPending && <LoadingState />}{list.error && <ErrorState error={list.error} onRetry={() => list.refetch()} />}
-      {list.data && !groups.length && <EmptyState title="还没有资料">在下方上传第一份 Markdown 资料。</EmptyState>}
+      {list.data && !groups.length && <EmptyState title="还没有资料">在上方上传第一份 Markdown 资料。</EmptyState>}
       <div className="document-list reference-list">{groups.map(group => <div key={group.documentId} className="reference-group">
         <strong>{group.title}</strong><small>{group.documentId}</small>
         {group.versions.map(v => <button type="button" key={v.version}
@@ -58,8 +63,6 @@ export function ReferencesPage() {
           <small>{v.bound_areas.length ? `用于 ${v.bound_areas.length} 个区域` : '未用于区域'}{v.chunk_count !== null ? ` · ${v.chunk_count} 块` : ''}</small>
         </button>)}
       </div>)}</div>
-      <UploadPanel targets={targets.data} targetsError={targets.error} groups={groups.map(g => ({ id: g.documentId, title: g.title }))}
-        onUploaded={result => { setSelected({ documentId: result.document_id, version: result.version }); client.invalidateQueries({ queryKey: ['area-references'] }); }} />
     </section>
     <section className="page-card document-detail"><ColumnHeader eyebrow="VERSION" title="版本与切块" />
       {!selected && <EmptyState title="尚未选择资料">选择左侧的某个版本，查看处理状态和切块结果。</EmptyState>}
@@ -97,6 +100,7 @@ export function ReferencesPage() {
         </>}
       </>}
     </section>
+    </div>
   </div>;
 }
 
@@ -161,31 +165,35 @@ function UploadPanel({ targets, targetsError, groups, onUploaded }: {
     },
   });
 
-  return <details className="upload-panel" open><summary>上传资料</summary>
-    <label>Markdown 文件<input type="file" accept=".md,.markdown" onChange={e => chooseFile(e.target.files?.[0] ?? null)} /></label>
-    <label>新资料还是新版本<select value={existing} onChange={e => chooseExisting(e.target.value)}>
-      <option value="">新资料</option>
-      {groups.map(g => <option key={g.id} value={g.id}>{g.title} 的新版本</option>)}
-    </select></label>
-    <div className="mini-grid">
+  return <div className="upload-form">
+    <p className="section-note">上传 Markdown 后，后台自动切块、计算向量；处理完成后，所选区域改用这份资料。</p>
+    <div className="upload-row">
+      <label>Markdown 文件<input type="file" accept=".md,.markdown" onChange={e => chooseFile(e.target.files?.[0] ?? null)} /></label>
+      <label>新资料还是新版本<select value={existing} onChange={e => chooseExisting(e.target.value)}>
+        <option value="">新资料</option>
+        {groups.map(g => <option key={g.id} value={g.id}>{g.title} 的新版本</option>)}
+      </select></label>
       <label>资料编号<input value={documentId} disabled={!!existing} maxLength={100} onChange={e => setDocumentId(e.target.value)} /></label>
       <label>标题<input value={title} maxLength={200} onChange={e => setTitle(e.target.value)} /></label>
     </div>
     <fieldset className="choice-group"><legend>用于哪些区域 *</legend>
       {targetsError ? <ErrorState error={targetsError} /> : null}
-      {targets?.templates.map(t => <div key={`${t.template_id}@${t.version}`}>
+      <div className="target-columns">{targets?.templates.map(t => <div className="target-column" key={`${t.template_id}@${t.version}`}>
         <small>{t.title} · 第 {t.version} 版模板</small>
         {t.areas.map(a => {
           const target = { template_id: t.template_id, template_version: t.version, area_id: a.id };
           return <label className="inline-check" key={a.id}><input type="checkbox" checked={areas.has(targetKey(target))} onChange={() => toggleArea(target)} />{a.title}</label>;
         })}
-      </div>)}
+      </div>)}</div>
     </fieldset>
     {headings.length > 0 && <fieldset className="choice-group"><legend>必带章节（可选：每次分析都发给 AI）</legend>
-      {headings.map(h => <label className="inline-check" key={h}><input type="checkbox" checked={always.includes(h)} onChange={() => toggleHeading(h)} />{h.replace(/^## +/, '')}</label>)}
+      <div className="heading-choices">{headings.map(h => <label className="inline-check" key={h}><input type="checkbox" checked={always.includes(h)} onChange={() => toggleHeading(h)} />{h.replace(/^## +/, '')}</label>)}</div>
     </fieldset>}
-    {file && problems.length > 0 && <ul className="inline-error">{problems.map(p => <li key={p}>{p}</li>)}</ul>}
-    <button type="button" disabled={problems.length > 0 || upload.isPending} onClick={() => upload.mutate()}>{upload.isPending ? '正在上传' : '上传并处理'}</button>
-    {message && <p role="status">{message}</p>}{upload.error && <ErrorState error={upload.error} />}
-  </details>;
+    <div className="upload-actions">
+      <button type="button" disabled={problems.length > 0 || upload.isPending} onClick={() => upload.mutate()}>{upload.isPending ? '正在上传' : '上传并处理'}</button>
+      {file && problems.length > 0 && <ul className="inline-error">{problems.map(p => <li key={p}>{p}</li>)}</ul>}
+      {message && <p role="status">{message}</p>}
+    </div>
+    {upload.error && <ErrorState error={upload.error} />}
+  </div>;
 }

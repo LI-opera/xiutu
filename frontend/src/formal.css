@@ -44,3 +44,11 @@
 .choice-group{border:1px solid var(--x-line);border-radius:10px;padding:10px 14px;margin:12px 0;display:grid;gap:6px}.choice-group legend{font-size:13px;font-weight:700;padding:0 4px}.choice-group small{color:var(--x-muted);display:block;margin-top:6px}
 .formal-app label.inline-check{flex-direction:row;align-items:center;gap:8px;font-weight:500;margin:0}.formal-app label.inline-check input{width:auto}
 .chunk-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.inline-error{color:var(--x-bad);padding-left:18px}
+
+.references-page{display:grid;gap:24px}.upload-card{max-width:none;margin:0}
+.upload-row{display:grid;grid-template-columns:minmax(220px,1.3fr) repeat(3,minmax(160px,1fr));gap:16px;align-items:end}
+.target-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px 24px}.target-column{display:grid;gap:6px;align-content:start}
+.heading-choices{display:flex;flex-wrap:wrap;gap:8px 24px}
+.upload-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;margin-top:8px}.upload-actions .inline-error{margin:0}
+@media (max-width:1000px){.upload-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){.upload-row{grid-template-columns:1fr}.references-page{gap:16px}.upload-card{padding:18px}}
