@@ -30,8 +30,10 @@ OLD_TABLES = [
     "reports", "case_analyses", "area_reference_bindings",
 ]
 # A case the template workbench keeps: created by template matching, on a template other than v1.
-KEEP_CASE = ("intake_snapshot->>'workbench_flow' = 'template-match-v1' "
-             "AND intake_snapshot->'template_binding'->>'version' IS DISTINCT FROM '1'")
+# COALESCE matters: older cases have no workbench_flow at all, and NOT (NULL AND ...) is NULL,
+# which a WHERE clause treats as "do not select" -- such cases would silently survive.
+KEEP_CASE = ("coalesce(intake_snapshot->>'workbench_flow', '') = 'template-match-v1' "
+             "AND coalesce(intake_snapshot->'template_binding'->>'version', '') <> '1'")
 RUNTIME_JOB_KINDS = "('reference_ingest', 'no_op')"
 
 

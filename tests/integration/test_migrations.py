@@ -86,7 +86,8 @@ def test_0026_keeps_template_cases_and_deletes_old_ones_only_when_allowed(fresh_
         kept = case({"workbench_flow": "template-match-v1", "template_binding": {"version": "2"}})
         old_template = case({"workbench_flow": "template-match-v1", "template_binding": {"version": "1"}})
         old_demo = case({"topic_binding": {"version": "2.2.1-b02"}})
-        for case_id in (kept, old_template, old_demo):
+        old_diagnosis = case({})  # the earliest cases have no workbench_flow at all
+        for case_id in (kept, old_template, old_demo, old_diagnosis):
             c.execute("INSERT INTO observations (case_id, kind, payload, created_revision, actor_id)"
                       " VALUES (%s, 'choice', %s, 1, %s)", (case_id, Jsonb({"question_id": "Q"}), owner))
     assert migrate(url, "upgrade", "head") != 0  # refuses: there are old cases to delete
