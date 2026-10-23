@@ -23,7 +23,7 @@ from scripts.wp15_workbench import STATE, environment  # noqa: E402
 
 def main():
     state = json.loads(STATE.read_text(encoding="utf-8"))
-    os.environ.update(environment(state))
+    os.environ.update(environment(state, ranking_local_testing=False))
     from app.config import load_settings
     from app.infrastructure.db_target import validate_target
     from app.infrastructure.orm import cases

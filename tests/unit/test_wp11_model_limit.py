@@ -11,7 +11,7 @@ from langchain_core.messages import HumanMessage
 from pydantic import ValidationError
 
 
-def test_larger_diagnosis_output_limit_matches_transport_and_reservation(tmp_path):
+def test_configured_output_limit_matches_transport_and_reservation(tmp_path):
     sent = []
 
     def response(request):
@@ -28,16 +28,16 @@ def test_larger_diagnosis_output_limit_matches_transport_and_reservation(tmp_pat
     ledger.initialize("offline fixture")
     gateway = DeepSeekGateway(
         settings, transport=httpx.MockTransport(response), ledger=ledger,
-        max_output_tokens=settings.diagnosis_max_output_tokens,
+        max_output_tokens=1536,
     )
     try:
         gateway.request([HumanMessage(content="synthetic")])
-        assert sent[0]["max_tokens"] == settings.diagnosis_max_output_tokens == 1536
+        assert sent[0]["max_tokens"] == 1536
         record = next(iter(ledger.read()["calls"].values()))
         assert record["output_upper"] == sent[0]["max_tokens"]
         assert record["usage_status"] == "unknown"  # provider omitted usage
         with pytest.raises(ModelError, match="MODEL_OPTIONS_DENIED"):
-            gateway.request([], max_tokens=2048)
+            gateway.request([], max_tokens=16384)
         assert len(sent) == 1
     finally:
         gateway.close()
@@ -77,9 +77,9 @@ def test_truncation_still_fails_without_using_partial_result(tmp_path):
 
 def test_output_limit_is_bounded_server_configuration(tmp_path):
     with pytest.raises(ValidationError):
-        Settings(diagnosis_max_output_tokens=2048)
+        Settings(area_analysis_max_output_tokens=16385)
     with pytest.raises(ValidationError):
-        Settings(diagnosis_max_output_tokens=500)
+        Settings(area_analysis_max_output_tokens=200)
     ledger = BudgetLedger(tmp_path / "ledger.json")
     ledger.initialize("offline fixture")
     gateway = DeepSeekGateway(

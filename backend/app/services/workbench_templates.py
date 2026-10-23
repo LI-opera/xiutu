@@ -1,4 +1,4 @@
-"""Vehicle -> stored complete template. No LLM, fuzzy guess or legacy routing."""
+"""Vehicle -> stored complete template. No LLM, fuzzy guess or hidden routing."""
 import hashlib
 import json
 import re
@@ -8,7 +8,6 @@ from sqlalchemy import select
 
 from app.domain.policies import DomainError
 from app.infrastructure.orm import workbench_template_matches, workbench_templates
-from app.services import template_legacy_calculations as legacy_calculations
 from app.services.template_projection import build_plan, project_template
 
 FLOW = "template-match-v1"
@@ -91,8 +90,7 @@ def frozen_snapshot(conn, data):
               "safety_gate": intake.get("safety_gate") or "unprovided"}
     if intake["symptom_condition"] not in {"unprovided", "mid_load", "high_load", "all_load", "intermittent"} or intake["safety_gate"] not in {"unprovided", "none", "caution", "stop_now", "unavailable"}:
         raise DomainError("INTAKE_INVALID", "工况或安全风险选项无效。", 422)
-    plan = (legacy_calculations.build_plan(topic, intake)
-            if legacy_calculations.supports(topic) else build_plan(topic, intake))
+    plan = build_plan(topic, intake)
     return {"workbench_flow": FLOW, "vehicle": vehicle,
             "fault_description": data.fault_description, "fault_codes": data.fault_codes,
             "synthetic": False, "demo": True, "formal_usable": False,
@@ -123,7 +121,5 @@ class FrozenTemplate:
         return {"content_hash": self.claim["content_hash"]}
 
 
-def template_projection(case, records, report_gate, topic):
-    if legacy_calculations.supports(topic):
-        return legacy_calculations.project_template(case, records, report_gate, topic)
-    return project_template(case, records, report_gate, topic)
+def template_projection(case, records, topic):
+    return project_template(case, records, topic)

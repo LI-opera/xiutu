@@ -1,6 +1,5 @@
 """Independent numeric template rules keep saved facts and uncertainty separate."""
 import json
-from unittest.mock import patch
 from uuid import uuid4
 
 import pytest
@@ -62,7 +61,7 @@ def series_topic():
 
 
 def view(topic, records, plan):
-    return project_template({"intake_snapshot": {"topic_plan": plan}}, records, {}, topic)
+    return project_template({"intake_snapshot": {"topic_plan": plan}}, records, topic)
 
 
 def test_numeric_reference_uses_same_batch_and_effective_correction():
@@ -138,7 +137,7 @@ def test_invalid_rule_cannot_reference_unknown_field_or_threshold():
         build_plan(topic, {})
 
 
-def test_numeric_catalog_is_publishable_without_b02(tmp_path):
+def test_numeric_catalog_is_publishable(tmp_path):
     topic = static_topic()
     topic["topic_id"] = "cooling-template"
     topic["version"] = "cooling-template-v1"
@@ -152,9 +151,8 @@ def test_numeric_catalog_is_publishable_without_b02(tmp_path):
                 "area_ids": ["cooling"], "content_file": "content.json"}
     config = tmp_path / "relations.json"
     config.write_text(json.dumps({"runtime_importable": True, "relations": [relation]}), encoding="utf-8")
-    with patch("app.topics.dkvb_b02.catalog", side_effect=AssertionError("B02 used")):
-        loaded_relation, loaded_topic = next(build_templates(config))
-        plan = build_plan(loaded_topic, {})
+    loaded_relation, loaded_topic = next(build_templates(config))
+    plan = build_plan(loaded_topic, {})
     assert loaded_relation == relation
     assert "cold_start" in plan["capture_batches"]
     assert "calculation_catalog" not in loaded_topic

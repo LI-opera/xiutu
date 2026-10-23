@@ -48,11 +48,15 @@ def test_standing_ranking_grant_is_local_test_only(monkeypatch):
     monkeypatch.setenv("XIUTU_AREA_RANKING_PAID_AUTHORIZED", "1")
     monkeypatch.setenv("XIUTU_AREA_RANKING_LOCAL_TESTING", "1")
     monkeypatch.delenv("XIUTU_AREA_RANKING_ALLOWED_CASE_ID", raising=False)
-    settings = SimpleNamespace(deepseek_api_key=object(), app_mode="test",
-                               retrieval_profile="synthetic", local_dev_auto_identity=True,
-                               app_origin="http://localhost:5215")
+    from pydantic import SecretStr
+    test_db = SecretStr("postgresql://xiutu:pw@127.0.0.1:5433/xiutu_test_workbench")
+    settings = SimpleNamespace(deepseek_api_key=object(), app_mode="test", database_url=test_db,
+                               local_dev_auto_identity=True, app_origin="http://localhost:5215")
     service = AreaRankingService(None, settings)
     assert service._authorized("case-a")
+    settings.database_url = SecretStr("postgresql://xiutu:pw@127.0.0.1:5433/xiutu_dev")
+    assert not service._authorized("case-a")
+    settings.database_url = test_db
     settings.app_mode = "production"
     assert not service._authorized("case-a")
     settings.app_mode = "test"

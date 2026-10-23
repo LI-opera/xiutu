@@ -10,7 +10,21 @@ import re
 from collections import Counter
 from dataclasses import dataclass, field
 
-from app.retrieval.sparse import DTC, tokens
+DTC = re.compile(r"(?<![A-Z0-9])[PBCU][0-9A-F]{4,6}(?![A-Z0-9])", re.I)
+
+
+def tokens(text):
+    """Latin words whole; Chinese as single characters plus character pairs (no segmenter needed)."""
+    parts = re.findall(r"[a-z0-9_]+|[\u3400-\u9fff]+", text.casefold())
+    result = []
+    for part in parts:
+        if "\u3400" <= part[0] <= "\u9fff":
+            result.extend(part)
+            result.extend(part[i : i + 2] for i in range(len(part) - 1))
+        else:
+            result.append(part)
+    return result
+
 
 HEADING = re.compile(r"^(#{2,3}) +(.+?)\s*$", re.MULTILINE)
 # Part, connector and tool codes as written in manuals: G31, GX9, N75, J623, V.A.G 1687, VAS 6150.

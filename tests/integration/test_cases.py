@@ -73,11 +73,7 @@ def test_idempotency_serial_and_revision(service):
         service.get(actor, UUID(result[1]["id"]), expected_revision=2)
     assert e.value.code == "REVISION_CONFLICT"
     assert service.get(actor, UUID(result[1]["id"])) == result[1]
-    assert (
-        result[1]["revision"] == 1
-        and result[1]["corpus_manifest"] == []
-        and not result[1]["report_gate"]["available"]
-    )
+    assert result[1]["revision"] == 1 and result[1]["template_progress"]["recorded"] == 0
 
 
 def test_true_concurrent_idempotency(service):

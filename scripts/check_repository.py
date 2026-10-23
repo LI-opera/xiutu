@@ -12,10 +12,10 @@ sys.path[:0] = [str(ROOT), str(ROOT / "backend")]
 
 def main():
     from scripts.publish_independent_templates import preflight
+    from scripts.seed_area_references import DEFAULT_PACKAGE, build_documents, load_manuals
 
-    bundle = ROOT / "resources/templates/tayron-v2"
-    result = preflight(bundle / "relations.json", bundle / "area_reference_manifest_v2.json",
-                       ROOT / "resources/knowledge/tayron")
+    result = preflight(ROOT / "resources/templates/tayron-v2/relations.json")
+    result["manuals"] = len(list(build_documents(DEFAULT_PACKAGE, load_manuals())))
     command = ["git", "-c", f"safe.directory={ROOT.as_posix()}", "ls-files", "--cached", "--others", "--exclude-standard", "-z"]
     names = sorted(set(subprocess.check_output(command, cwd=ROOT).decode("utf-8").split("\0")) - {""})
     private_values = set()

@@ -6,7 +6,7 @@ import pytest
 from app.domain.policies import DomainError
 from app.services import workbench_observation_service as service_module
 from app.services.template_projection import build_plan, project_template
-from app.services.workbench_b01_service import TopicAnswer, TopicService
+from app.services.workbench_observation_service import TopicAnswer, TopicService
 from app.services.workbench_templates import content_hash
 from sqlalchemy.sql.dml import Insert, Update
 
@@ -73,7 +73,7 @@ def fixture(monkeypatch):
     monkeypatch.setattr(service_module, 'idempotent', lambda connection, actor, scope, key, body, action: action())
     monkeypatch.setattr(TopicService, '_rows', staticmethod(lambda connection, case_id, version: list(conn.rows)))
     monkeypatch.setattr(TopicService, '_view', lambda self, connection, row:
-                        {'view': project_template(row, conn.rows, {}, row['intake_snapshot']['template_content'])})
+                        {'view': project_template(row, conn.rows, row['intake_snapshot']['template_content'])})
     instance = TopicService(type('CaseService', (), {'engine': object()})())
     def save(qid, option, *, round_id=None, correction=None, fields=None):
         body = TopicAnswer(expected_revision=case['revision'], topic_version=frozen['version'],
@@ -84,7 +84,7 @@ def fixture(monkeypatch):
 
 def test_distinct_template_save_correction_conditions_repair_and_independent_retest(monkeypatch):
     case, conn, save = fixture(monkeypatch)
-    initial = project_template(case, [], {}, topic())
+    initial = project_template(case, [], topic())
     assert initial['question_states']['ELEC-01']['condition_blockers'][0]['ref'] == 'COOL-01'
     with pytest.raises(DomainError, match='前置条件'):
         save('ELEC-01', 'done')
@@ -98,7 +98,7 @@ def test_distinct_template_save_correction_conditions_repair_and_independent_ret
     with pytest.raises(DomainError, match='前置条件'):
         save('ELEC-01', 'done')
     save('COOL-01', 'ok', correction=conn.rows[-1]['id'])
-    assert project_template(case, conn.rows, {}, topic())['question_states']['ELEC-01']['condition_blockers'] == []
+    assert project_template(case, conn.rows, topic())['question_states']['ELEC-01']['condition_blockers'] == []
     save('ELEC-01', 'done')
     with pytest.raises(DomainError, match='复检轮次'):
         save('VERIFY-01', 'resolved')
@@ -192,7 +192,7 @@ def test_independent_focus_conflict_and_operation_gate_follow_effective_correcti
     case['intake_snapshot']['template_binding']['content_hash'] = content_hash(frozen)
     case['intake_snapshot']['topic_plan'] = build_plan(frozen, {'safety_gate': 'unprovided'})
     save('COOL-01', 'fault')
-    projection = project_template(case, conn.rows, {}, frozen)
+    projection = project_template(case, conn.rows, frozen)
     assert projection['question_states']['ELEC-01']['focused']
     assert projection['plan_evaluation']['focus_question_ids'] == ['ELEC-01', 'ELEC-02']
     with pytest.raises(DomainError, match='前置条件'):
@@ -200,12 +200,12 @@ def test_independent_focus_conflict_and_operation_gate_follow_effective_correcti
     assert len(conn.rows) == 1
     save('ELEC-01', 'not_performed')
     save('ELEC-02', 'fault')
-    projection = project_template(case, conn.rows, {}, frozen)
+    projection = project_template(case, conn.rows, frozen)
     assert projection['synthesis']['conflicts'][0]['id'] == 'conflicting-claims'
     assert len(projection['synthesis']['conflicts'][0]['basis_observation_ids']) == 2
     original = conn.rows[0]['id']
     save('COOL-01', 'ok', correction=original)
-    projection = project_template(case, conn.rows, {}, frozen)
+    projection = project_template(case, conn.rows, frozen)
     assert projection['plan_evaluation']['focus_question_ids'] == []
     assert projection['synthesis']['conflicts'] == []
     assert projection['question_states']['ELEC-01']['condition_blockers'] == []

@@ -1,13 +1,11 @@
 import threading
 from concurrent.futures import ThreadPoolExecutor
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
-from app.domain.enums import CaseStatus, JobStatus, ParseStatus, ReviewStatus, RunStatus
-from app.domain.schemas import CreateCase
-from app.infrastructure.orm import cases, chunks, document_versions, documents, jobs, runs
+from app.domain.enums import CaseStatus
+from app.infrastructure.orm import cases, jobs, runs
 from app.infrastructure.uow import make_engine
-from app.legacy_case_creation import LegacyCaseService as CaseService
 from sqlalchemy import func, insert, select
 from sqlalchemy.exc import IntegrityError
 
@@ -24,14 +22,10 @@ def engine(database_url):
 
 
 def case_id(engine):
-    service = CaseService(engine, b"synthetic")
-    return UUID(
-        service.create(
-            uuid4(),
-            CreateCase(vehicle={"model": "synthetic"}, fault_description="constraint"),
-            uuid4().hex,
-        )[1]["id"]
-    )
+    with engine.begin() as c:
+        return c.execute(insert(cases).values(
+            owner_id=uuid4(), vehicle_json={"model": "synthetic"}, fault_description="constraint",
+        ).returning(cases.c.id)).scalar_one()
 
 
 def test_active_run_true_concurrency(engine):
@@ -75,76 +69,9 @@ def test_active_run_true_concurrency(engine):
     )
 
 
-def test_document_constraints_and_restrict(engine):
-    with engine.begin() as c:
-        document = c.execute(
-            insert(documents)
-            .values(title="Synthetic", source_kind="synthetic")
-            .returning(documents.c.id)
-        ).scalar_one()
-        version = c.execute(
-            insert(document_versions)
-            .values(
-                document_id=document, sha256="a" * 64, storage_key="synthetic", mime="text/plain"
-            )
-            .returning(document_versions.c.id)
-        ).scalar_one()
-        c.execute(
-            insert(chunks).values(
-                document_version_id=version,
-                ordinal=0,
-                text="Synthetic",
-                text_hash="b" * 64,
-                kind="paragraph",
-            )
-        )
-    with pytest.raises(IntegrityError), engine.begin() as c:
-        c.execute(
-            insert(document_versions).values(
-                document_id=document, sha256="a" * 64, storage_key="other", mime="text/plain"
-            )
-        )
-    with pytest.raises(IntegrityError), engine.begin() as c:
-        c.execute(
-            insert(chunks).values(
-                document_version_id=version,
-                ordinal=0,
-                text="Synthetic",
-                text_hash="c" * 64,
-                kind="paragraph",
-            )
-        )
-    with pytest.raises(IntegrityError), engine.begin() as c:
-        c.execute(documents.delete().where(documents.c.id == document))
-    with pytest.raises(IntegrityError), engine.begin() as c:
-        c.execute(
-            insert(chunks).values(
-                document_version_id=uuid4(),
-                ordinal=1,
-                text="Synthetic",
-                text_hash="c" * 64,
-                kind="paragraph",
-            )
-        )
-    with pytest.raises(IntegrityError), engine.begin() as c:
-        c.execute(
-            insert(chunks).values(
-                document_version_id=version,
-                ordinal=-1,
-                text="Synthetic",
-                text_hash="c" * 64,
-                kind="paragraph",
-            )
-        )
-
-
 def test_enum_checks_and_ranges(engine):
     for table, column, enum in [
         (cases, "status", CaseStatus),
-        (runs, "status", RunStatus),
-        (jobs, "status", JobStatus),
-        (document_versions, "review_status", ReviewStatus),
-        (document_versions, "parse_status", ParseStatus),
     ]:
         expression = " ".join(str(x.sqltext) for x in table.constraints if hasattr(x, "sqltext"))
         for value in enum:
@@ -171,10 +98,6 @@ def test_actual_database_checks_match_enums(engine):
     inspector = inspect(engine)
     for table, enum, name in [
         ("cases", CaseStatus, "ck_cases_status"),
-        ("runs", RunStatus, "ck_runs_status"),
-        ("jobs", JobStatus, "ck_jobs_status"),
-        ("document_versions", ReviewStatus, "ck_document_review"),
-        ("document_versions", ParseStatus, "ck_document_parse"),
     ]:
         constraints = {x["name"]: x["sqltext"] for x in inspector.get_check_constraints(table)}
         for value in enum:

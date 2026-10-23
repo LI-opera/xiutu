@@ -7,12 +7,11 @@ vi.mock('../src/formal/session', () => ({
   useSession: () => ({ logout: vi.fn() }),
 }));
 vi.mock('../src/formal/pages/WorkbenchPage', () => ({ WorkbenchPage: () => <div>workbench destination</div> }));
-vi.mock('../src/formal/pages/DocumentsPage', () => ({ DocumentsPage: () => <div>legacy documents destination</div> }));
 vi.mock('../src/formal/pages/ReferencesPage', () => ({ ReferencesPage: () => <div>documents destination</div> }));
 vi.mock('../src/formal/pages/HistoryPage', () => ({ HistoryPage: () => <div>history destination</div> }));
 afterEach(() => { cleanup(); window.history.replaceState(null, '', '/'); });
 
-it.each(['/preview', '/design/workbench-v2', '/#diagnosis', '/#dkvb', '/unknown'])('redirects retired or unknown entry %s to workbench', async path => {
+it.each(['/preview', '/design/workbench-v2', '/documents/legacy', '/#diagnosis', '/unknown'])('redirects retired or unknown entry %s to workbench', async path => {
   window.history.replaceState(null, '', path);
   render(<FormalApp />);
   expect(await screen.findByText('workbench destination')).toBeTruthy();
@@ -22,9 +21,9 @@ it.each(['/preview', '/design/workbench-v2', '/#diagnosis', '/#dkvb', '/unknown'
 });
 
 it.each([
-  ['/documents', 'documents destination'], ['/documents/legacy', 'legacy documents destination'],
+  ['/documents', 'documents destination'],
   ['/history', 'history destination'],
-  ['/workbench/legacy-case?legacy=1', 'workbench destination'],
+  ['/workbench/some-case', 'workbench destination'],
 ])('preserves formal route %s', async (path, text) => {
   window.history.replaceState(null, '', path);
   render(<FormalApp />);

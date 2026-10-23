@@ -2,7 +2,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from './components/AppShell';
-import { DocumentsPage } from './pages/DocumentsPage';
 import { ReferencesPage } from './pages/ReferencesPage';
 import { HistoryPage } from './pages/HistoryPage';
 import { WorkbenchPage } from './pages/WorkbenchPage';
@@ -28,7 +27,6 @@ export function FormalApp() {
       <Route element={<AppShell />}>
         <Route path="/workbench/:caseId?" element={<WorkbenchPage />} />
         <Route path="/documents" element={<ReferencesPage />} />
-        <Route path="/documents/legacy" element={<DocumentsPage />} />
         <Route path="/history" element={<HistoryPage />} />
         <Route path="*" element={<Navigate to="/workbench" replace />} />
       </Route>

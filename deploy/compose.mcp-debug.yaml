@@ -1,4 +1,0 @@
-services:
-  manual-mcp:
-    ports:
-      - "127.0.0.1:${MANUAL_MCP_DEBUG_PORT:-8031}:8031"

@@ -2,13 +2,11 @@
 from uuid import uuid4
 
 from app.domain.policies import DomainError
-from app.services.legacy_topic_answer_rules import legacy_rules_for
 
 
 class ObservationWorkflow:
-    def __init__(self, topic, *, template_bound=False):
+    def __init__(self, topic):
         self.topic = topic
-        self.template_bound = template_bound
         config = topic.get("observation_workflow") or {}
         self.repair_id = config.get("repair_question_id")
         self.retest_stage = config.get("retest_stage")
@@ -62,7 +60,7 @@ class ObservationWorkflow:
             return round_id
         return previous if original_id else plan["rounds"][-1]["id"] if plan["rounds"] else None
 
-    def prerequisites(self, question, plan, rows, body, *, show_labels=True):
+    def prerequisites(self, question, plan, rows, body):
         if question["answer_kind"] != "conditional_operation":
             return []
         conditions = question.get("execution_conditions")
@@ -101,14 +99,6 @@ class ObservationWorkflow:
             if question["id"] == rule["question_id"] and rule["option_id"] in body.option_ids:
                 plan["capture_batches"][rule["batch_kind"]] = str(uuid4())
 
-    def retest_frames(self, question, body):
-        if body.retest_frames:
-            raise DomainError("RETEST_FRAMES_UNCONFIGURED", "此题未配置复检帧记录", 422)
-        return []
 
-
-def workflow_for(topic, *, template_bound=False):
-    if legacy_rules_for(topic):
-        from app.services.legacy_topic_workflow import LegacyObservationWorkflow
-        return LegacyObservationWorkflow(topic, template_bound=template_bound)
-    return ObservationWorkflow(topic, template_bound=template_bound)
+def workflow_for(topic):
+    return ObservationWorkflow(topic)

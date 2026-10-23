@@ -20,14 +20,12 @@ def render() -> str:
         Settings(
             _env_file=None,
             app_mode="test",
-            retrieval_profile="formal",
             database_url=None,
             data_path=ROOT / ".local-data" / "openapi-export",
             operator_id=UUID("00000000-0000-4000-8000-000000000014"),
             operator_token="openapi-export-token-value-000014",
             app_origin="http://localhost:5214",
             deepseek_api_key=None,
-            tool_mode="local",
         )
     )
     return json.dumps(app.openapi(), ensure_ascii=False, indent=2, sort_keys=True) + "\n"

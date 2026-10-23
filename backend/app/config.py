@@ -17,10 +17,6 @@ class Settings(BaseSettings):
     app_mode: Literal["development", "test", "production"] = "development"
     database_url: SecretStr | None = Field(default=None, repr=False)
     data_path: Path = Path(".local-data")
-    upload_max_bytes: int = Field(default=25 * 1024 * 1024, ge=1024, le=100 * 1024 * 1024)
-    chunk_target_tokens: int = Field(default=600, ge=100, le=900)
-    chunk_max_tokens: int = Field(default=900, ge=100, le=900)
-    chunk_overlap_tokens: int = Field(default=80, ge=0, le=200)
     embedding_path: Path = Path(
         ".local-data/models/multilingual-e5-small/614241f622f53c4eeff9890bdc4f31cfecc418b3"
     )
@@ -43,37 +39,8 @@ class Settings(BaseSettings):
     llm_provider: Literal["deepseek"] = "deepseek"
     deepseek_model: str = "deepseek-flash"
     deepseek_base_url: str = "https://api.deepseek.com"
-    # Trusted server configuration for the longer WP-11 step envelope. This
-    # value is never accepted from a case request or a model tool argument.
-    diagnosis_max_output_tokens: int = Field(default=1536, ge=768, le=1536)
-    case_analysis_max_output_tokens: int = Field(
-        default=1536, ge=256, le=MAX_MODEL_OUTPUT_TOKENS, strict=True)
     area_analysis_max_output_tokens: int = Field(default=8192, ge=256, le=MAX_MODEL_OUTPUT_TOKENS)
     area_analysis_max_input_chars: int = Field(default=100000, ge=1000, le=500000)
-    retrieval_profile: Literal["formal", "synthetic"] = "formal"
-
-    @field_validator("case_analysis_max_output_tokens", mode="before")
-    @classmethod
-    def parse_case_analysis_output_tokens(cls, value):
-        # Environment variables are strings; keep strict validation for all
-        # other values instead of letting Pydantic coerce bools/floats.
-        if isinstance(value, str) and value.isascii() and value.isdecimal():
-            return int(value)
-        return value
-
-    @model_validator(mode="after")
-    def profile_boundary(self):
-        if self.retrieval_profile == "synthetic":
-            from app.infrastructure.db_target import validate_target
-
-            if self.app_mode != "test" or self.database_url is None:
-                raise ValueError("Synthetic retrieval requires test mode and isolated database")
-            validate_target(self.database_url.get_secret_value(), "test")
-        return self
-
-    tool_mode: Literal["local", "remote_mcp"] = "remote_mcp"
-    mcp_client_config: Path | None = None
-
     deepseek_api_key: SecretStr | None = Field(default=None, repr=False)
 
     operator_token: SecretStr | None = Field(default=None, repr=False)

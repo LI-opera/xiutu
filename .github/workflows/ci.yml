@@ -31,7 +31,6 @@ jobs:
       - name: 安装 Python 依赖
         run: uv sync --frozen --python 3.12
 
-      # 两个旧版病例分析测试已知失败，按决定随旧代码清理一并删除，这里先排除
       - name: 单元测试与契约测试
         env:
           PYTHONDONTWRITEBYTECODE: "1"
@@ -39,8 +38,6 @@ jobs:
           uv run --frozen python -B -m pytest tests/unit tests/contract
           -p no:cacheprovider -q --basetemp "$RUNNER_TEMP/pytest"
           --junitxml "$RUNNER_TEMP/pytest.xml"
-          --deselect tests/unit/test_case_analysis_c11.py::test_record_existing_question_result_not_recast_as_pressure_instruction
-          --deselect tests/unit/test_case_analysis_air_reference.py::test_new_prompt_grant_is_bound_to_current_contract
 
       # 把失败的测试名写成 PR 页面上的注释，不用翻日志也能看到哪里挂了
       - name: 列出失败的测试

@@ -43,7 +43,7 @@ def view_with(saved, rounds=()):
                for qid, revision in saved]
     case = {"intake_snapshot": {"topic_plan": plan,
                                 "template_binding": {"template_id": "tayron-dkvb-p0299", "version": "2"}}}
-    return {"topic": content, "view": project_template(case, records, {}, content), "plan": plan,
+    return {"topic": content, "view": project_template(case, records, content), "plan": plan,
             "case": {"id": str(uuid4()), "revision": 12, "vehicle": {}, "fault_description": "增压不足",
                      "fault_codes": ["P0299"], "intake_snapshot": case["intake_snapshot"]},
             "observations": [{"id": str(row["id"]), "question_id": row["payload"]["question_id"],

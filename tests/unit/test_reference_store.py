@@ -6,10 +6,9 @@ from app.retrieval.section_search import dense_rank, exact_rank
 from app.services import analysis_context
 from app.services.retrieval_reading import ComputedSections, Embeddings, select_sections
 
-from scripts.build_analysis_context import MANIFEST
-from scripts.seed_area_references import DEFAULT_PACKAGE, always_include, build_documents
+from scripts.seed_area_references import DEFAULT_PACKAGE, always_include, build_documents, load_manuals
 
-DOCUMENTS = [doc for _, doc in build_documents(DEFAULT_PACKAGE, json.loads(MANIFEST.read_text(encoding="utf-8")))]
+DOCUMENTS = [doc for _, doc in build_documents(DEFAULT_PACKAGE, load_manuals())]
 
 
 class Model:
@@ -95,8 +94,8 @@ def test_each_area_chooses_its_own_manual_among_all_of_the_vehicle():
     """Two-step retrieval, step one, offline: no table says which manual belongs to which area."""
     from app.services.retrieval_reading import area_texts, choose_documents
     from scripts.build_analysis_context import RELATIONS
-    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    assigned = {entry["area_id"]: entry["document_id"] for entry in manifest["documents"]}
+    from scripts.section_retrieval_eval import AREA_DOCUMENTS
+    assigned = json.loads(AREA_DOCUMENTS.read_text(encoding="utf-8"))["areas"]
     manuals = [{"id": d["document_id"], "version": d["version"], "body": d["body"]} for d in DOCUMENTS]
     relation = json.loads(RELATIONS.read_text(encoding="utf-8"))["relations"][0]
     topic = json.loads((RELATIONS.parent / relation["content_file"]).read_text(encoding="utf-8"))

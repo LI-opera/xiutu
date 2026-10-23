@@ -1,27 +1,24 @@
-"""Retired case construction must not enter the formal creation transaction."""
-from types import SimpleNamespace
-from uuid import uuid4
-
+"""Only template matching creates cases; the retired creation fields are rejected by the schema."""
 import pytest
+from pydantic import ValidationError
 
-from app.domain.policies import DomainError
 from app.domain.schemas import CreateCase
-from app.legacy_case_creation import LegacyCaseService
-from app.services.case_service import CaseService
+
+VEHICLE = {"brand": "大众", "model": "探岳", "year": 2019}
 
 
-@pytest.mark.parametrize("topic_version", [None, "2.2.0-b01", "2.2.1-b02"])
-def test_formal_service_rejects_old_creation_before_accessing_database(topic_version):
-    data = CreateCase(vehicle={"model": "historical"}, fault_description="archive",
-                      topic_version=topic_version)
-    with pytest.raises(DomainError) as denied:
-        CaseService(None, b"test").create(uuid4(), data, "old-flow")
-    assert denied.value.code == "LEGACY_CASE_READ_ONLY"
+def test_creation_requires_the_template_flow():
+    with pytest.raises(ValidationError):
+        CreateCase(vehicle=VEHICLE, fault_description="增压不足", fault_codes=["P0299"])
+    case = CreateCase(workbench_flow="template-match-v1", vehicle=VEHICLE,
+                      fault_description="增压不足", fault_codes=["p0299"])
+    assert case.fault_codes == ["P0299"]
 
 
-@pytest.mark.parametrize("database", ["xiutu_dev", "production", None])
-def test_legacy_constructor_refuses_nonisolated_database(database):
-    engine = SimpleNamespace(url=SimpleNamespace(database=database))
-    data = CreateCase(vehicle={"model": "historical"}, fault_description="archive")
-    with pytest.raises(ValueError, match="isolated test database"):
-        LegacyCaseService(engine, b"test").create(uuid4(), data, "old-flow")
+@pytest.mark.parametrize("field,value", [("topic_version", "2.2.1-b02"),
+                                         ("diagnosis_mode", "conservative"),
+                                         ("policy_version", "r1")])
+def test_retired_creation_fields_are_unknown(field, value):
+    with pytest.raises(ValidationError):
+        CreateCase(workbench_flow="template-match-v1", vehicle=VEHICLE,
+                   fault_description="增压不足", **{field: value})

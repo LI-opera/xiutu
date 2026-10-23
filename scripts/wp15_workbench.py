@@ -1,4 +1,7 @@
-"""Owned WP-15 synthetic browser instance; never operates 5180 or 5196."""
+"""Start, stop or check the local workbench: API (8215), web (5215) and worker, as owned processes.
+
+    uv run python -B -m scripts.wp15_workbench start | stop | status
+"""
 
 import argparse
 import ctypes
@@ -68,9 +71,7 @@ def embedding_environment(settings):
     return result
 
 
-def environment(state, *, real_case_id=None, real_revision=None, c05_key=None,
-                real_output_tokens=4096, local_auto_identity=True, real_context_hash=None,
-                real_prompt_version=None, ranking_real_case_id=None,
+def environment(state, *, local_auto_identity=True, ranking_real_case_id=None,
                 ranking_local_testing=True):
     password = json.loads(
         (ROOT / ".local-data" / "wp01-postgres.json").read_text(encoding="utf-8")
@@ -85,19 +86,16 @@ def environment(state, *, real_case_id=None, real_revision=None, c05_key=None,
             "DATABASE_URL",
             "APP_MODE",
             "DATA_PATH",
-            "RETRIEVAL_PROFILE",
             "OPERATOR_TOKEN",
             "OPERATOR_ID",
             "APP_ORIGIN",
             "LOCAL_DEV_AUTO_IDENTITY",
-            "CASE_ANALYSIS_MAX_OUTPUT_TOKENS",
         }
     }
     env.update(
         PYTHONPATH=str(ROOT / "backend"),
         PYTHONDONTWRITEBYTECODE="1",
         APP_MODE="test",
-        RETRIEVAL_PROFILE="synthetic",
         DATABASE_URL=url,
         TEST_DATABASE_URL=url,
         DATA_PATH=state["storage"],
@@ -106,18 +104,13 @@ def environment(state, *, real_case_id=None, real_revision=None, c05_key=None,
         APP_ORIGIN=f"http://localhost:{WEB_PORT}",
         # Loopback login is independent from the separately bounded paid-call gate.
         LOCAL_DEV_AUTO_IDENTITY="1" if local_auto_identity else "0",
-        TOOL_MODE="local",
         DEEPSEEK_API_KEY="",
-        XIUTU_C01_MODEL_MODE="stub",
-        XIUTU_C01_REAL_AUTHORIZED="0",
-        XIUTU_WP11_PAID="0",
-        CASE_ANALYSIS_MAX_OUTPUT_TOKENS="1536",
     )
     sys.path.insert(0, str(ROOT / "backend"))
     from app.config import load_settings
 
     env.update(embedding_environment(load_settings(project_env=True, embedding_local_files_only=True)))
-    if real_case_id is None and (ranking_real_case_id is not None or ranking_local_testing):
+    if ranking_real_case_id is not None or ranking_local_testing:
         ranking_case_id = str(UUID(ranking_real_case_id)) if ranking_real_case_id is not None else None
         sys.path.insert(0, str(ROOT / "backend"))
         from app.config import load_settings
@@ -137,53 +130,6 @@ def environment(state, *, real_case_id=None, real_revision=None, c05_key=None,
             env["XIUTU_AREA_RANKING_ALLOWED_CASE_ID"] = ranking_case_id
         else:
             env["XIUTU_AREA_RANKING_LOCAL_TESTING"] = "1"
-    if real_case_id is not None:
-        if real_revision is None or real_revision < 1:
-            raise ValueError("C03 requires a positive reviewed revision")
-        if real_output_tokens not in {4096, 8192}:
-            raise ValueError("Real output budget must be an explicitly reviewed 4096 or 8192")
-        case_id = str(UUID(real_case_id))
-        # Read the existing project dotenv through the application's validated
-        # loader. Its unrelated legacy embedding flag is overridden in memory;
-        # neither the key nor the selected model is written back to .env/state.
-        sys.path.insert(0, str(ROOT / "backend"))
-        from app.config import load_settings
-
-        settings = load_settings(project_env=True, embedding_local_files_only=True)
-        if (not settings.deepseek_api_key or settings.llm_provider != "deepseek"
-                or settings.deepseek_base_url.rstrip("/") not in
-                {"https://api.deepseek.com", "https://api.deepseek.com/v1"}):
-            raise RuntimeError("C03_MODEL_CONFIG_UNAVAILABLE")
-        env.update(
-            DEEPSEEK_API_KEY=settings.deepseek_api_key.get_secret_value(),
-            DEEPSEEK_MODEL="deepseek-flash",
-            DEEPSEEK_BASE_URL=settings.deepseek_base_url,
-            XIUTU_C01_MODEL_MODE="real",
-            XIUTU_C01_REAL_AUTHORIZED="1",
-            CASE_ANALYSIS_MAX_OUTPUT_TOKENS=str(real_output_tokens),
-        )
-        if c05_key is not None:
-            if not c05_key.startswith(f"c05-{case_id}-r{real_revision}-"):
-                raise ValueError("C05 key must identify the reviewed case and revision")
-            env.update(
-                XIUTU_C05_ALLOWED_CASE_ID=case_id,
-                XIUTU_C05_ALLOWED_REVISION=str(real_revision),
-                XIUTU_C05_ALLOWED_KEY=c05_key,
-            )
-            if real_context_hash is not None:
-                if len(real_context_hash) != 64 or any(ch not in "0123456789abcdef" for ch in real_context_hash):
-                    raise ValueError("Expected a reviewed SHA-256 source context")
-                env["XIUTU_C19_ALLOWED_CONTEXT_HASH"] = real_context_hash
-            if real_prompt_version is not None:
-                from app.services.case_analysis_context import PROMPT_VERSION
-                if not real_context_hash or real_prompt_version != PROMPT_VERSION:
-                    raise ValueError("Version-bound grant requires current prompt and source hash")
-                env["XIUTU_C19_ALLOWED_PROMPT_VERSION"] = real_prompt_version
-        else:
-            env.update(
-                XIUTU_C03_ALLOWED_CASE_ID=case_id,
-                XIUTU_C03_ALLOWED_REVISION=str(real_revision),
-            )
     return env
 
 
@@ -192,21 +138,16 @@ def free(port):
         sock.bind(("127.0.0.1", port))
 
 
-def start(state, *, real_case_id=None, real_revision=None, c05_key=None,
-          real_output_tokens=4096, local_auto_identity=True, real_context_hash=None,
-          real_prompt_version=None, ranking_real_case_id=None,
+def start(state, *, local_auto_identity=True, ranking_real_case_id=None,
           ranking_local_testing=True):
     if any(stamp(item["pid"]) == item["stamp"] for item in state.get("processes", [])):
-        raise SystemExit("Owned WP-15 processes already running")
+        raise SystemExit("Owned workbench processes already running")
     free(WEB_PORT)
     free(API_PORT)
-    env = environment(state, real_case_id=real_case_id, real_revision=real_revision,
-                      c05_key=c05_key, real_output_tokens=real_output_tokens,
-                      local_auto_identity=local_auto_identity, real_context_hash=real_context_hash,
-                      real_prompt_version=real_prompt_version,
+    env = environment(state, local_auto_identity=local_auto_identity,
                       ranking_real_case_id=ranking_real_case_id,
                       ranking_local_testing=ranking_local_testing)
-    ranking_enabled = real_case_id is None and (ranking_real_case_id is not None or ranking_local_testing)
+    ranking_enabled = ranking_real_case_id is not None or ranking_local_testing
     env["XIUTU_API_TARGET"] = f"http://127.0.0.1:{API_PORT}"
     commands = [
         (
@@ -279,9 +220,7 @@ def start(state, *, real_case_id=None, real_revision=None, c05_key=None,
                         == 200
                         and client.get(f"http://localhost:{WEB_PORT}/workbench").status_code == 200
                     ):
-                        print(
-                            f"WP-15 ready: http://localhost:{WEB_PORT}/workbench/{state['case_id']}"
-                        )
+                        print(f"Workbench ready: http://localhost:{WEB_PORT}/workbench")
                         return
                 except (httpx.ConnectError, httpx.ConnectTimeout, httpx.ReadTimeout):
                     pass
@@ -298,14 +237,6 @@ def start(state, *, real_case_id=None, real_revision=None, c05_key=None,
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("action", choices=["start", "stop", "status"])
-    parser.add_argument("--c03-real-once-case")
-    parser.add_argument("--c03-revision", type=int)
-    parser.add_argument("--c05-real-once-case")
-    parser.add_argument("--c05-revision", type=int)
-    parser.add_argument("--c05-key")
-    parser.add_argument("--real-output-tokens", type=int, choices=[4096, 8192], default=4096)
-    parser.add_argument("--real-context-hash", help="Explicit single attempt for a reviewed new source version")
-    parser.add_argument("--real-prompt-version", help="Scope a reviewed retry to the current prompt and contract")
     parser.add_argument("--manual-login", action="store_true",
                         help="Disable loopback auto identity for this local start")
     parser.add_argument("--area-ranking-real-once-case",
@@ -315,21 +246,9 @@ def main():
     args = parser.parse_args()
     state = json.loads(STATE.read_text(encoding="utf-8"))
     if args.action == "start":
-        if args.real_context_hash and not args.c05_real_once_case:
-            raise SystemExit("A context grant requires the bounded C05 case/revision/key")
-        if args.c05_real_once_case and args.c03_real_once_case:
-            raise SystemExit("Choose only one real-call window")
-        if args.area_ranking_real_once_case and (args.c05_real_once_case or args.c03_real_once_case):
-            raise SystemExit("Choose only one real-call window")
         if args.area_ranking_real_once_case and args.no_area_ranking_real:
             raise SystemExit("Choose either exact-case ranking or disabled ranking")
-        if args.c05_real_once_case and (args.c05_revision is None or not args.c05_key):
-            raise SystemExit("C05 requires reviewed revision and exact idempotency key")
-        start(state, real_case_id=args.c05_real_once_case or args.c03_real_once_case,
-              real_revision=args.c05_revision if args.c05_real_once_case else args.c03_revision,
-              c05_key=args.c05_key, real_output_tokens=args.real_output_tokens,
-              local_auto_identity=not args.manual_login, real_context_hash=args.real_context_hash,
-              real_prompt_version=args.real_prompt_version,
+        start(state, local_auto_identity=not args.manual_login,
               ranking_real_case_id=args.area_ranking_real_once_case,
               ranking_local_testing=not args.no_area_ranking_real)
     elif args.action == "stop":
@@ -337,12 +256,12 @@ def main():
             stamp(item["pid"], True, item["stamp"])
         state["processes"] = []
         save(state)
-        print("Stopped owned WP-15 browser processes")
+        print("Stopped owned workbench processes")
     else:
         print(
             json.dumps(
                 {
-                    "url": f"http://localhost:{WEB_PORT}/workbench/{state['case_id']}",
+                    "url": f"http://localhost:{WEB_PORT}/workbench",
                     "processes": [
                         {"label": item["label"], "alive": stamp(item["pid"]) == item["stamp"]}
                         for item in state.get("processes", [])
