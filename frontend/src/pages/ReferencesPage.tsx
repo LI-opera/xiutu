@@ -1,16 +1,16 @@
 import { Fragment, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiClient, idempotencyKey } from '../api-client';
+import { apiClient, idempotencyKey } from '../lib/api-client';
 import { ColumnHeader } from '../components/ColumnHeader';
 import { EmptyState, ErrorState, LoadingState, StatusBadge } from '../components/States';
 import {
   groupReferences, isWorking, MAX_REFERENCE_CHARS, REFERENCE_ID, referenceIdFrom, sectionHeadings,
   statusLabel, statusTone, suggestions, vehicleText,
-} from '../references';
+} from '../lib/references';
 import type {
   KnownVehicles, ReferenceChunkList, ReferenceItem, ReferenceList, ReferenceUpload, ReferenceUploadResult,
   ReferenceVersionUpload,
-} from '../types';
+} from '../lib/types';
 
 export function ReferencesPage() {
   const client = useQueryClient();

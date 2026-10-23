@@ -2,7 +2,7 @@
 from pathlib import Path
 from types import SimpleNamespace
 
-from scripts.wp15_workbench import embedding_environment
+from scripts.workbench import embedding_environment
 
 
 def test_configured_model_is_passed_and_unset_fields_are_left_out():

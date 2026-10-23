@@ -3,10 +3,10 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
-import { apiClient, ApiError } from '../src/formal/api-client';
-import { HistoryPage } from '../src/formal/pages/HistoryPage';
-import { WorkbenchPage } from '../src/formal/pages/WorkbenchPage';
-import { SessionBoundary } from '../src/formal/session';
+import { apiClient, ApiError } from '../src/lib/api-client';
+import { HistoryPage } from '../src/pages/HistoryPage';
+import { WorkbenchPage } from '../src/pages/WorkbenchPage';
+import { SessionBoundary } from '../src/lib/session';
 
 const wrapper = (ui: React.ReactNode, initial = ['/']) => {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });

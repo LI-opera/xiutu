@@ -1,4 +1,4 @@
-"""WP-01 local database boundary. Never pass an unvalidated DSN to a driver."""
+"""Local database boundary. Never pass an unvalidated DSN to a driver."""
 
 import os
 import re
@@ -50,7 +50,7 @@ def validate_target(
 ) -> DatabaseTarget:
     # Fail closed instead of guessing which ambient libpq option overrides a URL.
     if any(k.upper().startswith("PG") and v for k, v in os.environ.items()):
-        raise ValueError("PG* environment options are not allowed for isolated WP-01 connections")
+        raise ValueError("PG* environment options are not allowed for isolated local connections")
     try:
         if not isinstance(url, str) or any(ord(c) < 32 for c in url):
             raise ValueError()

@@ -1,4 +1,4 @@
-"""No-network budgeted WP-11 model-attempt checks."""
+"""No-network checks for the per-turn model attempt limit."""
 
 import json
 
@@ -110,7 +110,7 @@ def test_no_cumulative_cap_and_configuration_fail_closed(tmp_path):
         gateway.close()
 
 
-def test_wp09_default_still_allows_fifth_call(tmp_path):
+def test_default_without_turn_limit_allows_fifth_call(tmp_path):
     path = tmp_path / "wp09-ledger.json"
     ledger = BudgetLedger(path)
     ledger.initialize("offline synthetic fixture")

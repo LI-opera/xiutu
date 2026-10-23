@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { apiClient, errorText } from '../../api-client';
+import { apiClient, errorText } from '../lib/api-client';
 
 export function TemplateCaseLifecycle({ caseId, revision, closed, onChanged }: {caseId:string; revision:number; closed:boolean; onChanged:()=>void}) {
   const [confirm, setConfirm] = useState(false);

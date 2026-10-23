@@ -1,6 +1,6 @@
 """Migrate the local workspace to the current schema, install the repository's manuals, chunk and embed them.
 
-Stop the owned services first (wp15_workbench stop). Uses the same environment as the launched
+Stop the owned services first (workbench stop). Uses the same environment as the launched
 API and worker, so the stored vectors come from the model analyses will query with.
 """
 import json
@@ -17,7 +17,7 @@ from sqlalchemy import create_engine, text  # noqa: E402
 from app.infrastructure.db_target import validate_target  # noqa: E402
 from app.infrastructure.schema_version import EXPECTED_REVISION  # noqa: E402
 from scripts.seed_area_references import backfill_always_include, index, latest_versions, seed  # noqa: E402
-from scripts.wp15_workbench import STATE, environment  # noqa: E402
+from scripts.workbench import STATE, environment  # noqa: E402
 
 KNOWN = {"0019_case_area_rankings", "0020_area_analysis", "0021_area_input_identity",
          "0022_area_analysis_failed_retry", "0023_template_repair_retest", "0024_reference_ingest",

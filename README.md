@@ -210,7 +210,7 @@ uv run python scripts/setup_workspace.py --enable-ai-budget
 uv run python scripts/check_repository.py      # 资源完整性 + 密钥泄露扫描
 uv run python -m pytest tests/unit tests/contract -p no:cacheprovider -q --basetemp .test-runs\pt
 Push-Location frontend
-npm run typecheck; npx vitest run              # 前端类型检查与组件测试
+npm run typecheck; npm test                   # 前端类型检查与组件测试
 Pop-Location
 ```
 
@@ -230,9 +230,14 @@ backend/app/
   repositories/     病例数据访问
   infrastructure/   数据库表与事务、模型网关、向量模型、任务队列、用量账本
   retrieval/        章节检索（精准查找、BM25、向量、RRF）
-  topics/           记录角色、必带章节等版本化配置
+  reading_config/   记录角色、必带章节等版本化配置
   worker.py         后台任务进程（资料切块与向量化）
-frontend/src/formal/  工作台页面、组件、API 客户端
+frontend/src/
+  pages/            工作台、历史病例、维修资料三个页面
+  workbench/        病例工作台的各部分（接诊、检查、AI 分析、维修复检）
+  components/       通用组件
+  lib/              API 客户端、登录会话、类型
+  styles/           全局样式
 migrations/           Alembic 数据库迁移
 resources/            版本化模板、维修资料原文与资料列表
 evals/                检索与 AI 建议的离线评测题

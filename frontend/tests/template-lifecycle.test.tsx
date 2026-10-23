@@ -1,8 +1,8 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { TemplateCaseLifecycle } from '../src/formal/design/workbench-v2/TemplateCaseLifecycle';
-import { apiClient } from '../src/formal/api-client';
+import { TemplateCaseLifecycle } from '../src/workbench/TemplateCaseLifecycle';
+import { apiClient } from '../src/lib/api-client';
 afterEach(cleanup);
 it('closes only after explicit confirmation and reopens the same case', async()=>{
  const request=vi.spyOn(apiClient,'request').mockResolvedValue({});

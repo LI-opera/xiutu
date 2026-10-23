@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { useSession } from '../session';
+import { useSession } from '../lib/session';
 
 export function AppShell() {
   const { logout } = useSession();

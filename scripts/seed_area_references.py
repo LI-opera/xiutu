@@ -59,7 +59,7 @@ def build_documents(package, manuals):
             "provenance": {"sources": sources, "coverage": entry["coverage"], "images_sent": False}}
 
 
-READING = ROOT / "backend/app/topics/reading_documents_v1.json"
+READING = ROOT / "backend/app/reading_config/reading_documents_v1.json"
 
 
 def always_include(doc):
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     parser.add_argument("--no-vectors", action="store_true",
                         help="store chunks only (no local embedding model on this machine)")
     args = parser.parse_args()
-    from scripts.wp15_workbench import STATE, environment
+    from scripts.workbench import STATE, environment
     from app.infrastructure.db_target import validate_target
     from sqlalchemy import create_engine
     env = environment(json.loads(STATE.read_text(encoding="utf-8")), ranking_local_testing=False)

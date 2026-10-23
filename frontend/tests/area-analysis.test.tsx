@@ -1,8 +1,8 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AreaAnalysis } from '../src/formal/design/workbench-v2/AreaAnalysis';
-import { apiClient } from '../src/formal/api-client';
+import { AreaAnalysis } from '../src/workbench/AreaAnalysis';
+import { apiClient } from '../src/lib/api-client';
 
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 const doc = { id: 'doc', version: '1', title: '压力资料', body: '对应资料完整正文', content_hash: 'hash', provenance: { coverage: '详细版' } };

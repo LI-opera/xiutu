@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient, ApiError } from './api-client';
 import type { AuthSession } from './types';
-import { ErrorState, LoadingState } from './components/States';
+import { ErrorState, LoadingState } from '../components/States';
 
 type SessionContextValue = { session: AuthSession; logout: () => void };
 const SessionContext = createContext<SessionContextValue | null>(null);

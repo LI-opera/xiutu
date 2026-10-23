@@ -88,7 +88,7 @@ if __name__ == "__main__":
     from app.infrastructure.db_target import validate_target
     from sqlalchemy import create_engine
 
-    from scripts.wp15_workbench import STATE, environment
+    from scripts.workbench import STATE, environment
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=RELATIONS)
     args = parser.parse_args()

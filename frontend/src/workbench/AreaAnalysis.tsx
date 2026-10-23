@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { apiClient, errorText } from '../../api-client';
+import { apiClient, errorText } from '../lib/api-client';
 
 type Reference = { id: string; version: string; title: string; body: string; content_hash: string; provenance: { coverage: string } };
 type Step = { title?: string; kind?: "check" | "repair" | "record" | "handoff"; action: string; reason?: string; prerequisites?: string; retest?: string; stop_condition?: string; question_ids: string[]; source_ids: string[]; basis_observation_ids: string[] };

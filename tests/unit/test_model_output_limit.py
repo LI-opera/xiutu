@@ -1,4 +1,4 @@
-"""No-network checks for the server-owned WP-11 model output allowance."""
+"""No-network checks for the server-owned model output allowance."""
 
 import json
 
