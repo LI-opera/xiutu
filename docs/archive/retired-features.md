@@ -20,4 +20,4 @@ git show 3e7142f:backend/app/mcp_server/main.py
 git checkout 3e7142f -- backend/app/legacy_execution   # 取回到工作区，不会自动提交
 ```
 
-`docs/architecture/`、`docs/learning/` 等较早写成的文档里仍有提到这些旧部分的地方，以讲义和 README 为准。
+清理之前写的长篇文档已移到 [before-cleanup/](before-cleanup/)，现在的结构以 [../architecture.md](../architecture.md) 和 README 为准。
