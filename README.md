@@ -170,7 +170,30 @@ flowchart TD
 
 ## 快速开始
 
-**环境要求**：Python 3.12、Node.js 24.14.0、[uv](https://docs.astral.sh/uv/)、Docker Desktop（Linux 引擎）。以下命令以 Windows PowerShell 为例。
+有两种运行方式：只想试用，用 **Docker 一键运行**；要改代码，用 **本机运行**。
+
+### 方式一：Docker 一键运行
+
+只需要 [Docker Desktop](https://www.docker.com/products/docker-desktop/)。数据库、后端、后台任务和网页都在容器里，不用装 Python 和 Node。
+
+```powershell
+# 1. 配置：复制示例，填写数据库密码（字母和数字）和访问令牌（至少 32 个字符）
+Copy-Item deploy/docker/.env.example deploy/docker/.env
+
+# 2. 构建并启动（第一次构建需要下载依赖，较慢）
+docker compose -f deploy/docker/compose.yaml up --build -d
+```
+
+打开 <http://localhost:8080>，输入 `.env` 里的访问令牌。首次启动会自动建表并导入模板和 5 份维修资料。
+
+- **真实 AI（可选）**：在 `deploy/docker/.env` 填写 `DEEPSEEK_API_KEY`，重新 `up -d` 后执行一次 `docker compose -f deploy/docker/compose.yaml run --rm api python -B scripts/setup_workspace.py --enable-ai-budget`。
+- **本地向量模型（可选）**：在 `.env` 设置 `XIUTU_BGE_M3_DIR` 为本机 BGE-M3 模型目录。没有模型也能运行：分析时资料整份发送，只是不能上传新资料。
+
+停止、查看日志、清空数据等见 [Docker 运行指南](docs/guides/docker.md)。
+
+### 方式二：本机运行（开发）
+
+**环境要求**：Python 3.12、Node.js 24.14.0、[uv](https://docs.astral.sh/uv/)、Docker Desktop（Linux 引擎，只用来运行数据库）。以下命令以 Windows PowerShell 为例。
 
 ```powershell
 # 1. 安装依赖
@@ -243,7 +266,7 @@ resources/            版本化模板、维修资料原文与资料列表
 evals/                检索与 AI 建议的离线评测题
 scripts/              初始化、开发启动、校验、评测脚本
 tests/                单元 / 契约 / 集成 / 探针测试
-deploy/               本地 PostgreSQL 的 Docker Compose
+deploy/               本机运行用的数据库 Compose；docker/ 下是整套 Docker 部署
 docs/                 架构说明、运行与测试指南、历史记录
 ```
 
