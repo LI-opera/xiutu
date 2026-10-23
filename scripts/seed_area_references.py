@@ -143,7 +143,7 @@ if __name__ == "__main__":
     from scripts.wp15_workbench import STATE, environment
     from app.infrastructure.db_target import validate_target
     from sqlalchemy import create_engine
-    env = environment(json.loads(STATE.read_text(encoding="utf-8")))
+    env = environment(json.loads(STATE.read_text(encoding="utf-8")), ranking_local_testing=False)
     # Same settings as the launched API and worker, so vectors use the model they will query with.
     import os
     os.environ.update(env)

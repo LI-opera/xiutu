@@ -92,7 +92,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=RELATIONS)
     args = parser.parse_args()
-    env = environment(json.loads(STATE.read_text(encoding="utf-8")))
+    env = environment(json.loads(STATE.read_text(encoding="utf-8")), ranking_local_testing=False)
     target = validate_target(env["DATABASE_URL"], "migration")
     engine = create_engine(target.sqlalchemy_url(), connect_args=target.connect_kwargs())
     with engine.begin() as conn:

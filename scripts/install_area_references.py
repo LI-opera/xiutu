@@ -26,7 +26,7 @@ KNOWN = {"0019_case_area_rankings", "0020_area_analysis", "0021_area_input_ident
 
 def main():
     no_vectors = "--no-vectors" in sys.argv[1:]
-    env = environment(json.loads(STATE.read_text(encoding="utf-8")))
+    env = environment(json.loads(STATE.read_text(encoding="utf-8")), ranking_local_testing=False)
     os.environ.update(env)
     target = validate_target(env["DATABASE_URL"], "migration")
     engine = create_engine(target.sqlalchemy_url(), connect_args=target.connect_kwargs())
