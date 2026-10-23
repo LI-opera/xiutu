@@ -33,26 +33,24 @@ from app.retrieval.section_search import BM25, dense_rank, exact_rank, rrf, spli
 from app.services.retrieval_reading import route_documents  # noqa: E402
 
 from scripts.build_analysis_context import RELATIONS  # noqa: E402
-from scripts.seed_area_references import build_documents  # noqa: E402
+from scripts.seed_area_references import build_documents, load_manuals  # noqa: E402
 
 CONFIG = ROOT / "evals/section-retrieval/config.json"
 CONTEXT = ROOT / "evals/section-retrieval/reference_table_v1.json"
-MANIFEST = RELATIONS.parent / "area_reference_manifest_v2.json"
+AREA_DOCUMENTS = ROOT / "evals/area_documents.json"
 PACKAGE = ROOT / "resources/knowledge/tayron"
 OUT_DIR = ROOT / ".local-data/evals/section-retrieval"
 QUESTION_ID = re.compile(r"^[A-Z]{1,4}-[0-9]{2}\s*·\s*")
 
 
 def load_documents():
-    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    return {doc["document_id"]: doc for _, doc in build_documents(PACKAGE, manifest)}
+    return {doc["document_id"]: doc for _, doc in build_documents(PACKAGE, load_manuals())}
 
 
 def area_texts(config):
-    """(template, area) -> texts describing the area, and the document the manifest assigns it."""
+    """(template, area) -> texts describing the area, and the document it should read (gold)."""
     relations = json.loads(RELATIONS.read_text(encoding="utf-8"))["relations"]
-    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    assigned = {entry["area_id"]: entry["document_id"] for entry in manifest["documents"]}
+    assigned = json.loads(AREA_DOCUMENTS.read_text(encoding="utf-8"))["areas"]
     result = {}
     for template in config["templates"]:
         relation = next(r for r in relations if r["template_id"] == template["template_id"]

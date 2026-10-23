@@ -1,9 +1,11 @@
-"""The default store cannot silently opt into retired job execution."""
-from types import SimpleNamespace
-
+"""The worker claims only the job kinds it can run."""
 import pytest
 
 from app.infrastructure.job_store import RUNTIME_JOB_KINDS, JobStore
+
+
+def test_runtime_kinds_are_the_manual_ingest_and_the_test_job():
+    assert RUNTIME_JOB_KINDS == {"no_op", "reference_ingest"}
 
 
 def test_default_claim_uses_runtime_kinds_even_without_worker_filter():
@@ -14,25 +16,8 @@ def test_default_claim_uses_runtime_kinds_even_without_worker_filter():
     assert captured == [("runtime", None, "selected", RUNTIME_JOB_KINDS)]
 
 
-@pytest.mark.parametrize("kind", ["diagnosis", "report", "case_analysis", "unknown"])
-def test_runtime_claim_cannot_override_filter_with_retired_kinds(kind):
+@pytest.mark.parametrize("kind", ["diagnosis", "report", "case_analysis", "ingest", "index", "unknown"])
+def test_claim_rejects_kinds_no_handler_runs(kind):
     store = JobStore.__new__(JobStore)
-    with pytest.raises(ValueError, match="explicit isolated legacy"):
+    with pytest.raises(ValueError, match="Unknown job kind"):
         store.claim("runtime", allowed_kinds={"no_op", kind})
-
-
-@pytest.mark.parametrize("database", ["xiutu_dev", "production", None])
-def test_legacy_claim_refuses_nonisolated_database(database):
-    store = JobStore.__new__(JobStore)
-    store.engine = SimpleNamespace(url=SimpleNamespace(database=database))
-    with pytest.raises(ValueError, match="isolated test database"):
-        store.claim_legacy("old-worker")
-
-
-def test_explicit_isolated_claim_preserves_legacy_replay_arguments():
-    store = JobStore.__new__(JobStore)
-    store.engine = SimpleNamespace(url=SimpleNamespace(database="xiutu_test_replay"))
-    captured = []
-    store._claim = lambda *args: captured.append(args)
-    store.claim_legacy("replay", run_id="old-run", allowed_kinds={"diagnosis"})
-    assert captured == [("replay", None, "old-run", {"diagnosis"})]

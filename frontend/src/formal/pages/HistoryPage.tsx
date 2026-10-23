@@ -8,13 +8,12 @@ import type { CaseList } from '../types';
 
 const groups = [
   { key: 'continue', title: '可继续' }, { key: 'waiting', title: '待复检或待补充' },
-  { key: 'completed', title: '已结束' }, { key: 'restart', title: '建议重新开始' },
-  { key: 'reference', title: '历史参考' },
+  { key: 'completed', title: '已结束' },
 ] as const;
 
 function CaseRows({ items, onOpen }: { items: CaseList['items']; onOpen: (id: string) => void }) {
   if (!items.length) return <p className="muted">暂无病例。</p>;
-  return <div className="case-list">{items.map(item => <button type="button" className="case-row" key={item.id} onClick={() => onOpen(item.id)}><span><strong>{[item.vehicle.brand, item.vehicle.model, item.vehicle.engine_code].filter(Boolean).join(' · ')}</strong><small>{item.fault_description}</small><small>{item.fault_codes.join('、')}</small><small>{item.experience.guidance}</small>{Boolean(item.template_progress?.latest_repair) && <small>最近处理：{String(item.template_progress?.latest_repair)}</small>}{Boolean(item.template_progress?.latest_retest_outcome) && <small>最近复检：{({resolved:'原问题未再出现',persists:'原问题仍存在',uncertain:'结果尚不确定'} as Record<string,string>)[String(item.template_progress?.latest_retest_outcome)] ?? '已记录'}</small>}</span><span><StatusBadge value={item.experience.label} tone={item.experience.category === 'completed' ? 'good' : item.experience.category === 'reference' ? 'warn' : undefined} /><small>{new Date(item.updated_at).toLocaleString()}</small></span></button>)}</div>;
+  return <div className="case-list">{items.map(item => <button type="button" className="case-row" key={item.id} onClick={() => onOpen(item.id)}><span><strong>{[item.vehicle.brand, item.vehicle.model, item.vehicle.engine_code].filter(Boolean).join(' · ')}</strong><small>{item.fault_description}</small><small>{item.fault_codes.join('、')}</small><small>{item.experience.guidance}</small>{Boolean(item.template_progress?.latest_repair) && <small>最近处理：{String(item.template_progress?.latest_repair)}</small>}{Boolean(item.template_progress?.latest_retest_outcome) && <small>最近复检：{({resolved:'原问题未再出现',persists:'原问题仍存在',uncertain:'结果尚不确定'} as Record<string,string>)[String(item.template_progress?.latest_retest_outcome)] ?? '已记录'}</small>}</span><span><StatusBadge value={item.experience.label} tone={item.experience.category === 'completed' ? 'good' : undefined} /><small>{new Date(item.updated_at).toLocaleString()}</small></span></button>)}</div>;
 }
 
 export function HistoryPage() {
@@ -41,12 +40,12 @@ export function HistoryPage() {
   const items = allItems.filter(item => [item.id, item.vehicle.model, item.vehicle.vin ?? '', item.fault_description, ...item.fault_codes].some(value => value.toLowerCase().includes(needle)));
 
   return <section className="page-card"><ColumnHeader eyebrow="HISTORY" title="继续或恢复病例" />
-    <p className="section-note">查看病例记录；当前模板病例可继续，历史病例仅供查看。</p>
+    <p className="section-note">查看病例记录；未结束的病例可以继续记录；已结束的病例打开后可选择“继续此病例”。</p>
     <div className="search-row" role="group" aria-label="病例范围">
       {([{ value: 'daily', label: '日常病例' }, { value: 'test', label: '测试与验证' }, { value: 'all', label: '全部病例' }] as const).map(option =>
         <button key={option.value} type="button" className={scope === option.value ? '' : 'secondary'} aria-pressed={scope === option.value} onClick={() => setScope(option.value)}>{option.label}</button>)}
     </div>
-    <p className="muted">{scope === 'test' ? '按主诉开头的明确标签归类，原始记录完整保留。' : scope === 'daily' ? '查找不到旧病例时，可切换到“全部病例”。' : '包含日常病例及带有测试、模拟或验收标签的病例。'}</p>
+    <p className="muted">{scope === 'test' ? '按主诉开头的明确标签归类，原始记录完整保留。' : scope === 'daily' ? '找不到病例时，可切换到“全部病例”。' : '包含日常病例及带有测试、模拟或验收标签的病例。'}</p>
     <div className="search-row"><label>筛选病例、车型、VIN、故障码或描述<input value={draft} onChange={e => setDraft(e.target.value)} /></label></div>
     {query.isFetching && !query.isFetchingNextPage && !query.data && <LoadingState label="正在读取病例" />}
     {query.isFetchingNextPage && <LoadingState label="正在继续搜索后续病例" />}

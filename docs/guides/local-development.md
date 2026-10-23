@@ -16,7 +16,7 @@ uv run python scripts/setup_workspace.py --apply
 uv run python scripts/dev.py
 ```
 
-setup 默认仅校验仓库内独立 v2 模板、资料覆盖和源文件哈希；--apply 才连接指定数据库，要求没有病例且 schema 为空或已经位于当前迁移 head。它不会重置旧库，不调用模型。
+setup 默认仅校验仓库内 v2 模板、资料列表（`resources/knowledge/tayron/manuals.json`）和源文件哈希；--apply 才连接指定数据库，要求没有病例且 schema 为空或已经位于当前迁移 head。它不会重置旧库，不调用模型。
 
 dev 从项目 .env 加载配置，要求 APP_ORIGIN 是本机 HTTP，端口空闲、数据库当前 schema 就绪，再启动 API、Vite 和默认资料 worker。Ctrl+C 只终止本次创建的子进程。默认网页 5215、API 8215；支持 --web-port/--api-port，APP_ORIGIN 由本次网页端口明确指定。
 
@@ -38,4 +38,10 @@ uv run python scripts/setup_workspace.py --enable-ai-budget
 
 克隆不恢复原机器的数据库、病例与历史 AI。需要迁移真实使用数据时，应另走备份、恢复和来源核对流程；不把 SQL dump 放进 Git。
 
-资料中心的 embedding 模型不上传仓库；没有本地模型时，不把资料检索和索引功能宣称为已就绪。模板主流程直接读区域绑定正文，允许在不运行向量索引时使用。
+## 本地向量模型
+
+向量模型不上传仓库。在 `.env` 设置 `EMBEDDING_PROVIDER=local_bge_m3` 和 `EMBEDDING_MODEL_PATH`（本机 BGE-M3 快照目录）后：
+
+- 在“维修资料”页上传的新资料由 Worker 切块、算向量；没有模型时上传会标为失败（`EMBEDDING_UNAVAILABLE`），重新上传同一份内容即可重试。
+- 原机器上已有资料可用 `uv run python -m scripts.install_area_references` 一次性切块、算向量（依赖本机 `runtime.json`；先停掉运行中的服务；`--no-vectors` 只切块）。新克隆不需要这一步：资料没切块时，分析会现场计算。
+- 没有模型时 AI 分析照常进行：该份资料的章节检索失败，整份原文发送，并在输入的阅读说明里记下。

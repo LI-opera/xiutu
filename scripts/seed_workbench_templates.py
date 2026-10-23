@@ -2,13 +2,12 @@
 import argparse
 import json
 import sys
-from copy import deepcopy
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
 
-RELATIONS = ROOT / "backend/app/topics/workbench_template_relations_v1.json"
+RELATIONS = ROOT / "resources/templates/tayron-v2/relations.json"
 
 
 def _independent_content(config_path, relation):
@@ -19,7 +18,7 @@ def _independent_content(config_path, relation):
         raise ValueError(f"Invalid template content file: {relation['id']}")
     topic = json.loads(path.read_text(encoding="utf-8"))
     if topic.get("calculation_catalog") is not None:
-        raise ValueError(f"Independent template cannot use B01/B02 calculation_catalog: {relation['id']}")
+        raise ValueError(f"Template rules must be data (calculation_rules), not a catalog: {relation['id']}")
     expected_version = relation["template_id"] + "-v" + relation["version"]
     if (topic.get("topic_id") != relation["template_id"] or
             topic.get("version") != expected_version or
@@ -47,37 +46,12 @@ def _independent_content(config_path, relation):
 def build_templates(config_path=RELATIONS):
     config_path = Path(config_path).resolve()
     config = json.loads(config_path.read_text(encoding="utf-8"))
-    if config_path != RELATIONS.resolve() and config.get("runtime_importable") is not True:
-        raise ValueError("New template package is not approved for runtime import")
-    base = None
+    if config.get("runtime_importable") is not True:
+        raise ValueError("Template package is not approved for runtime import")
     for relation in config["relations"]:
-        if "content_file" in relation:
-            yield relation, _independent_content(config_path, relation)
-            continue
-        if config_path != RELATIONS.resolve():
-            raise ValueError(f"New template requires content_file: {relation['id']}")
-        # Only the already published v1 installation uses the frozen B02 source.
-        if base is None:
-            from app.topics import dkvb_b02
-            base, _ = dkvb_b02.catalog()
-        topic = deepcopy(base)
-        topic["calculation_catalog"] = deepcopy(base)
-        topic["topic_id"] = relation["template_id"]
-        topic["version"] = relation["template_id"] + "-v" + relation["version"]
-        topic["authority"] = config["boundary"]
-        topic["areas"] = [a for a in topic["areas"] if a["id"] in relation["area_ids"]]
-        topic["questions"] = [q for q in topic["questions"] if q["area_id"] in relation["area_ids"] or q["id"] == "IN-08"]
-        ids = {q["id"] for q in topic["questions"]}
-        topic["cards"] = [c for c in topic["cards"] if set(c["questionIds"]) & ids]
-        for card in topic["cards"]:
-            card["questionIds"] = [qid for qid in card["questionIds"] if qid in ids]
-        for q in topic["questions"]:
-            unresolved = set(q["prerequisites"]["refs"]) - ids
-            if unresolved:
-                raise ValueError(f"Template {relation['id']} has absent prerequisites: {q['id']} {unresolved}")
-        # Existing local question rules remain versioned; the route does not rank areas.
-        topic["match_provenance"] = {"relation": relation, "package": config["package_root"], "boundary": config["boundary"]}
-        yield relation, topic
+        if "content_file" not in relation:
+            raise ValueError(f"Template requires content_file: {relation['id']}")
+        yield relation, _independent_content(config_path, relation)
 
 
 def seed(conn, config_path=RELATIONS):
@@ -118,7 +92,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=RELATIONS)
     args = parser.parse_args()
-    env = environment(json.loads(STATE.read_text(encoding="utf-8")))
+    env = environment(json.loads(STATE.read_text(encoding="utf-8")), ranking_local_testing=False)
     target = validate_target(env["DATABASE_URL"], "migration")
     engine = create_engine(target.sqlalchemy_url(), connect_args=target.connect_kwargs())
     with engine.begin() as conn:

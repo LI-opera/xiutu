@@ -15,7 +15,6 @@ from datetime import datetime, timezone
 
 from sqlalchemy import func, select, update
 
-from app.domain.documents import IngestError
 from app.domain.policies import DomainError
 from app.infrastructure.orm import area_reference_chunk_vectors as vectors
 from app.infrastructure.orm import area_reference_chunks as chunks
@@ -28,6 +27,15 @@ from app.services.retrieval_reading import NAVIGATION, section_ranges
 CHUNKER_VERSION = "markdown-sections-v1"
 JOB_KIND = "reference_ingest"
 DOCUMENT_ID = re.compile(r"^[a-z0-9][a-z0-9-]{1,99}$")
+
+
+class IngestError(Exception):
+    """Processing a manual failed; code is stored on the version (e.g. REFERENCE_NO_SECTIONS)."""
+    def __init__(self, code):
+        self.code = code
+        super().__init__(code)
+
+
 MAX_CHARS = 2_000_000
 EMBED_BATCH = 16
 
@@ -232,7 +240,7 @@ class ReferenceIngestService:
 
     def _queue(self, conn, actor, document_id, values, body):
         """Insert one queued version (numbered after the existing ones) and schedule its job."""
-        from app.services.run_service import enqueue
+        from app.services.job_queue import enqueue
         existing = conn.execute(select(documents.c.version).where(
             documents.c.document_id == document_id)).scalars().all()
         version = next_version(existing)
@@ -245,7 +253,7 @@ class ReferenceIngestService:
 
     def _reuse(self, conn, actor, row):
         """Same content again: return that version; a failed one is queued again (retry)."""
-        from app.services.run_service import enqueue
+        from app.services.job_queue import enqueue
         run = None
         if row["status"] == "failed":
             conn.execute(update(documents).where(documents.c.document_id == row["document_id"],

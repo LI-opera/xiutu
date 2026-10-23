@@ -12,7 +12,7 @@ const wrapper = (ui: React.ReactNode, initial = ['/']) => {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
   return render(<QueryClientProvider client={client}><MemoryRouter initialEntries={initial}>{ui}</MemoryRouter></QueryClientProvider>);
 };
-const caseItem = { id: '11111111-1111-4111-8111-111111111111', vehicle: { model: '测试车型', year: null, engine_code: null, engine_family: null, vin: null }, fault_description: '故障描述', fault_codes: [], revision: 1, graph_epoch: 0, status: 'open', corpus_manifest: [], created_at: '2026-09-21T00:00:00Z', updated_at: '2026-09-21T00:00:00Z', active_run: null, current_check: null, experience: { category: 'continue', label: '可继续', guidance: '进入病例', priority: 10 }, report_gate: { available: false, reason: 'FINAL_NOT_READY', blocking_items: [] } };
+const caseItem = { id: '11111111-1111-4111-8111-111111111111', vehicle: { model: '测试车型', year: null, engine_code: null, engine_family: null, vin: null }, fault_description: '故障描述', fault_codes: [], intake_snapshot: {}, revision: 1, status: 'waiting_input', created_at: '2026-09-21T00:00:00Z', updated_at: '2026-09-21T00:00:00Z', experience: { category: 'continue', label: '可继续', guidance: '进入病例', priority: 10 } };
 afterEach(cleanup);
 
 describe('formal routes', () => {
@@ -26,26 +26,11 @@ describe('formal routes', () => {
     expect(screen.getByText(`/workbench/${caseItem.id}`)).toBeTruthy();
   });
 
-  it('restores the case named by the workbench route', async () => {
-    const request = vi.spyOn(apiClient, 'request').mockImplementation(async path => {
-      if (path.endsWith('/workbench-view')) return {
-        case_summary: { ...caseItem, title: '历史病例工作台', status_label: '待继续', symptom_context: {}, synthetic: true, formal_usable: false },
-        areas: [{ area_id: 'air', title: '历史排查区域', priority: 1, priority_reason: '', status: 'handed_off', completed_checks: 0, required_checks: 1, has_abnormality: false, available: true, components: [] }],
-        selected_area_id: 'air', current_component: null, current_action: null, saved_facts: [],
-        synthesis: { status: 'handoff', confirmed_facts: [], handled_issues: [], remaining_abnormalities: [], unchecked_items: [], next_recommendations: ['等待补充检查'], can_generate_demo_summary: false },
-      } as never;
-      if (path.endsWith('/diagnosis/areas')) return { case_id: caseItem.id, revision: 1, graph_epoch: 0, areas: [] } as never;
-      if (path.endsWith('/diagnosis')) return { case_id: caseItem.id, revision: 1, graph_epoch: 0, status: 'open', recent_runs: [], current_step: null } as never;
-      if (path.endsWith('/observations')) return { case_id: caseItem.id, revision: 1, items: [] } as never;
-      if (path.endsWith('/reports/gate')) return { allowed: false, blocking_items: [{ code: 'AREA_UNFINISHED' }], case_revision: 1, graph_epoch: 0 } as never;
-      if (path.endsWith('/reports')) return { case_id: caseItem.id, items: [] } as never;
-      return caseItem as never;
-    });
+  it('opens a template case in the template workbench and refuses any other case', async () => {
+    const request = vi.spyOn(apiClient, 'request').mockResolvedValue(caseItem as never);
     wrapper(<Routes><Route path="/workbench/:caseId" element={<WorkbenchPage />} /></Routes>, [`/workbench/${caseItem.id}`]);
-    expect(await screen.findByText('测试车型')).toBeTruthy();
+    expect(await screen.findByText('无法打开此病例')).toBeTruthy();
     expect(request).toHaveBeenCalledWith(`/cases/${caseItem.id}`, expect.any(Object));
-    expect(screen.getByRole('heading', { name: '历史病例工作台' })).toBeTruthy();
-    expect(screen.getByText('正式最终报告：仍不可生成')).toBeTruthy();
   });
 
   it('shows login after a 401 session failure instead of swallowing it', async () => {

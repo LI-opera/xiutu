@@ -10,7 +10,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from sqlalchemy import func, select, update
 from sqlalchemy.dialects.postgresql import insert
 
-from app.domain.case_analysis import AreaAdviceV3
+from app.domain.area_advice import AreaAdviceV3
 from app.domain.policies import DomainError
 from app.infrastructure.model_gateway import (
     DeepSeekGateway,
@@ -25,7 +25,7 @@ from app.services.reference_store import candidates as stored_candidates
 from app.services.reference_store import pool as stored_pool
 from app.services.reference_store import provider as stored_sections
 from app.services.retrieval_reading import Embeddings, area_texts, choose_documents
-from app.services.run_service import lock_case
+from app.services.write_guards import lock_case
 from app.services.workbench_observation_service import TopicService
 from app.services.workbench_templates import is_template
 

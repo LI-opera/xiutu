@@ -31,10 +31,10 @@ from app.services.template_projection import build_plan, project_template  # noq
 from app.services.workbench_templates import content_hash  # noqa: E402
 
 from scripts.build_analysis_context import RELATIONS  # noqa: E402
-from scripts.seed_area_references import build_documents  # noqa: E402
+from scripts.seed_area_references import build_documents, load_manuals  # noqa: E402
 
 CASES = ROOT / "evals/area-advice/cases.json"
-MANIFEST = RELATIONS.parent / "area_reference_manifest_v2.json"
+AREA_DOCUMENTS = ROOT / "evals/area_documents.json"
 PACKAGE = ROOT / "resources/knowledge/tayron"
 DEFAULT_MAX_OUTPUT_TOKENS = 8192
 
@@ -54,12 +54,11 @@ def load_topic(template):
 
 def load_references(template):
     """Documents per area, in the same shape load_documents() returns from the database."""
-    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if template["template_id"] not in manifest["template_ids"] or manifest["template_version"] != template["version"]:
-        raise ValueError("Reference manifest does not cover the case template")
+    areas = json.loads(AREA_DOCUMENTS.read_text(encoding="utf-8"))["areas"]
+    area_of = {document_id: area_id for area_id, document_id in areas.items()}
     by_area = {}
-    for entry, doc in build_documents(PACKAGE, manifest):
-        by_area.setdefault(entry["area_id"], []).append({
+    for _, doc in build_documents(PACKAGE, load_manuals()):
+        by_area.setdefault(area_of[doc["document_id"]], []).append({
             "id": doc["document_id"], "version": doc["version"], "title": doc["title"],
             "body": doc["body"], "content_hash": doc["content_hash"], "provenance": doc["provenance"]})
     for docs in by_area.values():
@@ -137,7 +136,7 @@ def build_view(spec, case, topic=None):
     binding = {"template_id": spec["template"]["template_id"], "version": spec["template"]["version"],
                "content_hash": content_hash(topic)}
     intake = {"topic_plan": plan, "template_binding": binding}
-    projection = project_template({"intake_snapshot": intake}, records, {}, topic)
+    projection = project_template({"intake_snapshot": intake}, records, topic)
     superseded = {r["supersedes_id"] for r in records if r["supersedes_id"]}
     return {"topic": topic, "plan": plan, "view": projection,
         "case": {"id": _id(case["id"], "case"), "revision": len(records) + 1,

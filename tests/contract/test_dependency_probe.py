@@ -22,9 +22,6 @@ from pydantic import BaseModel, ConfigDict, SecretStr, ValidationError
         "psycopg",
         "alembic",
         "pgvector",
-        "langgraph",
-        "langgraph.checkpoint.postgres",
-        "mcp",
     ],
 )
 def test_import(module):

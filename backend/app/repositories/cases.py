@@ -2,7 +2,6 @@ from sqlalchemy import func, select, tuple_
 
 from app.domain.schemas import CaseSnapshot
 from app.infrastructure.orm import cases
-from app.topics.dkvb_v2 import applicable as dkvb_topic_applicable, binding as dkvb_topic_binding
 
 
 # Only explicit purpose labels, never the old automatically populated synthetic/demo flags.
@@ -19,7 +18,7 @@ class CaseRepository:
     def __init__(self, connection):
         self.connection = connection
 
-    def create(self, actor_id, data, manifest=None, intake_override=None):
+    def create(self, actor_id, data, intake_snapshot):
         return (
             self.connection.execute(
                 cases.insert()
@@ -28,20 +27,8 @@ class CaseRepository:
                     vehicle_json=data.vehicle.model_dump(mode="json"),
                     fault_description=data.fault_description,
                     fault_codes=data.fault_codes,
-                    corpus_manifest=manifest or [],
-                    diagnosis_mode=data.diagnosis_mode,
-                    policy_version=data.policy_version,
-                    intake_snapshot=intake_override if intake_override is not None else {
-                        "vehicle": data.vehicle.model_dump(mode="json"),
-                        "fault_description": data.fault_description,
-                        "fault_codes": data.fault_codes,
-                        "diagnosis_mode": data.diagnosis_mode,
-                        "policy_version": data.policy_version,
-                        "synthetic": True,
-                        "topic_binding": dkvb_topic_binding(),
-                    } if dkvb_topic_applicable(data.vehicle.model_dump(mode="json"), data.fault_codes, data.diagnosis_mode) else {},
+                    intake_snapshot=intake_snapshot,
                     revision=0,
-                    graph_epoch=0,
                     status="draft",
                 )
                 .returning(cases)
@@ -84,13 +71,9 @@ def snapshot(row):
             "id",
             "fault_description",
             "fault_codes",
-            "diagnosis_mode",
-            "policy_version",
             "intake_snapshot",
             "revision",
-            "graph_epoch",
             "status",
-            "corpus_manifest",
             "created_at",
             "updated_at",
         ]

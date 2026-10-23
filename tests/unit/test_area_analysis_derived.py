@@ -32,7 +32,7 @@ def view_with(values):
         "fields": {"hpa": {"value": value, "unit": "hPa absolute"}}}} for qid, value in values.items()]
     case = {"intake_snapshot": {"topic_plan": plan,
                                 "template_binding": {"template_id": "tayron-dkvb-p0299", "version": "2"}}}
-    projection = project_template(case, records, {}, content)
+    projection = project_template(case, records, content)
     return {"topic": content, "view": projection, "plan": plan, "case": {
         "id": str(uuid4()), "revision": 3, "vehicle": {}, "fault_description": "增压不足",
         "fault_codes": ["P0299"], "intake_snapshot": case["intake_snapshot"]},

@@ -40,7 +40,7 @@ def test_focus_conflict_and_gate_are_consistent_in_saved_view_and_ai_preview():
                for qid, option in (("SOURCE", "fault"), ("SECOND", "fault"))]
     case = {"intake_snapshot": {"topic_plan": build_plan(content, {}),
                                 "template_binding": {"template_id": "cooling", "version": "1"}}}
-    projection = project_template(case, records, {}, content)
+    projection = project_template(case, records, content)
     assert projection["question_states"]["CHECK"]["focused"]
     assert projection["question_states"]["CHECK"]["condition_blockers"][0]["ref"] == "SOURCE"
     assert projection["synthesis"]["conflicts"][0]["id"] == "cross-conflict"
@@ -69,12 +69,12 @@ def test_independent_operation_can_use_case_intake_safety_without_legacy_questio
     operation["execution_conditions"] = {
         "bypass_options": ["unable"], "requirements": [
             {"intake_key": "safety_gate", "allowed": ["none", "caution"], "label": "接诊安全条件允许操作"}]}
-    workflow = ObservationWorkflow(content, template_bound=True)
+    workflow = ObservationWorkflow(content)
     stop = build_plan(content, {"safety_gate": "stop_now"})
     allowed = build_plan(content, {"safety_gate": "none"})
     body = SimpleNamespace(option_ids=["done"])
     assert workflow.prerequisites(operation, stop, [], body)[0]["ref"] == "intake:safety_gate"
     assert workflow.prerequisites(operation, allowed, [], body) == []
     assert workflow.prerequisites(operation, stop, [], SimpleNamespace(option_ids=["unable"])) == []
-    projection = project_template({"intake_snapshot": {"topic_plan": stop}}, [], None, content)
+    projection = project_template({"intake_snapshot": {"topic_plan": stop}}, [], content)
     assert projection["question_states"]["CHECK"]["condition_blockers"][0]["ref"] == "intake:safety_gate"

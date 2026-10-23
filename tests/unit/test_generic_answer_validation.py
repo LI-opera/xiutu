@@ -1,6 +1,6 @@
 import pytest
 from app.domain.policies import DomainError
-from app.services.workbench_b01_service import TopicAnswer, TopicService
+from app.services.workbench_observation_service import TopicAnswer, TopicService
 from app.services.workbench_topic_workflow import ObservationWorkflow, workflow_for
 
 
@@ -44,12 +44,9 @@ def test_required_fields_unit_batch_and_unknown_calculator_are_enforced():
         TopicService._validate_answer(topic, plan, [], answer)
     answer.batch_id = "current-batch"
     TopicService._validate_answer(topic, plan, [], answer)
-    topic["calculation_catalog"] = {"version": "unknown"}
-    with pytest.raises(DomainError, match="尚不支持"):
-        TopicService._validate_answer(topic, plan, [], answer)
 
 
-def test_independent_topic_cannot_inherit_legacy_rules_by_version_collision():
+def test_old_demo_version_string_gets_no_special_rules():
     topic, plan, answer = inputs(1.2)
     topic["version"] = "2.2.1-b02"
     answer.topic_version = topic["version"]

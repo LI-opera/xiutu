@@ -15,12 +15,12 @@ def main():
     parser.add_argument("--enable-ai-budget", action="store_true")
     args = parser.parse_args()
     from scripts.publish_independent_templates import preflight
+    from scripts.seed_area_references import DEFAULT_PACKAGE as package
+    from scripts.seed_area_references import build_documents, load_manuals
 
-    bundle = ROOT / "resources/templates/tayron-v2"
-    package = ROOT / "resources/knowledge/tayron"
-    relations = bundle / "relations.json"
-    manifest = bundle / "area_reference_manifest_v2.json"
-    report = preflight(relations, manifest, package)
+    relations = ROOT / "resources/templates/tayron-v2/relations.json"
+    report = preflight(relations)
+    report["manuals"] = len(list(build_documents(package, load_manuals())))
     if args.apply:
         from alembic import command
         from alembic.config import Config
@@ -62,8 +62,9 @@ def main():
                         os.environ["DATABASE_URL"] = previous
             with engine.begin() as conn:
                 templates = seed_templates(conn, relations)
-                bindings = seed_references(conn, package, manifest)
-            report.update(database_writes=True, installed_templates=len(templates), bindings=len(bindings))
+                manuals = seed_references(conn, package)
+            report.update(database_writes=True, installed_templates=len(templates),
+                          installed_manuals=len(manuals))
         finally:
             engine.dispose()
     if args.enable_ai_budget:

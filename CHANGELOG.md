@@ -1,5 +1,15 @@
 # 变更记录
 
+## 2026-10-23 — 清理第二步：只保留模板工作台
+
+- 删除旧资料中心（页面、接口、旧解析与 token 分块、Worker 的 `ingest`/`index` 任务）、早期诊断流程（`legacy_execution/`、诊断区域与步骤、证据、测量规格、工具、报告、运行接口与 SSE）、旧病例分析（C 系列）、B01/B02 演示专题和模板 v1、旧原型页面、MCP 服务及其 Docker 配置。说明与找回方法见 `docs/archive/retired-features.md`。
+- 迁移 `0026_retire_legacy`：删除上述旧表、LangGraph 检查点 schema、区域资料绑定表，以及不是模板 v2 的旧病例和它们的记录、旧任务；`cases` 去掉只有旧流程用的四列。有旧病例时必须设置 `XIUTU_ALLOW_LEGACY_DELETE=1` 才执行（先备份）；不能降级。
+- 区域资料清单换成两份文件：`resources/knowledge/tayron/manuals.json`（要安装的资料与适用车型，不含区域）和 `evals/area_documents.json`（评测用的"区域 → 资料"标准答案）。安装脚本不再写绑定表。
+- 主流程原来放在旧模块里的公共部分拆出：病例加锁与幂等键（`services/write_guards.py`）、后台任务入队（`services/job_queue.py`）、AI 分析输出结构（`domain/area_advice.py`，JSON schema 逐字节不变）。
+- 前端删除旧资料中心页、旧区域工作台、旧演示页、旧病例分析面板和 A 类题号判断（RET-01、RET-04、IN-08）；非模板病例打开时提示不再支持。
+- 删除对应的旧测试，CI 去掉两个已知失败测试的 `--deselect`。新增迁移测试：0026 在没有许可时拒绝删除、许可后只保留模板 v2 病例、记录仍只能追加。
+- 已有 AI 分析记录不受影响：输入身份的计算内容没有变化，旧分析不会因此显示"已过期"。
+
 ## 2026-10-22 — 资料按车型上传，分析两步检索（不再有区域对资料的表）
 
 - 迁移 `0025_reference_vehicle`：资料加上适用车型（品牌、车型、年款、发动机代码），旧资料按原绑定模板的车型自动补齐；去掉 `requested_areas`。区域绑定表保留旧数据，分析不再读取。

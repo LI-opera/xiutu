@@ -1,17 +1,19 @@
 """Version-bound, append-only observations for frozen question templates."""
 from copy import deepcopy
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select, text, update
 
 from app.domain.policies import DomainError, check_revision
-from app.infrastructure.orm import case_analyses, cases, observations
+from app.infrastructure.orm import cases, observations
 from app.infrastructure.uow import UnitOfWork
 from app.repositories.cases import CaseRepository
-from app.services.run_service import idempotent, lock_case
+from app.services.write_guards import idempotent, lock_case
 from app.services.workbench_answer_validation import validate_answer
+from app.services.template_case_history import require_open
+from app.services.workbench_templates import FrozenTemplate, is_template, template_projection
 from app.services.workbench_topic_workflow import workflow_for
 
 
@@ -26,9 +28,7 @@ class TopicAnswer(BaseModel):
     unavailable_reason: str = Field(default="", max_length=2000)
     batch_id: str | None = None
     round_id: str | None = None
-    retest_frames: list[dict[str, object]] = Field(default_factory=list, max_length=3)
     correction_reason: str | None = Field(default=None, max_length=1000)
-    related_analysis_id: UUID | None = None
 
 
 class PlanExpand(BaseModel):
@@ -53,17 +53,9 @@ class TopicService:
 
     @staticmethod
     def _topic(row):
-        from app.services.workbench_templates import FrozenTemplate, is_template
-        if is_template(row):
-            return FrozenTemplate(row)
-        from app.topics import dkvb_b01, dkvb_b02
-        version = ((row.get("intake_snapshot") or {}).get("topic_binding") or {}).get("version")
-        module = {dkvb_b01.TOPIC_VERSION: dkvb_b01,
-                  dkvb_b02.TOPIC_VERSION: dkvb_b02}.get(version)
-        if module is None:
-            raise DomainError("TOPIC_NOT_BOUND", "病例未绑定可执行的新专题", 404)
-        module.require_bound(row)
-        return module
+        if not is_template(row):
+            raise DomainError("TEMPLATE_REQUIRED", "病例没有模板快照", 404)
+        return FrozenTemplate(row)
 
     @staticmethod
     def _serialize(record, effective):
@@ -75,21 +67,15 @@ class TopicService:
                 "effective": record["id"] not in effective}
 
     def _view(self, conn, row):
-        from app.services.workbench_templates import is_template, template_projection
         module = self._topic(row)
-        case = self.case_service.with_active(conn, row)
+        case = self.case_service.with_progress(conn, row)
         rows = self._rows(conn, row["id"], module.TOPIC_VERSION)
         superseded = {record["supersedes_id"] for record in rows if record["supersedes_id"]}
         topic, _ = module.catalog()
-        if is_template(row):
-            projection = template_projection
-        else:
-            from app.services.workbench_b01_projection import project
-            projection = project
         return jsonable_encoder({"case": case, "topic": topic,
             "plan": row["intake_snapshot"]["topic_plan"],
             "observations": [self._serialize(record, superseded) for record in rows],
-            "view": projection(row, rows, case.get("report_gate"), topic),
+            "view": template_projection(row, rows, topic),
             "mode": "server_saved_" + module.TOPIC_VERSION, "ai_model_connected": False})
 
     def get(self, actor, case_id):
@@ -122,35 +108,15 @@ class TopicService:
                     if len(filtered) > limit else None, "total": len(rows)}
 
     @staticmethod
-    def _effective(rows, question_id, round_id):
-        from app.services.legacy_topic_answer_rules import effective_legacy_observation
-        return effective_legacy_observation(rows, question_id, round_id)
-
-    @staticmethod
     def _validate_answer(topic, plan, rows, body, original=None):
         return validate_answer(topic, plan, rows, body, original,
                                effective=workflow_for(topic).effective)
-
-    @staticmethod
-    def _prerequisites(q, plan, rows, body, topic=None):
-        topic_explicit = topic is not None
-        if topic is None:
-            from app.topics import dkvb_b01
-            topic = dkvb_b01.catalog()[0]
-        return workflow_for(topic).prerequisites(q, plan, rows, body, show_labels=topic_explicit)
-
-    @staticmethod
-    def _repair_round(plan, existing, option_ids, original_id):
-        # Compatibility entry for existing B01/B02 callers.
-        from app.topics import dkvb_b01
-        return workflow_for(dkvb_b01.catalog()[0]).begin_round(plan, existing, option_ids, original_id)
 
     def _write(self, conn, actor, row, module, body, original_id=None, extra_payload=None):
         """Validate one answer and append it as a record; the caller owns locking and revision checks.
 
         Returns (observation_id, new_revision). Shared by single saves and post-repair retests.
         """
-        from app.services.workbench_templates import is_template
         case_id = row["id"]
         topic, _ = module.catalog()
         rows = self._rows(conn, case_id, module.TOPIC_VERSION)
@@ -159,17 +125,7 @@ class TopicService:
         q = next((q for q in topic["questions"] if q["id"] == body.question_id), None)
         if not q:
             raise DomainError("QUESTION_UNKNOWN", "问题不存在", 422)
-        workflow = workflow_for(topic, template_bound=is_template(row))
-        if body.related_analysis_id:
-            if q["id"] != workflow.repair_id:
-                raise DomainError("ANALYSIS_LINK_SCOPE", "仅实际处理可关联病例建议", 422)
-            linked = conn.execute(select(case_analyses.c.id).where(
-                case_analyses.c.id == body.related_analysis_id,
-                case_analyses.c.case_id == case_id,
-                case_analyses.c.owner_id == actor,
-                case_analyses.c.status == "current")).scalar_one_or_none()
-            if linked is None:
-                raise DomainError("ANALYSIS_LINK_INVALID", "关联建议不存在或尚未完成", 422)
+        workflow = workflow_for(topic)
         round_id = workflow.initial_round(q, plan, body)
         existing = workflow.effective(rows, body.question_id, round_id if workflow.round_scoped(q) else None)
         if original_id:
@@ -200,11 +156,9 @@ class TopicService:
                    "topic_content_hash": module.binding()["content_hash"],
                    "question_id": q["id"], "option_ids": body.option_ids,
                    "fields": fields, "note": body.note.strip(),
-                   "retest_frames": workflow.retest_frames(q, body),
                    "unavailable_reason": (body.unavailable_reason.strip() or "原因未提供") if unavailable else "",
                    "batch_id": body.batch_id, "round_id": round_id,
                    "source_refs": q["source_refs"], "source": "USER_OBSERVATION",
-                   "related_analysis_id": str(body.related_analysis_id) if body.related_analysis_id else None,
                    "operation_type": ("user_reselection" if option_changed else "user_record_update") if original_id else "user_selection",
                    "instance_id": f"{q['id']}:{round_id or 'before-repair'}", **(extra_payload or {})}
         conn.execute(observations.insert().values(
@@ -222,12 +176,9 @@ class TopicService:
             module = self._topic(row)
             # idempotency_keys.route_scope is varchar(100); keep exact target
             # identity without using the much longer public URL.
-            from app.services.workbench_templates import is_template
-            scope_version = "tpl1" if is_template(row) else module.TOPIC_VERSION
-            scope = f"{scope_version}:{'correct' if original_id else 'save'}:{case_id}" + (f":{original_id}" if original_id else "")
+            scope = f"tpl1:{'correct' if original_id else 'save'}:{case_id}" + (f":{original_id}" if original_id else "")
             def action():
                 check_revision(row["revision"], body.expected_revision)
-                from app.services.template_case_history import require_open
                 require_open(row)
                 identifier, revision = self._write(conn, actor, row, module, body, original_id)
                 fresh = conn.execute(select(cases).where(cases.c.id == case_id)).mappings().one()
@@ -242,7 +193,6 @@ class TopicService:
             module = self._topic(row)
             def action():
                 check_revision(row["revision"], body.expected_revision)
-                from app.services.template_case_history import require_open
                 require_open(row)
                 topic, _ = module.catalog()
                 if body.area_id not in {a["id"] for a in topic["areas"]}:

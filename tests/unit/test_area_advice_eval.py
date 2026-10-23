@@ -36,7 +36,7 @@ def test_every_saved_record_is_a_valid_answer(case_id):
         value = record["payload"]
         body = SimpleNamespace(question_id=value["question_id"], option_ids=value["option_ids"],
             fields=value["fields"], note=value["note"], unavailable_reason=value["unavailable_reason"],
-            retest_frames=[], batch_id=value.get("batch_id"), topic_version=TOPIC["version"])
+            batch_id=value.get("batch_id"), topic_version=TOPIC["version"])
         validate_answer(TOPIC, view["plan"], [], body, effective=lambda *_: None)
 
 

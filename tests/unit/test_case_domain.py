@@ -4,6 +4,7 @@ from app.domain.schemas import CreateCase
 from pydantic import ValidationError
 
 VALID = {
+    "workbench_flow": "template-match-v1",
     "vehicle": {"model": "Synthetic car", "engine_family": "family", "engine_code": "CODE"},
     "fault_description": "Synthetic fault",
 }
