@@ -9,7 +9,6 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16%20%2B%20pgvector-4169E1?logo=postgresql&logoColor=white)
 ![DeepSeek](https://img.shields.io/badge/LLM-DeepSeek-4D6BFE)
 
-<!-- 📷 待补截图：AI 综合分析结果（当前判断、行动卡片、暂缓的步骤）。建议文件名 docs/images/ai-analysis.png（覆盖旧图）。旧图还有已删除的"未发送给 AI"提示和"整体复检"栏 -->
 <p align="center">
   <img src="docs/images/ai-analysis.png" alt="AI 分析建议：当前判断、操作提醒与带执行条件的行动卡片" width="860">
 </p>
@@ -81,19 +80,16 @@ flowchart LR
   <tr>
     <td width="50%" valign="top">
       <b>⑤ 维修处理与独立复检</b>：第 1 步记录处理，第 2 步复检并重新回答相关题目<br><br>
-      <!-- 📷 待补截图：维修复检两步页面（第 1 步处理 → 第 2 步复检：工况、项目、结果）。建议文件名 docs/images/repair-retest.png（覆盖旧图）。旧图是改成两步之前的布局 -->
       <img src="docs/images/repair-retest.png" alt="维修处理与独立复检">
     </td>
     <td width="50%" valign="top">
       <b>⑥ 历史病例</b>：显示检查进度、处理轮次与最近复检<br><br>
-      <!-- 📷 待补截图：历史病例列表。建议文件名 docs/images/history.png（覆盖旧图）。旧图里有已删除的旧病例和“历史参考”分组 -->
       <img src="docs/images/history.png" alt="历史病例列表">
     </td>
   </tr>
   <tr>
     <td width="50%" valign="top">
       <b>⑦ 维修资料</b>：按适用车型上传 Markdown，后台切块、算向量，可查看版本和切块<br><br>
-      <!-- 📷 待补截图（新增）：维修资料页，最好展开一份资料，能看到版本和切块。建议文件名 docs/images/references.png -->
       <img src="docs/images/references.png" alt="维修资料：按车型管理资料、版本与切块">
     </td>
     <td width="50%" valign="top">
