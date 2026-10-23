@@ -1,6 +1,6 @@
 """Start, stop or check the local workbench: API (8215), web (5215) and worker, as owned processes.
 
-    uv run python -B -m scripts.wp15_workbench start | stop | status
+    uv run python -B -m scripts.workbench start | stop | status
 """
 
 import argparse
@@ -17,6 +17,7 @@ from urllib.parse import quote
 from uuid import UUID
 
 ROOT = Path(__file__).resolve().parents[1]
+# Local paths keep their original names so existing machines keep their database and settings.
 RUNTIME = ROOT / ".local-data" / "wp15-workbench"
 STATE = RUNTIME / "runtime.json"
 PYTHON = ROOT / ".venv" / "Scripts" / "python.exe"

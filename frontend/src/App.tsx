@@ -5,9 +5,9 @@ import { AppShell } from './components/AppShell';
 import { ReferencesPage } from './pages/ReferencesPage';
 import { HistoryPage } from './pages/HistoryPage';
 import { WorkbenchPage } from './pages/WorkbenchPage';
-import { SessionBoundary } from './session';
-import '../tokens.css';
-import '../formal.css';
+import { SessionBoundary } from './lib/session';
+import './styles/tokens.css';
+import './styles/app.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,7 +16,7 @@ const queryClient = new QueryClient({
   },
 });
 
-export function FormalApp() {
+export function App() {
   useEffect(() => {
     const previous = document.title;
     document.title = '修途 · 正式工作台';

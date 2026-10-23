@@ -18,7 +18,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / "backend")]
 
 from sqlalchemy import create_engine, select  # noqa: E402
 
-from scripts.wp15_workbench import STATE, environment  # noqa: E402
+from scripts.workbench import STATE, environment  # noqa: E402
 
 
 def main():

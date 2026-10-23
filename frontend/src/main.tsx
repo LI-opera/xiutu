@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import { FormalApp } from './formal/FormalApp';
-import './style.css';
+import { App } from './App';
+import './styles/global.css';
 
-createRoot(document.getElementById('root')!).render(<FormalApp />);
+createRoot(document.getElementById('root')!).render(<App />);

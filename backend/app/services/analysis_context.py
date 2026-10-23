@@ -12,9 +12,9 @@ from pathlib import Path
 
 from app.services.retrieval_reading import METHOD_VERSION, queries_for, select_sections
 
-TOPICS = Path(__file__).resolve().parents[1] / "topics"
-ROLES_CONFIG = TOPICS / "record_roles_v1.json"
-READING_CONFIG = TOPICS / "reading_documents_v1.json"
+CONFIG_DIR = Path(__file__).resolve().parents[1] / "reading_config"
+ROLES_CONFIG = CONFIG_DIR / "record_roles_v1.json"
+READING_CONFIG = CONFIG_DIR / "reading_documents_v1.json"
 ROLES = {"observation", "inspection_status", "human_judgment", "disposition",
          "completed_action", "retest", "unclassified"}
 TOP_K = 3

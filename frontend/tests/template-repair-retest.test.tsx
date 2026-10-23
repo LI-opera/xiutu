@@ -1,8 +1,8 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { TemplateRepairRetest } from '../src/formal/design/workbench-v2/TemplateRepairRetest';
-import { apiClient } from '../src/formal/api-client';
+import { TemplateRepairRetest } from '../src/workbench/TemplateRepairRetest';
+import { apiClient } from '../src/lib/api-client';
 afterEach(cleanup);
 const props = { caseId: 'case', areaId: 'alpha', revision: 7, onArea: vi.fn(), onChanged: vi.fn(),
   cards: [{ id: 'a', title: '部件甲' }, { id: 'b', title: '部件乙' }],

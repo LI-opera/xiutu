@@ -12,7 +12,7 @@ Settings = importlib.import_module("app.config").Settings
 create_app = importlib.import_module("app.main").create_app
 
 
-OUTPUT = ROOT / "docs" / "api" / "openapi.wp14.json"
+OUTPUT = ROOT / "docs" / "api" / "openapi.json"
 
 
 def render() -> str:

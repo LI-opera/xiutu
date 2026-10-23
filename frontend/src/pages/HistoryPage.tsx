@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { apiClient } from '../api-client';
+import { apiClient } from '../lib/api-client';
 import { ColumnHeader } from '../components/ColumnHeader';
 import { EmptyState, ErrorState, LoadingState, StatusBadge } from '../components/States';
-import type { CaseList } from '../types';
+import type { CaseList } from '../lib/types';
 
 const groups = [
   { key: 'continue', title: '可继续' }, { key: 'waiting', title: '待复检或待补充' },

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ApiError, apiClient, errorText } from '../src/formal/api-client';
+import { ApiError, apiClient, errorText } from '../src/lib/api-client';
 
 afterEach(() => apiClient.clearSession());
 

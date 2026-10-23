@@ -34,7 +34,7 @@ flowchart LR
 | `repositories/` | 病例读写 | `cases.py` |
 | `infrastructure/` | 表定义、事务、模型网关、向量模型、任务队列、用量账本 | `orm.py`、`uow.py`、`model_gateway.py`、`bge_gateway.py`、`job_store.py`、`model_budget.py` |
 | `retrieval/` | 章节检索算法（纯函数，不碰数据库） | `section_search.py` |
-| `topics/` | 版本化配置：记录角色、每份资料的必带章节初始值 | `record_roles_v1.json`、`reading_documents_v1.json` |
+| `reading_config/` | 版本化配置：记录角色、每份资料的必带章节初始值 | `record_roles_v1.json`、`reading_documents_v1.json` |
 
 | 服务 | 负责 |
 | --- | --- |
@@ -73,7 +73,7 @@ flowchart LR
 | `/history` | 历史病例：按进度分组，可筛选 | `HistoryPage.tsx` |
 | `/documents` | 维修资料：上传、新版本、查看历史版本和切块 | `ReferencesPage.tsx` |
 
-接口类型由后端 OpenAPI 生成（`docs/api/openapi.wp14.json` → `frontend/src/generated/api-schema.ts`），统一的请求工具 `api-client.ts` 负责 CSRF 头和幂等键。
+接口类型由后端 OpenAPI 生成（`docs/api/openapi.json` → `frontend/src/generated/api-schema.ts`），统一的请求工具 `api-client.ts` 负责 CSRF 头和幂等键。
 
 ## 5. 主要数据流
 

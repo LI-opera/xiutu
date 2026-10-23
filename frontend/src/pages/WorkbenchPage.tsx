@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
-import { apiClient } from '../api-client';
+import { apiClient } from '../lib/api-client';
 import { EmptyState, ErrorState, LoadingState } from '../components/States';
-import type { CaseSnapshot } from '../types';
-import { TemplateWorkbenchPage } from '../design/workbench-v2/TemplateWorkbenchPage';
-import { MatchedVehicleIntake } from '../design/workbench-v2/MatchedVehicleIntake';
+import type { CaseSnapshot } from '../lib/types';
+import { TemplateWorkbenchPage } from '../workbench/TemplateWorkbenchPage';
+import { MatchedVehicleIntake } from '../workbench/MatchedVehicleIntake';
 
 function CaseRoute({ caseId }: { caseId: string }) {
   const snapshot = useQuery({ queryKey: ['case', caseId], queryFn: ({ signal }) => apiClient.request<CaseSnapshot>(`/cases/${caseId}`, { signal }) });

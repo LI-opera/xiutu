@@ -1,4 +1,4 @@
-import { ApiError, errorText } from '../api-client';
+import { ApiError, errorText } from '../lib/api-client';
 
 export function LoadingState({ label = '正在读取真实状态' }: { label?: string }) {
   return <div className="state loading" role="status"><span aria-hidden="true" />{label}…</div>;

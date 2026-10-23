@@ -110,7 +110,7 @@ class AreaRankingService:
             return False
         if os.environ.get("XIUTU_AREA_RANKING_ALLOWED_CASE_ID") == str(case_id):
             return True
-        # Standing consent applies only to the isolated, loopback WP15 workspace.
+        # Standing consent applies only to the isolated, loopback local workbench.
         # The POST endpoint still requires an authenticated, CSRF-protected click;
         # the unique case row limits each case to one provider attempt.
         return (os.environ.get("XIUTU_AREA_RANKING_LOCAL_TESTING") == "1"

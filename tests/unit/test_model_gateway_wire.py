@@ -9,7 +9,7 @@ from decimal import Decimal
 import pytest
 from app.infrastructure.model_gateway import ModelError
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
-from test_wp09_contracts import rig
+from test_model_gateway_contracts import rig
 
 SECRET = "13800138000 audit-person@example.test"
 

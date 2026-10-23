@@ -20,7 +20,7 @@ setup 默认仅校验仓库内 v2 模板、资料列表（`resources/knowledge/t
 
 dev 从项目 .env 加载配置，要求 APP_ORIGIN 是本机 HTTP，端口空闲、数据库当前 schema 就绪，再启动 API、Vite 和默认资料 worker。Ctrl+C 只终止本次创建的子进程。默认网页 5215、API 8215；支持 --web-port/--api-port，APP_ORIGIN 由本次网页端口明确指定。
 
-不要在同一端口已有服务时另开 dev。原机器 WP15 实例继续用 wp15_workbench.py，它依赖未上传的本机 runtime.json，并非新克隆的通用初始化入口。
+不要在同一端口已有服务时另开 dev。`scripts/workbench.py start/stop/status` 以后台方式运行同样三个进程，它依赖本机已有的 `.local-data/wp15-workbench/runtime.json`（不在仓库里），不是新克隆的初始化入口。
 
 ## 可选真实 AI
 

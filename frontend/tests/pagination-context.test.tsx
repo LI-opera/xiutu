@@ -4,8 +4,8 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
-import { apiClient } from '../src/formal/api-client';
-import { HistoryPage } from '../src/formal/pages/HistoryPage';
+import { apiClient } from '../src/lib/api-client';
+import { HistoryPage } from '../src/pages/HistoryPage';
 
 const A = '11111111-1111-4111-8111-111111111111';
 const B = '22222222-2222-4222-8222-222222222222';

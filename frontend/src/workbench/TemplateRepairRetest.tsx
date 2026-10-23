@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { apiClient, errorText } from '../../api-client';
+import { apiClient, errorText } from '../lib/api-client';
 
 type Round = { id: string; area_id: string; repair_action: string; repair_note: string;
   pre_repair_revision: number; retest_condition: string | null; retest_outcome: string | null;

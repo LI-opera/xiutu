@@ -1,6 +1,6 @@
 """Carry reviewed record roles to a new template version, or stop for manual review.
 
-Record roles (backend/app/topics/record_roles_v1.json) say what kind of information a saved
+Record roles (backend/app/reading_config/record_roles_v1.json) say what kind of information a saved
 record is: observation, inspection status, human judgment, disposition, ... They are bound
 to exact question definitions by hash, so a new template version has no roles until it gets
 its own entries. This script derives them from the previously reviewed version and never

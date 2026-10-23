@@ -2,10 +2,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { apiClient } from '../src/formal/api-client';
-import { ReferencesPage } from '../src/formal/pages/ReferencesPage';
-import { groupReferences, referenceIdFrom, sectionHeadings, suggestions, vehicleText } from '../src/formal/references';
-import type { ReferenceItem } from '../src/formal/types';
+import { apiClient } from '../src/lib/api-client';
+import { ReferencesPage } from '../src/pages/ReferencesPage';
+import { groupReferences, referenceIdFrom, sectionHeadings, suggestions, vehicleText } from '../src/lib/references';
+import type { ReferenceItem } from '../src/lib/types';
 
 const vehicle = { brand: '大众', model: '探岳', year: 2019, engine_code: 'DKVB' };
 const item = (version: string, status: string, extra: Partial<ReferenceItem> = {}): ReferenceItem => ({

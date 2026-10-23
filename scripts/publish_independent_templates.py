@@ -37,7 +37,7 @@ def main():
     from app.infrastructure.db_target import validate_target
     from sqlalchemy import create_engine
 
-    from scripts.wp15_workbench import STATE, environment
+    from scripts.workbench import STATE, environment
 
     state = json.loads(STATE.read_text(encoding="utf-8"))
     env = environment(state, ranking_local_testing=False)

@@ -71,7 +71,7 @@ jobs:
         working-directory: frontend
         run: |
           npm ci
-          npx openapi-typescript ../docs/api/openapi.wp14.json -o src/generated/api-schema.ts --check
+          npx openapi-typescript ../docs/api/openapi.json -o src/generated/api-schema.ts --check
 
   frontend:
     name: 前端类型检查与测试
@@ -97,4 +97,4 @@ jobs:
 
       - name: 前端测试
         if: ${{ !cancelled() }}
-        run: npm run test:wp14
+        run: npm test
