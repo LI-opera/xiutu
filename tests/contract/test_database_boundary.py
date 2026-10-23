@@ -116,3 +116,40 @@ def test_real_entrypoints_reject_before_engine(monkeypatch, entry, query):
     with pytest.raises(ValueError):
         runpy.run_path(str(ROOT / entry), run_name="__main__")
     engine.assert_not_called()
+
+
+CONTAINER = "postgresql://xiutu:synthetic@postgres:5432/xiutu_dev"
+
+
+def test_container_service_needs_its_explicit_name(monkeypatch):
+    monkeypatch.delenv("CONTAINER_DB_HOST", raising=False)
+    with pytest.raises(ValueError):
+        validate_target(CONTAINER, "migration")
+    monkeypatch.setenv("CONTAINER_DB_HOST", "postgres")
+    target = validate_target(CONTAINER, "migration")
+    kwargs = target.connect_kwargs()
+    assert (kwargs["host"], kwargs["port"], kwargs["dbname"]) == ("postgres", 5432, "xiutu_dev")
+    assert "hostaddr" not in kwargs
+    assert target.sqlalchemy_url().host == "postgres"
+    # The loopback target is unchanged while the container name is set.
+    assert validate_target(GOOD, "migration").connect_kwargs()["hostaddr"] == "127.0.0.1"
+
+
+@pytest.mark.parametrize("url", [
+    "postgresql://xiutu:synthetic@postgres:5433/xiutu_dev",            # wrong port for the service
+    "postgresql://xiutu:synthetic@db:5432/xiutu_dev",                  # a different host
+    "postgresql://xiutu:synthetic@192.0.2.10:5432/xiutu_dev",          # an address
+    "postgresql://xiutu:synthetic@postgres:5432/other",                # not a xiutu database
+    "postgresql://xiutu:synthetic@postgres:5432/xiutu_dev?host=192.0.2.10",
+])
+def test_container_name_allows_only_that_service(monkeypatch, url):
+    monkeypatch.setenv("CONTAINER_DB_HOST", "postgres")
+    with pytest.raises(ValueError):
+        validate_target(url, "migration")
+
+
+@pytest.mark.parametrize("name", ["192.0.2.10", "Postgres", "-x", "a" * 64, "postgres.example.com"])
+def test_container_name_must_be_a_plain_service_name(monkeypatch, name):
+    monkeypatch.setenv("CONTAINER_DB_HOST", name)
+    with pytest.raises(ValueError):
+        validate_target(f"postgresql://xiutu:synthetic@{name}:5432/xiutu_dev", "migration")

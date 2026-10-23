@@ -1,7 +1,16 @@
+# Only what the two Dockerfiles copy; never local data, secrets or installed packages.
 **
+!pyproject.toml
+!uv.lock
+!alembic.ini
 !backend/
-!backend/**
-!requirements.txt
-!deploy/
-!deploy/manual-mcp.Dockerfile
+!migrations/
+!resources/
+!scripts/
+!deploy/docker/
+!frontend/
+!.node-version
 **/__pycache__/
+**/.env
+frontend/node_modules/
+frontend/dist/

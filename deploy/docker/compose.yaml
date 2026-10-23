@@ -1,0 +1,92 @@
+# The whole app in Docker: database, API, worker and web page.
+#   1. Copy .env.example to .env in this folder and fill it in.
+#   2. docker compose -f deploy/docker/compose.yaml up --build
+#   3. Open http://localhost:8080 and enter XIUTU_ACCESS_TOKEN.
+# Separate from the local setup in deploy/compose.yaml: own project name and own volumes.
+name: xiutu-docker
+
+x-backend: &backend
+  build:
+    context: ../..
+    dockerfile: deploy/docker/backend.Dockerfile
+  image: xiutu-backend
+  env_file: .env
+  environment:
+    DATABASE_URL: postgresql://xiutu:${XIUTU_DB_PASSWORD:?Set XIUTU_DB_PASSWORD in deploy/docker/.env}@postgres:5432/xiutu_dev
+    CONTAINER_DB_HOST: postgres
+    APP_ORIGIN: http://localhost:${XIUTU_WEB_PORT:-8080}
+    OPERATOR_TOKEN: ${XIUTU_ACCESS_TOKEN:?Set XIUTU_ACCESS_TOKEN in deploy/docker/.env}
+    LOCAL_DEV_AUTO_IDENTITY: "false"
+    DATA_PATH: /app/.local-data
+    EMBEDDING_PROVIDER: local_bge_m3
+    EMBEDDING_MODEL: BAAI/bge-m3
+    EMBEDDING_REVISION: 5617a9f61b028005a4858fdac845db406aefb181
+    EMBEDDING_DIMENSION: "1024"
+    EMBEDDING_LOCAL_FILES_ONLY: "true"
+  volumes:
+    - appdata:/app/.local-data
+    # Optional local BGE-M3 model folder (read-only); without it the app still runs.
+    - ${XIUTU_BGE_M3_DIR:-./no-model}:/models/bge-m3:ro
+  restart: unless-stopped
+
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.2-pg16-bookworm@sha256:00ba258a66dac104fd5171074a0084462a64a1369d8513f3d0a634e2f24d15bc
+    environment:
+      POSTGRES_USER: xiutu
+      POSTGRES_PASSWORD: ${XIUTU_DB_PASSWORD:?Set XIUTU_DB_PASSWORD in deploy/docker/.env}
+      POSTGRES_DB: xiutu_dev
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U xiutu -d xiutu_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  # One-off before the API and worker: migrate, install templates and manuals, compute vectors.
+  # The first start with a model takes a few minutes; later starts only check and exit.
+  init:
+    <<: *backend
+    command: ["init"]
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    <<: *backend
+    command: ["api"]
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v2/health/ready', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+
+  worker:
+    <<: *backend
+    command: ["worker"]
+    depends_on:
+      init:
+        condition: service_completed_successfully
+
+  web:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/web.Dockerfile
+    image: xiutu-web
+    ports:
+      - "127.0.0.1:${XIUTU_WEB_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  appdata:
