@@ -69,7 +69,7 @@ def test_independent_operation_can_use_case_intake_safety_without_legacy_questio
     operation["execution_conditions"] = {
         "bypass_options": ["unable"], "requirements": [
             {"intake_key": "safety_gate", "allowed": ["none", "caution"], "label": "接诊安全条件允许操作"}]}
-    workflow = ObservationWorkflow(content, template_bound=True)
+    workflow = ObservationWorkflow(content)
     stop = build_plan(content, {"safety_gate": "stop_now"})
     allowed = build_plan(content, {"safety_gate": "none"})
     body = SimpleNamespace(option_ids=["done"])
