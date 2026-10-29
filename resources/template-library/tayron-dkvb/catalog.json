@@ -1,0 +1,371 @@
+{
+  "schema_version": "template-catalog/1",
+  "library_id": "tayron-dkvb",
+  "description": "探岳 DKVB 增压相关排查模板的积木库：共用的阶段、图片和来源。",
+  "stages": [
+    {
+      "id": "S0",
+      "phase": "intake"
+    },
+    {
+      "id": "S1",
+      "phase": "diagnostic_observation"
+    },
+    {
+      "id": "S2",
+      "phase": "diagnostic_observation"
+    },
+    {
+      "id": "S3",
+      "phase": "diagnostic_observation"
+    },
+    {
+      "id": "S4",
+      "phase": "diagnostic_observation"
+    },
+    {
+      "id": "S5",
+      "phase": "diagnostic_observation"
+    },
+    {
+      "id": "S6",
+      "phase": "actual_repair_and_post_repair_retest"
+    }
+  ],
+  "calculation_rules_version": "evidence-v1",
+  "observation_rules_version": "observation-v1",
+  "assets": [
+    {
+      "id": "M02",
+      "title": "增压空气系统装配一览",
+      "file": "/workbench-v2-assets/manual-pages/02-增压空气系统装配一览.png",
+      "source": "FACT_LOCAL_MANUAL",
+      "description": "查看增压空气路径",
+      "source_ref": "SRC-CHARGE-AIR",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/manual-pages/02-增压空气系统装配一览.png"
+    },
+    {
+      "id": "M03",
+      "title": "增压软管接头卡箍与标记",
+      "file": "/workbench-v2-assets/manual-pages/03-增压软管接头卡箍与标记.png",
+      "source": "FACT_LOCAL_MANUAL",
+      "description": "查看接头座合与标记",
+      "source_ref": "SRC-CHARGE-AIR",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/manual-pages/03-增压软管接头卡箍与标记.png"
+    },
+    {
+      "id": "M04",
+      "title": "G31增压压力传感器位置",
+      "file": "/workbench-v2-assets/manual-pages/04-G31增压压力传感器位置.png",
+      "source": "FACT_LOCAL_MANUAL",
+      "description": "查看G31安装位置",
+      "source_ref": "SRC-CHARGE-AIR",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/manual-pages/04-G31增压压力传感器位置.png"
+    },
+    {
+      "id": "M05",
+      "title": "增压系统检漏步骤（一）",
+      "file": "/workbench-v2-assets/manual-pages/05-增压空气系统检漏步骤-1.png",
+      "source": "FACT_LOCAL_MANUAL",
+      "description": "检漏准备与连接",
+      "source_ref": "SRC-CHARGE-AIR",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/manual-pages/05-增压空气系统检漏步骤-1.png"
+    },
+    {
+      "id": "M06",
+      "title": "增压系统检漏步骤（二）",
+      "file": "/workbench-v2-assets/manual-pages/06-增压空气系统检漏步骤-2.png",
+      "source": "FACT_LOCAL_MANUAL",
+      "description": "0.5 bar安全边界",
+      "source_ref": "SRC-CHARGE-AIR",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/manual-pages/06-增压空气系统检漏步骤-2.png"
+    },
+    {
+      "id": "M07",
+      "title": "涡轮增压器装配一览",
+      "file": "/workbench-v2-assets/manual-pages/07-涡轮增压器装配一览.png",
+      "source": "FACT_LOCAL_MANUAL",
+      "description": "涡轮、V465和N249位置",
+      "source_ref": "SRC-TURBO",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/manual-pages/07-涡轮增压器装配一览.png"
+    },
+    {
+      "id": "M08",
+      "title": "空气滤清器装配一览",
+      "file": "/workbench-v2-assets/manual-pages/08-空气滤清器装配一览.png",
+      "source": "FACT_LOCAL_MANUAL",
+      "description": "空滤与进气导管",
+      "source_ref": "SRC-AIRFILTER",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/manual-pages/08-空气滤清器装配一览.png"
+    },
+    {
+      "id": "M09",
+      "title": "高压燃油泵装配一览",
+      "file": "/workbench-v2-assets/manual-pages/09-高压燃油泵装配一览.png",
+      "source": "FACT_LOCAL_MANUAL",
+      "description": "高压燃油系统",
+      "source_ref": "SRC-FUEL",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/manual-pages/09-高压燃油泵装配一览.png"
+    },
+    {
+      "id": "M10",
+      "title": "点火装置装配一览",
+      "file": "/workbench-v2-assets/manual-pages/10-点火装置装配一览.png",
+      "source": "FACT_LOCAL_MANUAL",
+      "description": "点火线圈与火花塞",
+      "source_ref": "SRC-IGNITION",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/manual-pages/10-点火装置装配一览.png"
+    },
+    {
+      "id": "M11",
+      "title": "尾气催化净化器装配一览",
+      "file": "/workbench-v2-assets/manual-pages/11-尾气催化净化器装配一览.png",
+      "source": "FACT_LOCAL_MANUAL",
+      "description": "前段排气与催化器",
+      "source_ref": "SRC-EXHAUST",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/manual-pages/11-尾气催化净化器装配一览.png"
+    },
+    {
+      "id": "E01",
+      "title": "G31增压压力传感器线路",
+      "file": "/workbench-v2-assets/wiring-pages/01-G31增压压力传感器线路.png",
+      "source": "FACT_LOCAL_MANUAL",
+      "description": "G31线路",
+      "source_ref": "SRC-WIRING-DKVB-70",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/wiring-pages/01-G31增压压力传感器线路.png"
+    },
+    {
+      "id": "E02",
+      "title": "G71/G42进气歧管传感器线路",
+      "file": "/workbench-v2-assets/wiring-pages/02-G71-G42进气歧管传感器线路.png",
+      "source": "FACT_LOCAL_MANUAL",
+      "description": "G71/G42线路",
+      "source_ref": "SRC-WIRING-DKVB-70",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/wiring-pages/02-G71-G42进气歧管传感器线路.png"
+    },
+    {
+      "id": "E03",
+      "title": "V465/N249控制线路",
+      "file": "/workbench-v2-assets/wiring-pages/03-V465-N249增压控制线路.png",
+      "source": "FACT_LOCAL_MANUAL",
+      "description": "V465/N249线路",
+      "source_ref": "SRC-WIRING-DKVB-70",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/wiring-pages/03-V465-N249增压控制线路.png"
+    },
+    {
+      "id": "E04",
+      "title": "G247/G410燃油压力传感器线路",
+      "file": "/workbench-v2-assets/wiring-pages/04-G247-G410燃油压力传感器线路.png",
+      "source": "FACT_LOCAL_MANUAL",
+      "description": "燃油压力线路",
+      "source_ref": "SRC-WIRING-DKVB-70",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/wiring-pages/04-G247-G410燃油压力传感器线路.png"
+    },
+    {
+      "id": "E05",
+      "title": "点火线圈与火花塞线路",
+      "file": "/workbench-v2-assets/wiring-pages/05-点火线圈与火花塞线路.png",
+      "source": "FACT_LOCAL_MANUAL",
+      "description": "点火线路",
+      "source_ref": "SRC-WIRING-DKVB-70",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/wiring-pages/05-点火线圈与火花塞线路.png"
+    },
+    {
+      "id": "D01",
+      "title": "DKVB增压系统关系图",
+      "file": "/workbench-v2-assets/diagrams/01-DKVB增压系统关系图.svg",
+      "source": "EDITORIAL_TEMPLATE",
+      "description": "控制与传感器关系",
+      "source_ref": "EDITORIAL_TEMPLATE",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/diagrams/01-DKVB增压系统关系图.svg"
+    },
+    {
+      "id": "D02",
+      "title": "证据链分级图",
+      "file": "/workbench-v2-assets/diagrams/02-证据链分级图.svg",
+      "source": "EDITORIAL_TEMPLATE",
+      "description": "事实、解释与下一步",
+      "source_ref": "EDITORIAL_TEMPLATE",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/diagrams/02-证据链分级图.svg"
+    },
+    {
+      "id": "D03",
+      "title": "P0299诊断路由图",
+      "file": "/workbench-v2-assets/diagrams/03-P0299诊断路由图.svg",
+      "source": "EDITORIAL_TEMPLATE",
+      "description": "五区域专题路由",
+      "source_ref": "EDITORIAL_TEMPLATE",
+      "package_file": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/assets/diagrams/03-P0299诊断路由图.svg"
+    }
+  ],
+  "sources": [
+    {
+      "id": "SRC-ID-DKVB",
+      "kind": "local_manual",
+      "citation": "`维修手册\\2.0升TSI发动机DKVB,DPLA(低功率)\\00 技术数据\\标识.pdf`",
+      "pages_or_use": "1",
+      "scope_or_limit": "DKVB适用TAYRON 2019、排量、功率、扭矩、基本结构",
+      "original_file": "E:\\BaiduNetdiskDownload\\M164\\06大众车系\\大众车系\\28探岳\\2019一汽大众探岳（探岳GTE）\\维修手册\\2.0升TSI发动机DKVB,DPLA(低功率)\\00 技术数据\\标识.pdf",
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": false
+    },
+    {
+      "id": "SRC-CHARGE-AIR",
+      "kind": "local_manual",
+      "citation": "`维修手册\\2.0升TSI发动机DKVB,DPLA(低功率)\\21 废气涡轮增压器\\增压空气系统.pdf`",
+      "pages_or_use": "1-6",
+      "scope_or_limit": "管路装配、接头标记、G31位置、检漏工具与0.5 bar上限",
+      "original_file": "E:\\BaiduNetdiskDownload\\M164\\06大众车系\\大众车系\\28探岳\\2019一汽大众探岳（探岳GTE）\\维修手册\\2.0升TSI发动机DKVB,DPLA(低功率)\\21 废气涡轮增压器\\增压空气系统.pdf",
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": false
+    },
+    {
+      "id": "SRC-TURBO",
+      "kind": "local_manual",
+      "citation": "`维修手册\\2.0升TSI发动机DKVB,DPLA(低功率)\\21 废气涡轮增压器\\涡轮增压器.pdf`",
+      "pages_or_use": "1-9",
+      "scope_or_limit": "涡轮总成、N249、V465、油液/冷却连接及拆装边界",
+      "original_file": "E:\\BaiduNetdiskDownload\\M164\\06大众车系\\大众车系\\28探岳\\2019一汽大众探岳（探岳GTE）\\维修手册\\2.0升TSI发动机DKVB,DPLA(低功率)\\21 废气涡轮增压器\\涡轮增压器.pdf",
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": false
+    },
+    {
+      "id": "SRC-AIRFILTER",
+      "kind": "local_manual",
+      "citation": "`维修手册\\2.0升TSI发动机DKVB,DPLA(低功率)\\24 燃油准备\\空气滤清器.pdf`",
+      "pages_or_use": "1",
+      "scope_or_limit": "空滤壳体、G70、导管和卡箍结构",
+      "original_file": "E:\\BaiduNetdiskDownload\\M164\\06大众车系\\大众车系\\28探岳\\2019一汽大众探岳（探岳GTE）\\维修手册\\2.0升TSI发动机DKVB,DPLA(低功率)\\24 燃油准备\\空气滤清器.pdf",
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": false
+    },
+    {
+      "id": "SRC-FUEL",
+      "kind": "local_manual",
+      "citation": "`维修手册\\2.0升TSI发动机DKVB,DPLA(低功率)\\24 燃油准备\\高压油泵.pdf`",
+      "pages_or_use": "1",
+      "scope_or_limit": "高压泵及燃油连接结构和安全警告",
+      "original_file": "E:\\BaiduNetdiskDownload\\M164\\06大众车系\\大众车系\\28探岳\\2019一汽大众探岳（探岳GTE）\\维修手册\\2.0升TSI发动机DKVB,DPLA(低功率)\\24 燃油准备\\高压油泵.pdf",
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": false
+    },
+    {
+      "id": "SRC-IGNITION",
+      "kind": "local_manual",
+      "citation": "`维修手册\\2.0升TSI发动机DKVB,DPLA(低功率)\\28 点火装置\\点火装置.pdf`",
+      "pages_or_use": "1",
+      "scope_or_limit": "点火线圈、火花塞和相关传感器装配",
+      "original_file": "E:\\BaiduNetdiskDownload\\M164\\06大众车系\\大众车系\\28探岳\\2019一汽大众探岳（探岳GTE）\\维修手册\\2.0升TSI发动机DKVB,DPLA(低功率)\\28 点火装置\\点火装置.pdf",
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": false
+    },
+    {
+      "id": "SRC-EXHAUST",
+      "kind": "local_manual",
+      "citation": "`维修手册\\2.0升TSI发动机DKVB,DPLA(低功率)\\26 排气装置\\尾气催化净化器装置.pdf`",
+      "pages_or_use": "1",
+      "scope_or_limit": "前段排气、催化器、涡轮连接结构",
+      "original_file": "E:\\BaiduNetdiskDownload\\M164\\06大众车系\\大众车系\\28探岳\\2019一汽大众探岳（探岳GTE）\\维修手册\\2.0升TSI发动机DKVB,DPLA(低功率)\\26 排气装置\\尾气催化净化器装置.pdf",
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": false
+    },
+    {
+      "id": "SRC-WIRING-DKVB-70",
+      "kind": "local_manual",
+      "citation": "`电路图\\电路图\\2.0升汽油发动机DKVB-2019.pdf`",
+      "pages_or_use": "10,12,15,16,18",
+      "scope_or_limit": "G31、G71/G42、燃油压力、V465/N249、点火线路",
+      "original_file": "E:\\BaiduNetdiskDownload\\M164\\06大众车系\\大众车系\\28探岳\\2019一汽大众探岳（探岳GTE）\\电路图\\电路图\\2.0升汽油发动机DKVB-2019.pdf",
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": false
+    },
+    {
+      "id": "WEB-SSP-359",
+      "kind": "generic_web_register_only",
+      "citation": "https://www.volkspage.net/technik/ssp/ssp/SSP_359.pdf",
+      "pages_or_use": "理解G31信号用于增压控制、进气温度用于修正的通用原理",
+      "scope_or_limit": "资料针对较早的1.4 TSI，不证明DKVB位置、针脚或规格",
+      "original_file": null,
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": false
+    },
+    {
+      "id": "WEB-P0299-ROSS",
+      "kind": "generic_web_register_only",
+      "citation": "https://wiki.ross-tech.com/wiki/index.php/16683/P0299/000665",
+      "pages_or_use": "补充P0299常见症状与检查方向：管路泄漏、增压控制、涡轮、循环空气阀、排气受阻",
+      "scope_or_limit": "通用VAG售后诊断参考，非DKVB厂家故障树",
+      "original_file": null,
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": false
+    },
+    {
+      "id": "WEB-P0236-ROSS",
+      "kind": "generic_web_register_only",
+      "citation": "https://wiki.ross-tech.com/wiki/index.php/16620/P0236/000566",
+      "pages_or_use": "补充G31信号不可信时的线路、连接、管路与执行器检查方向",
+      "scope_or_limit": "页面给出的其他市场车型阈值不得套用DKVB",
+      "original_file": null,
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": false
+    },
+    {
+      "id": "WEB-P2261-ROSS",
+      "kind": "generic_web_register_only",
+      "citation": "https://wiki.ross-tech.com/wiki/index.php/18693/P2261/008801",
+      "pages_or_use": "补充N249机械/线路方向",
+      "scope_or_limit": "非DKVB专用",
+      "original_file": null,
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": false
+    },
+    {
+      "id": "WEB-MISFIRE-ROSS",
+      "kind": "generic_web_register_only",
+      "citation": "https://wiki.ross-tech.com/wiki/index.php/Misfire_Diagnosis",
+      "pages_or_use": "补充失火、点火、喷油、进气泄漏等交叉方向",
+      "scope_or_limit": "通用汽油机诊断参考",
+      "original_file": null,
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": false
+    },
+    {
+      "id": "WEB-P0087-ROSS",
+      "kind": "generic_web_register_only",
+      "citation": "https://wiki.ross-tech.com/wiki/index.php/16471/P0087/000135",
+      "pages_or_use": "补充燃油压力不足的低压、高压与测量值检查方向",
+      "scope_or_limit": "非DKVB专用判定值",
+      "original_file": null,
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": false
+    },
+    {
+      "id": "WEB-EA888-SSP",
+      "kind": "generic_web_register_only",
+      "citation": "https://static.nhtsa.gov/odi/tsbs/2014/MC-10122162-9999.pdf",
+      "pages_or_use": "EA888 Gen3涡轮、V465、N249和增压空气结构原理图",
+      "scope_or_limit": "培训原理资料，不代替探岳维修步骤",
+      "original_file": null,
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": false
+    },
+    {
+      "id": "EDITORIAL_TEMPLATE",
+      "kind": "editorial",
+      "citation": "专题包编辑性问题设计",
+      "pages_or_use": "07/08/09 与已确认网页",
+      "scope_or_limit": "不是厂家故障树、阈值或实车确诊",
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/sources-register.md",
+      "verified_in_this_task": true
+    },
+    {
+      "id": "SAFETY_BOUNDARY",
+      "kind": "safety",
+      "citation": "专题包保守安全边界",
+      "pages_or_use": "00/09",
+      "scope_or_limit": "安全条件不足时停止或交接",
+      "register_path": "E:/Work/v4-double/docs/参考/专题资料包/探岳维修资料1/00-专题知识包总规范-v2.md",
+      "verified_in_this_task": true
+    }
+  ]
+}

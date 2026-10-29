@@ -1,0 +1,1409 @@
+{
+  "schema_version": "template-module/1",
+  "library_id": "tayron-dkvb",
+  "module_id": "powertrain",
+  "module_version": "1",
+  "requires_modules": [],
+  "area": {
+    "id": "powertrain",
+    "stage": "S5",
+    "title": "其他动力系统方向",
+    "icon": "⌘",
+    "description": "记录点火、燃油、排气和进气控制事实。",
+    "initialPriority": 5,
+    "componentIds": [
+      "x-misfire",
+      "x-ignition",
+      "x-spark",
+      "x-fuel-dtc",
+      "x-fuel",
+      "x-exhaust",
+      "x-review"
+    ]
+  },
+  "cards": [
+    {
+      "id": "x-misfire",
+      "stage": "S5",
+      "areaId": "powertrain",
+      "title": "故障码与失火",
+      "icon": "!",
+      "location": "故障存储与失火计数",
+      "why": "确认失火缸和出现工况。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "X-01",
+        "X-02"
+      ],
+      "assetIds": [
+        "E05"
+      ],
+      "long_card_ids": [
+        "LC-10"
+      ]
+    },
+    {
+      "id": "x-ignition",
+      "stage": "S5",
+      "areaId": "powertrain",
+      "title": "点火线圈与连接",
+      "icon": "ϟ",
+      "location": "点火线圈和线束",
+      "why": "记录点火系统外观事实。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "X-03"
+      ],
+      "assetIds": [
+        "M10",
+        "E05"
+      ],
+      "long_card_ids": [
+        "LC-10"
+      ]
+    },
+    {
+      "id": "x-spark",
+      "stage": "S5",
+      "areaId": "powertrain",
+      "title": "火花塞与对调",
+      "icon": "ϟ",
+      "location": "火花塞和可控对调",
+      "why": "观察异常是否随部件转移。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "X-04",
+        "X-05"
+      ],
+      "assetIds": [
+        "M10",
+        "E05"
+      ],
+      "long_card_ids": [
+        "LC-10"
+      ]
+    },
+    {
+      "id": "x-fuel-dtc",
+      "stage": "S5",
+      "areaId": "powertrain",
+      "title": "燃油故障码",
+      "icon": "◍",
+      "location": "故障存储",
+      "why": "区分低压、高压和控制方向。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "X-06"
+      ],
+      "assetIds": [
+        "E04"
+      ],
+      "long_card_ids": [
+        "LC-11"
+      ]
+    },
+    {
+      "id": "x-fuel",
+      "stage": "S5",
+      "areaId": "powertrain",
+      "title": "燃油压力与供给",
+      "icon": "◍",
+      "location": "低压供油与高压油轨",
+      "why": "观察负荷下是否持续落后。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "X-07",
+        "X-08",
+        "X-09"
+      ],
+      "assetIds": [
+        "M09",
+        "E04"
+      ],
+      "long_card_ids": [
+        "LC-11"
+      ]
+    },
+    {
+      "id": "x-exhaust",
+      "stage": "S5",
+      "areaId": "powertrain",
+      "title": "排气与进气控制",
+      "icon": "≈",
+      "location": "催化器、节气门和歧管翻板",
+      "why": "只记录方向线索。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "X-10",
+        "X-11",
+        "X-12"
+      ],
+      "assetIds": [
+        "M11"
+      ],
+      "long_card_ids": [
+        "LC-12"
+      ]
+    },
+    {
+      "id": "x-review",
+      "stage": "S5",
+      "areaId": "powertrain",
+      "title": "跨系统综合复核",
+      "icon": "→",
+      "location": "综合复核",
+      "why": "由前序事实选择主方向或交接。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "X-13",
+        "X-14"
+      ],
+      "assetIds": [
+        "D03"
+      ],
+      "long_card_ids": [
+        "LC-10",
+        "LC-11",
+        "LC-12"
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "X-01",
+      "stage": "S5",
+      "cardId": "x-misfire",
+      "title": "X-01 · 是否存在P0300-P0304或明显失火计数",
+      "prompt": "是否存在P0300-P0304或明显失火计数？",
+      "purpose": "在增压恢复或伴随故障码时扩展方向。",
+      "instructions": "记录点火、燃油、排气和进气事实，只形成方向建议。",
+      "factKey": "misfire_direction",
+      "fields": [
+        {
+          "id": "dtc",
+          "label": "故障码",
+          "defaultValue": "P0302",
+          "type": "text",
+          "demo_default_only": true,
+          "required_when_recorded": false,
+          "validation": "trimmed text; no default-as-fact"
+        }
+      ],
+      "assetIds": [
+        "E05"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "none",
+          "label": "未发现/无",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "random",
+          "label": "随机失火",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "cyl1",
+          "label": "一缸",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "cyl2",
+          "label": "二缸",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "cyl3",
+          "label": "三缸",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "cyl4",
+          "label": "四缸",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "powertrain",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-10"
+      ],
+      "capture": null
+    },
+    {
+      "id": "X-02",
+      "stage": "S5",
+      "cardId": "x-misfire",
+      "title": "X-02 · 失火是否随负荷增加而明显",
+      "prompt": "失火是否随负荷增加而明显？",
+      "purpose": "在增压恢复或伴随故障码时扩展方向。",
+      "instructions": "记录点火、燃油、排气和进气事实，只形成方向建议。",
+      "factKey": "misfire_condition",
+      "fields": [],
+      "assetIds": [],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "no",
+          "label": "否",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "yes",
+          "label": "是",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "idle_only",
+          "label": "仅怠速",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "intermittent",
+          "label": "间歇出现",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "powertrain",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-10"
+      ],
+      "capture": null
+    },
+    {
+      "id": "X-03",
+      "stage": "S5",
+      "cardId": "x-ignition",
+      "title": "X-03 · 点火线圈、插头和线束外观",
+      "prompt": "点火线圈、插头和线束外观？",
+      "purpose": "在增压恢复或伴随故障码时扩展方向。",
+      "instructions": "记录点火、燃油、排气和进气事实，只形成方向建议。",
+      "factKey": "ignition_visual",
+      "fields": [],
+      "assetIds": [
+        "M10",
+        "E05"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "正常/未见异常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "coil_damage",
+          "label": "线圈损伤",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "connector_issue",
+          "label": "连接器问题",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "harness_issue",
+          "label": "线束问题",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "powertrain",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-IGNITION",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-10"
+      ],
+      "capture": null
+    },
+    {
+      "id": "X-04",
+      "stage": "S5",
+      "cardId": "x-spark",
+      "title": "X-04 · 火花塞状态和四缸一致性",
+      "prompt": "火花塞状态和四缸一致性？",
+      "purpose": "在增压恢复或伴随故障码时扩展方向。",
+      "instructions": "记录点火、燃油、排气和进气事实，只形成方向建议。",
+      "factKey": "spark_plug_pattern",
+      "fields": [],
+      "assetIds": [
+        "M10",
+        "E05"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "normal_consistent",
+          "label": "四缸一致且正常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "worn",
+          "label": "磨损",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "fouled",
+          "label": "积碳或污染",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "one_cylinder_differs",
+          "label": "单缸明显不同",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "powertrain",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-IGNITION",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-10"
+      ],
+      "capture": null
+    },
+    {
+      "id": "X-05",
+      "stage": "S5",
+      "cardId": "x-spark",
+      "title": "X-05 · 对调后异常是否随部件转移",
+      "prompt": "对调后异常是否随部件转移？",
+      "purpose": "在增压恢复或伴随故障码时扩展方向。",
+      "instructions": "记录点火、燃油、排气和进气事实，只形成方向建议。",
+      "factKey": "ignition_swap_result",
+      "fields": [],
+      "assetIds": [
+        "E05"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "not_moved",
+          "label": "异常未转移",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "moved_with_coil",
+          "label": "随点火线圈转移",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "moved_with_plug",
+          "label": "随火花塞转移",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "not_performed",
+          "label": "尚未执行",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "powertrain",
+      "phase": "diagnostic_observation",
+      "answer_kind": "conditional_operation",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [
+          "X-01"
+        ],
+        "when": "有可追踪的失火对象、合适操作者和安全条件；否则 not_performed/unavailable。"
+      },
+      "dependency_question_ids": [
+        "X-01"
+      ],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-IGNITION",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-10"
+      ],
+      "capture": null,
+      "operation_kind": "controlled_swap",
+      "execution_conditions": {
+        "bypass_options": [
+          "not_performed",
+          "unavailable"
+        ],
+        "requirements": [
+          {
+            "ref": "X-01",
+            "allowed": [
+              "random",
+              "cyl1",
+              "cyl2",
+              "cyl3",
+              "cyl4"
+            ],
+            "label": "先记录可追踪的失火对象"
+          }
+        ]
+      }
+    },
+    {
+      "id": "X-06",
+      "stage": "S5",
+      "cardId": "x-fuel-dtc",
+      "title": "X-06 · 是否有P0087/P0088/G247/G410/N290相关码",
+      "prompt": "是否有P0087/P0088/G247/G410/N290相关码？",
+      "purpose": "在增压恢复或伴随故障码时扩展方向。",
+      "instructions": "记录点火、燃油、排气和进气事实，只形成方向建议。",
+      "factKey": "fuel_dtcs",
+      "fields": [
+        {
+          "id": "dtc",
+          "label": "燃油故障码",
+          "defaultValue": "P0087",
+          "type": "text",
+          "demo_default_only": true,
+          "required_when_recorded": false,
+          "validation": "trimmed text; no default-as-fact"
+        }
+      ],
+      "assetIds": [
+        "E04"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "none",
+          "label": "未发现/无",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "low_pressure",
+          "label": "低压方向",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "high_pressure",
+          "label": "高压方向",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "sensor_or_control",
+          "label": "传感器或控制方向",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "multiple",
+          "label": "多类燃油相关故障码",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "powertrain",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-11"
+      ],
+      "capture": null
+    },
+    {
+      "id": "X-07",
+      "stage": "S5",
+      "cardId": "x-fuel",
+      "title": "X-07 · 低压侧目标/实际表现",
+      "prompt": "低压侧目标/实际表现？",
+      "purpose": "在增压恢复或伴随故障码时扩展方向。",
+      "instructions": "记录点火、燃油、排气和进气事实，只形成方向建议。",
+      "factKey": "low_fuel_pressure",
+      "fields": [],
+      "assetIds": [
+        "M09"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "正常/未见异常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "low",
+          "label": "压力偏低",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unstable",
+          "label": "压力不稳定",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "signal_unreliable",
+          "label": "信号不可信",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "powertrain",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-FUEL",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-11"
+      ],
+      "capture": null
+    },
+    {
+      "id": "X-08",
+      "stage": "S5",
+      "cardId": "x-fuel",
+      "title": "X-08 · 高压油轨目标/实际表现",
+      "prompt": "高压油轨目标/实际表现？",
+      "purpose": "在增压恢复或伴随故障码时扩展方向。",
+      "instructions": "记录点火、燃油、排气和进气事实，只形成方向建议。",
+      "factKey": "rail_pressure",
+      "fields": [
+        {
+          "id": "condition",
+          "label": "出现工况",
+          "defaultValue": "高负荷",
+          "type": "text",
+          "demo_default_only": true,
+          "required_when_recorded": false,
+          "validation": "trimmed text; no default-as-fact"
+        }
+      ],
+      "assetIds": [
+        "M09",
+        "E04"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "tracks",
+          "label": "跟随目标",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "falls_under_load",
+          "label": "负荷下掉压",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "excessive",
+          "label": "压力过高",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "signal_unreliable",
+          "label": "信号不可信",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "powertrain",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-FUEL",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-11"
+      ],
+      "capture": null
+    },
+    {
+      "id": "X-09",
+      "stage": "S5",
+      "cardId": "x-fuel",
+      "title": "X-09 · 燃油量、燃油品质和供油限制线索",
+      "prompt": "燃油量、燃油品质和供油限制线索？",
+      "purpose": "在增压恢复或伴随故障码时扩展方向。",
+      "instructions": "记录点火、燃油、排气和进气事实，只形成方向建议。",
+      "factKey": "fuel_supply_context",
+      "fields": [],
+      "assetIds": [],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "no_clue",
+          "label": "未见相关线索",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "low_level",
+          "label": "燃油量不足",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "quality_suspect",
+          "label": "燃油品质可疑",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "restriction_suspect",
+          "label": "供油限制线索",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "powertrain",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-FUEL",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-11"
+      ],
+      "capture": null
+    },
+    {
+      "id": "X-10",
+      "stage": "S5",
+      "cardId": "x-exhaust",
+      "title": "X-10 · 催化器/排气是否存在受阻、过热或异响线索",
+      "prompt": "催化器/排气是否存在受阻、过热或异响线索？",
+      "purpose": "在增压恢复或伴随故障码时扩展方向。",
+      "instructions": "记录点火、燃油、排气和进气事实，只形成方向建议。",
+      "factKey": "exhaust_restriction",
+      "fields": [],
+      "assetIds": [
+        "M11"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "none",
+          "label": "未发现/无",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "restriction_clue",
+          "label": "受阻线索",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "overheat_clue",
+          "label": "过热线索",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "rattle",
+          "label": "异响",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "powertrain",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-EXHAUST"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-12"
+      ],
+      "capture": null
+    },
+    {
+      "id": "X-11",
+      "stage": "S5",
+      "cardId": "x-exhaust",
+      "title": "X-11 · 节气门实际位置与驾驶请求是否一致",
+      "prompt": "节气门实际位置与驾驶请求是否一致？",
+      "purpose": "在增压恢复或伴随故障码时扩展方向。",
+      "instructions": "记录点火、燃油、排气和进气事实，只形成方向建议。",
+      "factKey": "throttle_response",
+      "fields": [],
+      "assetIds": [],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "tracks",
+          "label": "跟随目标",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "limited",
+          "label": "响应受限",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "implausible",
+          "label": "位置不可信",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "not_available",
+          "label": "数据不可用",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "powertrain",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-EXHAUST"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-12"
+      ],
+      "capture": null
+    },
+    {
+      "id": "X-12",
+      "stage": "S5",
+      "cardId": "x-exhaust",
+      "title": "X-12 · 进气歧管翻板相关码或位置异常",
+      "prompt": "进气歧管翻板相关码或位置异常？",
+      "purpose": "在增压恢复或伴随故障码时扩展方向。",
+      "instructions": "记录点火、燃油、排气和进气事实，只形成方向建议。",
+      "factKey": "manifold_flap",
+      "fields": [],
+      "assetIds": [],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "none",
+          "label": "未发现/无",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "dtc",
+          "label": "存在相关故障码",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "position_abnormal",
+          "label": "位置异常",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "not_available",
+          "label": "数据不可用",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "powertrain",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-EXHAUST"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-12"
+      ],
+      "capture": null
+    },
+    {
+      "id": "X-13",
+      "stage": "S5",
+      "cardId": "x-review",
+      "title": "X-13 · 当前最有证据的非增压方向",
+      "prompt": "当前最有证据的非增压方向？",
+      "purpose": "在增压恢复或伴随故障码时扩展方向。",
+      "instructions": "记录点火、燃油、排气和进气事实，只形成方向建议。",
+      "factKey": "cross_system_primary",
+      "fields": [],
+      "assetIds": [
+        "D03"
+      ],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "ignition",
+          "label": "点火/失火方向",
+          "outcome": "abnormal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "fuel",
+          "label": "燃油方向",
+          "outcome": "abnormal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "exhaust",
+          "label": "排气方向",
+          "outcome": "abnormal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "intake_control",
+          "label": "进气控制方向",
+          "outcome": "abnormal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "none",
+          "label": "未发现/无",
+          "outcome": "normal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "multiple",
+          "label": "多个方向",
+          "outcome": "abnormal",
+          "status_semantics": "derived_state_not_user_submittable"
+        }
+      ],
+      "area_id": "powertrain",
+      "phase": "diagnostic_observation",
+      "answer_kind": "automatic_derived",
+      "submission_semantics": "server_derived_only",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [
+          "X-01",
+          "X-02",
+          "X-03",
+          "X-04",
+          "X-05",
+          "X-06",
+          "X-07",
+          "X-08",
+          "X-09",
+          "X-10",
+          "X-11",
+          "X-12"
+        ],
+        "when": "all applicable saved inputs; otherwise insufficient"
+      },
+      "dependency_question_ids": [
+        "X-01",
+        "X-02",
+        "X-03",
+        "X-04",
+        "X-05",
+        "X-06",
+        "X-07",
+        "X-08",
+        "X-09",
+        "X-10",
+        "X-11",
+        "X-12"
+      ],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-10",
+        "LC-11",
+        "LC-12"
+      ],
+      "capture": null,
+      "derived_rule_id": "D-CROSS-SYSTEM-DIRECTION"
+    },
+    {
+      "id": "X-14",
+      "stage": "S5",
+      "cardId": "x-review",
+      "title": "X-14 · 是否需要跨系统交接",
+      "prompt": "是否需要跨系统交接？",
+      "purpose": "在增压恢复或伴随故障码时扩展方向。",
+      "instructions": "记录点火、燃油、排气和进气事实，只形成方向建议。",
+      "factKey": "cross_system_handoff",
+      "fields": [],
+      "assetIds": [
+        "D03"
+      ],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "continue_here",
+          "label": "继续当前方向",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "specialist_handoff",
+          "label": "专业交接",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "data_missing",
+          "label": "数据不足",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        },
+        {
+          "id": "conflicting_facts",
+          "label": "多方向事实冲突",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        }
+      ],
+      "area_id": "powertrain",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-10",
+        "LC-11",
+        "LC-12"
+      ],
+      "capture": null
+    }
+  ],
+  "calculation_rules": [
+    {
+      "id": "other-system-directions",
+      "operator": "direction_set",
+      "target_question_id": "X-13",
+      "groups": [
+        {
+          "id": "ignition",
+          "any": [
+            {
+              "question_id": "X-01",
+              "option_ids": [
+                "random",
+                "cyl1",
+                "cyl2",
+                "cyl3",
+                "cyl4"
+              ]
+            },
+            {
+              "question_id": "X-03",
+              "option_ids": [
+                "coil_damage",
+                "connector_issue",
+                "harness_issue"
+              ]
+            },
+            {
+              "question_id": "X-05",
+              "option_ids": [
+                "moved_with_coil",
+                "moved_with_plug"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "fuel",
+          "any": [
+            {
+              "question_id": "X-06",
+              "option_ids": [
+                "low_pressure",
+                "high_pressure",
+                "sensor_or_control",
+                "multiple"
+              ]
+            },
+            {
+              "question_id": "X-07",
+              "option_ids": [
+                "low",
+                "unstable",
+                "signal_unreliable"
+              ]
+            },
+            {
+              "question_id": "X-08",
+              "option_ids": [
+                "falls_under_load",
+                "excessive",
+                "signal_unreliable"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "exhaust",
+          "any": [
+            {
+              "question_id": "X-10",
+              "option_ids": [
+                "restriction_clue",
+                "overheat_clue",
+                "rattle"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "intake_control",
+          "any": [
+            {
+              "question_id": "X-11",
+              "option_ids": [
+                "limited",
+                "implausible"
+              ]
+            },
+            {
+              "question_id": "X-12",
+              "option_ids": [
+                "dtc",
+                "position_abnormal"
+              ]
+            }
+          ]
+        }
+      ],
+      "outputs": {
+        "ignition": "ignition",
+        "fuel": "fuel",
+        "exhaust": "exhaust",
+        "intake_control": "intake_control",
+        "multiple": "multiple"
+      },
+      "reasons": {
+        "multiple": "多个方向均有记录支持，分别核对，不强行归为单一故障。"
+      },
+      "source_refs": [
+        "17-其他动力系统方向检查与维修参考-详细版.md"
+      ]
+    }
+  ],
+  "focus_rules": [],
+  "conflict_rules": []
+}

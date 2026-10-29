@@ -1,0 +1,57 @@
+{
+  "schema_version": "template-recipe/1",
+  "library_id": "tayron-dkvb",
+  "output": "resources/templates/tayron-v2/tayron-dkvb-p0299-v2.json",
+  "template": {
+    "schema_version": "workbench-topic-candidate/1",
+    "topic_id": "tayron-dkvb-p0299",
+    "version": "tayron-dkvb-p0299-v2",
+    "authority": "适用范围限定为 2019 大众探岳 DKVB；初始排查建议不代替厂家维修程序。",
+    "source_boundary": "题目来自维修资料包，阈值为模板级比较参考而非厂家判废值；实际观察由用户记录。"
+  },
+  "values": {
+    "question_applicability": "DKVB/P0299 已匹配病例；优先级仅表示建议顺序"
+  },
+  "modules": [
+    {
+      "id": "boost-air",
+      "version": "1"
+    },
+    {
+      "id": "pressure",
+      "version": "1"
+    },
+    {
+      "id": "actuator",
+      "version": "1"
+    },
+    {
+      "id": "turbo",
+      "version": "1"
+    },
+    {
+      "id": "powertrain",
+      "version": "1"
+    }
+  ],
+  "source_ids": [
+    "SRC-ID-DKVB",
+    "SRC-CHARGE-AIR",
+    "SRC-TURBO",
+    "SRC-AIRFILTER",
+    "SRC-FUEL",
+    "SRC-IGNITION",
+    "SRC-EXHAUST",
+    "SRC-WIRING-DKVB-70",
+    "WEB-SSP-359",
+    "WEB-P0299-ROSS",
+    "WEB-P0236-ROSS",
+    "WEB-P2261-ROSS",
+    "WEB-MISFIRE-ROSS",
+    "WEB-P0087-ROSS",
+    "WEB-EA888-SSP",
+    "EDITORIAL_TEMPLATE",
+    "SAFETY_BOUNDARY"
+  ],
+  "excluded_asset_ids": []
+}

@@ -1,0 +1,1020 @@
+{
+  "schema_version": "template-module/1",
+  "library_id": "tayron-dkvb",
+  "module_id": "turbo",
+  "module_version": "1",
+  "requires_modules": [
+    "pressure"
+  ],
+  "area": {
+    "id": "turbo",
+    "stage": "S4",
+    "title": "涡轮增压器本体",
+    "icon": "◌",
+    "description": "只做外部、非拆解检查并形成专业检测建议。",
+    "initialPriority": 4,
+    "componentIds": [
+      "turbo-external",
+      "turbo-fluids",
+      "turbo-mechanical",
+      "turbo-noise",
+      "turbo-review"
+    ]
+  },
+  "cards": [
+    {
+      "id": "turbo-external",
+      "stage": "S4",
+      "areaId": "turbo",
+      "title": "壳体与进气端",
+      "icon": "◌",
+      "location": "涡轮外部可见位置",
+      "why": "收集壳体、固定和进气端线索。",
+      "safety": "只做外部非拆解检查，不输出部件定罪或换件建议。",
+      "questionIds": [
+        "TUR-01",
+        "TUR-02"
+      ],
+      "assetIds": [
+        "M07"
+      ],
+      "long_card_ids": [
+        "LC-09"
+      ]
+    },
+    {
+      "id": "turbo-fluids",
+      "stage": "S4",
+      "areaId": "turbo",
+      "title": "机油与冷却液连接",
+      "icon": "◍",
+      "location": "涡轮油液连接外部",
+      "why": "记录外部渗漏与湿痕。",
+      "safety": "只做外部非拆解检查，不输出部件定罪或换件建议。",
+      "questionIds": [
+        "TUR-03",
+        "TUR-04"
+      ],
+      "assetIds": [
+        "M07"
+      ],
+      "long_card_ids": [
+        "LC-09"
+      ]
+    },
+    {
+      "id": "turbo-mechanical",
+      "stage": "S4",
+      "areaId": "turbo",
+      "title": "进排气连接与活动",
+      "icon": "⇄",
+      "location": "涡轮连接和连杆",
+      "why": "记录连接和机械活动线索。",
+      "safety": "只做外部非拆解检查，不输出部件定罪或换件建议。",
+      "questionIds": [
+        "TUR-05",
+        "TUR-06"
+      ],
+      "assetIds": [
+        "M07"
+      ],
+      "long_card_ids": [
+        "LC-09"
+      ]
+    },
+    {
+      "id": "turbo-noise",
+      "stage": "S4",
+      "areaId": "turbo",
+      "title": "异响与烟雾",
+      "icon": "≋",
+      "location": "负荷表现",
+      "why": "记录异响类型、负荷关系和烟雾。",
+      "safety": "只做外部非拆解检查，不输出部件定罪或换件建议。",
+      "questionIds": [
+        "TUR-07",
+        "TUR-08"
+      ],
+      "assetIds": [
+        "M07"
+      ],
+      "long_card_ids": [
+        "LC-09"
+      ]
+    },
+    {
+      "id": "turbo-review",
+      "stage": "S4",
+      "areaId": "turbo",
+      "title": "证据分级与交接",
+      "icon": "→",
+      "location": "综合复核",
+      "why": "多项独立线索才支持专业检测。",
+      "safety": "只做外部非拆解检查，不输出部件定罪或换件建议。",
+      "questionIds": [
+        "TUR-09",
+        "TUR-10"
+      ],
+      "assetIds": [
+        "D01",
+        "D03"
+      ],
+      "long_card_ids": [
+        "LC-09"
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "TUR-01",
+      "stage": "S4",
+      "cardId": "turbo-external",
+      "title": "TUR-01 · 压气机壳、涡轮壳及固定位置是否有裂纹、松动或碰撞",
+      "prompt": "压气机壳、涡轮壳及固定位置是否有裂纹、松动或碰撞？",
+      "purpose": "在不拆解前提下收集涡轮外部线索。",
+      "instructions": "仅做安全可见检查；多类线索才支持专业检测。",
+      "factKey": "turbo_external",
+      "fields": [],
+      "assetIds": [
+        "M07"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "正常/未见异常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "crack_clue",
+          "label": "裂纹线索",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "loose",
+          "label": "松动",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "impact",
+          "label": "碰撞痕迹",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "turbo",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-TURBO",
+        "SAFETY_BOUNDARY"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-09"
+      ],
+      "capture": null
+    },
+    {
+      "id": "TUR-02",
+      "stage": "S4",
+      "cardId": "turbo-external",
+      "title": "TUR-02 · 涡轮入口是否有异物、异常油液或叶轮可见损伤线索",
+      "prompt": "涡轮入口是否有异物、异常油液或叶轮可见损伤线索？",
+      "purpose": "在不拆解前提下收集涡轮外部线索。",
+      "instructions": "仅做安全可见检查；多类线索才支持专业检测。",
+      "factKey": "compressor_inlet",
+      "fields": [],
+      "assetIds": [
+        "M07"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "正常/未见异常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "foreign_object",
+          "label": "可见异物",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "excess_oil",
+          "label": "异常油液",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "visible_damage",
+          "label": "可见损伤",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "turbo",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-TURBO",
+        "SAFETY_BOUNDARY"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-09"
+      ],
+      "capture": null
+    },
+    {
+      "id": "TUR-03",
+      "stage": "S4",
+      "cardId": "turbo-fluids",
+      "title": "TUR-03 · 供油/回油连接外部是否干燥、渗漏或明显湿润",
+      "prompt": "供油/回油连接外部是否干燥、渗漏或明显湿润？",
+      "purpose": "在不拆解前提下收集涡轮外部线索。",
+      "instructions": "仅做安全可见检查；多类线索才支持专业检测。",
+      "factKey": "oil_connection",
+      "fields": [],
+      "assetIds": [
+        "M07"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "dry",
+          "label": "干燥",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "seepage",
+          "label": "渗漏",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "active_leak",
+          "label": "明显泄漏",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "turbo",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-TURBO",
+        "SAFETY_BOUNDARY"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-09"
+      ],
+      "capture": null
+    },
+    {
+      "id": "TUR-04",
+      "stage": "S4",
+      "cardId": "turbo-fluids",
+      "title": "TUR-04 · 冷却液连接是否存在结晶、湿痕或液位关联异常",
+      "prompt": "冷却液连接是否存在结晶、湿痕或液位关联异常？",
+      "purpose": "在不拆解前提下收集涡轮外部线索。",
+      "instructions": "仅做安全可见检查；多类线索才支持专业检测。",
+      "factKey": "coolant_connection",
+      "fields": [],
+      "assetIds": [
+        "M07"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "正常/未见异常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "trace",
+          "label": "结晶或湿痕",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "active_leak",
+          "label": "明显泄漏",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "turbo",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-TURBO",
+        "SAFETY_BOUNDARY"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-09"
+      ],
+      "capture": null
+    },
+    {
+      "id": "TUR-05",
+      "stage": "S4",
+      "cardId": "turbo-mechanical",
+      "title": "TUR-05 · 排气侧和增压侧连接是否有漏气/积炭/松动线索",
+      "prompt": "排气侧和增压侧连接是否有漏气/积炭/松动线索？",
+      "purpose": "在不拆解前提下收集涡轮外部线索。",
+      "instructions": "仅做安全可见检查；多类线索才支持专业检测。",
+      "factKey": "turbo_connections",
+      "fields": [],
+      "assetIds": [
+        "M07"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "正常/未见异常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "exhaust_trace",
+          "label": "排气侧泄漏痕迹",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "charge_leak_trace",
+          "label": "增压侧泄漏痕迹",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "loose",
+          "label": "松动",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "turbo",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-TURBO",
+        "SAFETY_BOUNDARY"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-09"
+      ],
+      "capture": null
+    },
+    {
+      "id": "TUR-06",
+      "stage": "S4",
+      "cardId": "turbo-mechanical",
+      "title": "TUR-06 · 在安全允许范围内是否存在明显卡滞或异常间隙线索",
+      "prompt": "在安全允许范围内是否存在明显卡滞或异常间隙线索？",
+      "purpose": "在不拆解前提下收集涡轮外部线索。",
+      "instructions": "仅做安全可见检查；多类线索才支持专业检测。",
+      "factKey": "mechanical_clue",
+      "fields": [],
+      "assetIds": [
+        "M07"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "no_clue",
+          "label": "未见相关线索",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "binding_clue",
+          "label": "卡滞线索",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "play_clue",
+          "label": "异常间隙线索",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "not_accessible",
+          "label": "无法安全接近",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "turbo",
+      "phase": "diagnostic_observation",
+      "answer_kind": "conditional_operation",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "仅外部安全可接近；不安全时 not_accessible。"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-TURBO",
+        "SAFETY_BOUNDARY"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-09"
+      ],
+      "capture": null,
+      "operation_kind": "external_physical_test",
+      "execution_conditions": {
+        "bypass_options": [
+          "not_accessible"
+        ],
+        "requirements": [
+          {
+            "allowed": [
+              "none",
+              "caution"
+            ],
+            "label": "安全条件允许外部可见检查",
+            "intake_key": "safety_gate"
+          }
+        ]
+      }
+    },
+    {
+      "id": "TUR-07",
+      "stage": "S4",
+      "cardId": "turbo-noise",
+      "title": "TUR-07 · 异响类型及与负荷关系",
+      "prompt": "异响类型及与负荷关系？",
+      "purpose": "在不拆解前提下收集涡轮外部线索。",
+      "instructions": "仅做安全可见检查；多类线索才支持专业检测。",
+      "factKey": "turbo_noise",
+      "fields": [
+        {
+          "id": "description",
+          "label": "异响补充",
+          "defaultValue": "",
+          "type": "text",
+          "demo_default_only": false,
+          "required_when_recorded": false,
+          "validation": "trimmed text; no default-as-fact"
+        }
+      ],
+      "assetIds": [
+        "M07"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "none",
+          "label": "未发现/无",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "whistle",
+          "label": "啸叫",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "scrape",
+          "label": "刮擦声",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "rattle",
+          "label": "异响",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "load_related_unknown",
+          "label": "负荷相关但类型不明",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "turbo",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-TURBO",
+        "SAFETY_BOUNDARY"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-09"
+      ],
+      "capture": null
+    },
+    {
+      "id": "TUR-08",
+      "stage": "S4",
+      "cardId": "turbo-noise",
+      "title": "TUR-08 · 是否出现蓝烟、黑烟或无异常烟雾",
+      "prompt": "是否出现蓝烟、黑烟或无异常烟雾？",
+      "purpose": "在不拆解前提下收集涡轮外部线索。",
+      "instructions": "仅做安全可见检查；多类线索才支持专业检测。",
+      "factKey": "smoke_state",
+      "fields": [],
+      "assetIds": [
+        "M07"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "none",
+          "label": "未发现/无",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "blue",
+          "label": "蓝烟",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "black",
+          "label": "黑烟",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "other",
+          "label": "其他烟雾或类型不明",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "turbo",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-TURBO",
+        "SAFETY_BOUNDARY"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-09"
+      ],
+      "capture": null
+    },
+    {
+      "id": "TUR-09",
+      "stage": "S4",
+      "cardId": "turbo-review",
+      "title": "TUR-09 · 多项外部事实是否共同指向本体方向",
+      "prompt": "多项外部事实是否共同指向本体方向？",
+      "purpose": "在不拆解前提下收集涡轮外部线索。",
+      "instructions": "仅做安全可见检查；多类线索才支持专业检测。",
+      "factKey": "turbo_evidence_grade",
+      "fields": [],
+      "assetIds": [
+        "D01",
+        "D03"
+      ],
+      "sources": [
+        "GENERAL_VAG_REFERENCE",
+        "SAFETY_BOUNDARY"
+      ],
+      "options": [
+        {
+          "id": "no_support",
+          "label": "暂无支持",
+          "outcome": "normal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "weak_support",
+          "label": "支持较弱",
+          "outcome": "abnormal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "multiple_supporting_facts",
+          "label": "多项独立线索支持",
+          "outcome": "abnormal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "conflict",
+          "label": "事实冲突",
+          "outcome": "abnormal",
+          "status_semantics": "derived_state_not_user_submittable"
+        }
+      ],
+      "area_id": "turbo",
+      "phase": "diagnostic_observation",
+      "answer_kind": "automatic_derived",
+      "submission_semantics": "server_derived_only",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [
+          "TUR-01",
+          "TUR-02",
+          "TUR-03",
+          "TUR-04",
+          "TUR-05",
+          "TUR-06",
+          "TUR-07",
+          "TUR-08",
+          "PRS-11",
+          "PRS-04",
+          "PRS-05",
+          "PRS-06",
+          "PRS-07"
+        ],
+        "when": "all applicable saved inputs; otherwise insufficient"
+      },
+      "dependency_question_ids": [
+        "TUR-01",
+        "TUR-02",
+        "TUR-03",
+        "TUR-04",
+        "TUR-05",
+        "TUR-06",
+        "TUR-07",
+        "TUR-08",
+        "PRS-11",
+        "PRS-04",
+        "PRS-05",
+        "PRS-06",
+        "PRS-07"
+      ],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SAFETY_BOUNDARY"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-09"
+      ],
+      "capture": null,
+      "derived_rule_id": "D-TURBO-INDEPENDENT-EVIDENCE"
+    },
+    {
+      "id": "TUR-10",
+      "stage": "S4",
+      "cardId": "turbo-review",
+      "title": "TUR-10 · 当前应如何收尾",
+      "prompt": "当前应如何收尾？",
+      "purpose": "在不拆解前提下收集涡轮外部线索。",
+      "instructions": "仅做安全可见检查；多类线索才支持专业检测。",
+      "factKey": "turbo_handoff",
+      "fields": [],
+      "assetIds": [
+        "D03"
+      ],
+      "sources": [
+        "GENERAL_VAG_REFERENCE",
+        "SAFETY_BOUNDARY"
+      ],
+      "options": [
+        {
+          "id": "return_to_controls",
+          "label": "返回控制方向复核",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "professional_test",
+          "label": "转专业检测",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "cross_system",
+          "label": "转其他动力系统",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "safety_stop",
+          "label": "安全停止",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        }
+      ],
+      "area_id": "turbo",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SAFETY_BOUNDARY"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-09"
+      ],
+      "capture": null
+    }
+  ],
+  "calculation_rules": [
+    {
+      "id": "turbo-external-groups",
+      "operator": "independent_group_count",
+      "target_question_id": "TUR-09",
+      "parameters": {
+        "minimum_multiple": 2
+      },
+      "groups": [
+        {
+          "id": "housing",
+          "any": [
+            {
+              "question_id": "TUR-01",
+              "option_ids": [
+                "crack_clue",
+                "loose",
+                "impact"
+              ]
+            },
+            {
+              "question_id": "TUR-05",
+              "option_ids": [
+                "exhaust_trace",
+                "charge_leak_trace",
+                "loose"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "wheel",
+          "any": [
+            {
+              "question_id": "TUR-02",
+              "option_ids": [
+                "foreign_object",
+                "visible_damage"
+              ]
+            },
+            {
+              "question_id": "TUR-06",
+              "option_ids": [
+                "binding_clue",
+                "play_clue"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "leak",
+          "any": [
+            {
+              "question_id": "TUR-03",
+              "option_ids": [
+                "active_leak"
+              ]
+            },
+            {
+              "question_id": "TUR-04",
+              "option_ids": [
+                "active_leak"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "operating",
+          "any": [
+            {
+              "question_id": "TUR-07",
+              "option_ids": [
+                "scrape",
+                "rattle"
+              ]
+            },
+            {
+              "question_id": "TUR-08",
+              "option_ids": [
+                "blue",
+                "black"
+              ]
+            }
+          ]
+        }
+      ],
+      "outputs": {
+        "below_threshold": "weak_support",
+        "multiple": "multiple_supporting_facts"
+      },
+      "reasons": {
+        "weak_support": "目前只有一类外部线索；先排除其他增压路径，不据此认定本体故障。",
+        "multiple_supporting_facts": "至少两类独立外部线索并存，可考虑专业测量；仍不是更换结论。"
+      },
+      "source_refs": [
+        "16-涡轮增压器本体检查与维修参考-详细版.md"
+      ]
+    }
+  ],
+  "focus_rules": [
+    {
+      "id": "turbo-noise-followup",
+      "all": [
+        {
+          "question_id": "TUR-07",
+          "option_ids": [
+            "scrape",
+            "rattle"
+          ]
+        }
+      ],
+      "question_ids": [
+        "TUR-01",
+        "TUR-02",
+        "TUR-06"
+      ]
+    }
+  ],
+  "conflict_rules": []
+}
