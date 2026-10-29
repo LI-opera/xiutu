@@ -12,7 +12,8 @@ LIBRARY = ROOT / "resources/template-library/tayron-dkvb"
 
 def test_modules_reassemble_the_published_templates_exactly():
     results = run(LIBRARY)
-    assert {item["recipe"] for item in results} == {"tayron-dkvb-p0299-v2.json", "tayron-dkvb-p0236-v2.json"}
+    assert {item["recipe"] for item in results} == {f"tayron-dkvb-{code}-v{version}.json"
+                                                    for code in ("p0299", "p0236") for version in (2, 3)}
     for item in results:
         published = json.loads((ROOT / item["output"]).read_text(encoding="utf-8"))
         assert item["status"] == "identical"
@@ -27,13 +28,15 @@ def copy_library(tmp_path, edit):
     recipe["output"] = str(tmp_path / "out.json")
     edit(recipe)
     recipe_path.write_text(json.dumps(recipe, ensure_ascii=False), encoding="utf-8")
-    (library / "recipes/tayron-dkvb-p0299-v2.json").unlink()
+    for other in (library / "recipes").glob("*.json"):
+        if other != recipe_path:
+            other.unlink()
     return library, recipe_path
 
 
 @pytest.mark.parametrize(("edit", "message"), [
     (lambda r: r.update(modules=[{"id": "turbo", "version": "1"}]), "needs modules"),
-    (lambda r: r["modules"][0].update(version="9"), "wants boost-air v9"),
+    (lambda r: r["modules"][0].update(version="9"), "no module boost-air v9"),
     (lambda r: r["excluded_asset_ids"].append("M11"), "not used by any module"),
     (lambda r: r["values"].clear(), "no value for 'question_applicability'"),
     (lambda r: r["source_ids"].append("NO-SUCH-SOURCE"), "not in the catalog"),
@@ -46,7 +49,7 @@ def test_invalid_recipes_are_rejected(tmp_path, edit, message):
 
 def test_missing_question_reference_is_rejected(tmp_path):
     library, recipe_path = copy_library(tmp_path, lambda r: None)
-    module_path = library / "modules/pressure.json"
+    module_path = library / "modules/pressure/1.json"
     module = json.loads(module_path.read_text(encoding="utf-8"))
     module["questions"][0]["prerequisites"]["refs"] = ["TUR-01"]
     module_path.write_text(json.dumps(module, ensure_ascii=False), encoding="utf-8")
@@ -63,3 +66,19 @@ def test_write_creates_new_outputs_but_never_overwrites(tmp_path):
     output.write_text("{}", encoding="utf-8")
     assert run(library, write=True)[0]["status"] == "different"
     assert output.read_text(encoding="utf-8") == "{}"
+
+
+def test_v3_changes_only_the_boost_air_connector_questions():
+    folder = ROOT / "resources/templates/tayron-v2"
+    for code in ("p0299", "p0236"):
+        old = json.loads((folder / f"tayron-dkvb-{code}-v2.json").read_text(encoding="utf-8"))
+        new = json.loads((folder / f"tayron-dkvb-{code}-v3.json").read_text(encoding="utf-8"))
+        changed = {q["id"] for q, before in zip(new["questions"], old["questions"]) if q != before}
+        assert [q["id"] for q in new["questions"]] == [q["id"] for q in old["questions"]]
+        assert changed == {"AIR-07", "AIR-08", "AIR-09", "AIR-10"}
+        assert {c["id"] for c, before in zip(new["cards"], old["cards"]) if c != before} == {"air-connector"}
+        for key in ("stages", "assets", "sources", "areas", "calculation_rules", "observation_workflow"):
+            assert new[key] == old[key]
+        assert new["observation_rules"]["conflict_rules"] == []
+        assert new["observation_rules"]["focus_rules"][0]["all"] == [
+            {"question_id": "AIR-07", "option_ids": ["not_inserted"]}]

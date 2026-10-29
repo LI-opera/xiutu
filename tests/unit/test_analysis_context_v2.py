@@ -131,3 +131,37 @@ def test_changed_options_stop_for_manual_review():
     topic["questions"][0]["options"][0]["status_semantics"] = "not_executed_not_normal"
     with pytest.raises(ReviewRequired, match="not executed"):
         derive_template(ROLES_DATA, relation, topic)
+
+
+CLAMP_QUESTIONS = {"AIR-07", "AIR-08", "AIR-09", "AIR-10"}
+
+
+def roles_of(template_id, version, config=ROLES_DATA):
+    return next(t for t in config["templates"]
+                if t["template_id"] == template_id and t["version"] == version)["questions"]
+
+
+def without_hash(spec):
+    return {k: v for k, v in spec.items() if k != "definition_hash"}
+
+
+def test_v3_carries_unchanged_roles_from_v2():
+    for template_id in ("tayron-dkvb-p0299", "tayron-dkvb-p0236"):
+        v2, v3 = roles_of(template_id, "2"), roles_of(template_id, "3")
+        assert set(v2) == set(v3)
+        for qid in set(v3) - CLAMP_QUESTIONS:
+            assert without_hash(v3[qid]) == without_hash(v2[qid])
+        assert roles_of(template_id, "3")["AIR-07"]["option_roles"]["unavailable"] == "inspection_status"
+
+
+def test_changed_questions_need_a_review_and_stale_reviews_are_rejected():
+    config = deepcopy(ROLES_DATA)
+    config["templates"] = [t for t in config["templates"] if t["version"] != "3"]
+    with pytest.raises(ReviewRequired, match="AIR-07: options changed"):
+        build(config)
+    reviews = {qid: without_hash(roles_of("tayron-dkvb-p0299", "3")[qid]) for qid in CLAMP_QUESTIONS}
+    result, _ = build(config, reviews=reviews)
+    for template_id in ("tayron-dkvb-p0299", "tayron-dkvb-p0236"):
+        assert roles_of(template_id, "3", result) == roles_of(template_id, "3")
+    with pytest.raises(ReviewRequired, match="not needed"):
+        build(ROLES_DATA, reviews=reviews)

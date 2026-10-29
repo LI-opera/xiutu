@@ -5,7 +5,7 @@
 ```
 template-library/<库名>/
 ├─ catalog.json        共用部分：阶段、图片、来源、规则引擎版本
-├─ modules/<区域>.json  一个区域：区域定义、分组、题目、只属于这个区域的计算/观察规则
+├─ modules/<区域>/<版本>.json  一个区域的一个版本：区域定义、分组、题目、只属于这个区域的计算/观察规则
 └─ recipes/<模板>.json  一个模板：选哪些积木、按什么顺序、模板级文字、来源清单、要去掉的图片
 ```
 
@@ -36,6 +36,15 @@ uv run python -B scripts/compile_templates.py --library resources/template-libra
 - 来源清单 = 配方 `source_ids` 选中的来源，按目录顺序；
 - 输出为 2 空格缩进、CRLF 换行，与现有发布文件一致。
 
+## 修改一个区域的步骤
+
+1. 复制 `modules/<区域>/<旧版本>.json` 为新版本，改内容和 `module_version`；旧版本文件保留不动；
+2. 为每个用到这个区域的模板新建配方（换新的 `version` 和 `output`），把该积木改成新版本；
+3. `--write` 生成新模板文件，在 `relations.json` 里登记新版本；
+4. 配记录角色：`scripts/build_analysis_context.py`。没改的题自动沿用上一版；改过的题要人工写一个审核文件，用 `--review` 传入；
+5. 预检、试用、发布。
+
 ## tayron-dkvb
 
-由 `tayron-dkvb-p0299-v2` 拆出 5 个积木（boost-air、pressure、actuator、turbo、powertrain）。两个配方拼出的结果与已发布的 P0299 v2、P0236 v2 **逐字节相同**（`tests/unit/test_template_compiler.py` 会持续检查）。两者的差别全部在配方里：题目适用说明文字、来源清单，以及 P0236 去掉了 P0299 专用的诊断路由图 D03。
+- v2：由 `tayron-dkvb-p0299-v2` 拆出 5 个积木（boost-air、pressure、actuator、turbo、powertrain）。两个配方拼出的结果与已发布的 P0299 v2、P0236 v2 **逐字节相同**。两者的差别全部在配方里：题目适用说明文字、来源清单，以及 P0236 去掉了 P0299 专用的诊断路由图 D03。
+- v3：boost-air 积木第 2 版。本车增压软管接头是"插到止动位置 + 标记对齐 + 螺旋卡箍"，不是快插接头，AIR-07～10 按此重写，相应调整追查规则，删去只适用于快插接头的冲突规则。P0299、P0236 同时升到 v3，其他 4 个积木不变。
