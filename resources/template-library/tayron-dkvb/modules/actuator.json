@@ -1,0 +1,939 @@
+{
+  "schema_version": "template-module/1",
+  "library_id": "tayron-dkvb",
+  "module_id": "actuator",
+  "module_version": "1",
+  "requires_modules": [],
+  "area": {
+    "id": "actuator",
+    "stage": "S3",
+    "title": "增压调节机构",
+    "icon": "⚙",
+    "description": "检查V465、连杆、N249和设置后复核。",
+    "initialPriority": 3,
+    "componentIds": [
+      "act-v465",
+      "act-v465-response",
+      "act-linkage",
+      "act-n249",
+      "act-setting"
+    ]
+  },
+  "cards": [
+    {
+      "id": "act-v465",
+      "stage": "S3",
+      "areaId": "actuator",
+      "title": "V465连接与反馈",
+      "icon": "⌘",
+      "location": "V465及线束",
+      "why": "检查连接和位置反馈。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "ACT-01",
+        "ACT-02"
+      ],
+      "assetIds": [
+        "E03"
+      ],
+      "long_card_ids": [
+        "LC-07"
+      ]
+    },
+    {
+      "id": "act-v465-response",
+      "stage": "S3",
+      "areaId": "actuator",
+      "title": "V465输出测试响应",
+      "icon": "⇄",
+      "location": "V465可见响应",
+      "why": "记录输出测试响应。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "ACT-03"
+      ],
+      "assetIds": [
+        "E03"
+      ],
+      "long_card_ids": [
+        "LC-07"
+      ]
+    },
+    {
+      "id": "act-linkage",
+      "stage": "S3",
+      "areaId": "actuator",
+      "title": "连杆与废气旁通机构",
+      "icon": "⇄",
+      "location": "涡轮外部连杆",
+      "why": "检查完整性和安全可见活动。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "ACT-04",
+        "ACT-05"
+      ],
+      "assetIds": [
+        "M07"
+      ],
+      "long_card_ids": [
+        "LC-07"
+      ]
+    },
+    {
+      "id": "act-n249",
+      "stage": "S3",
+      "areaId": "actuator",
+      "title": "N249循环空气阀",
+      "icon": "◉",
+      "location": "涡轮上的N249",
+      "why": "区分电气连接与功能线索。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "ACT-06",
+        "ACT-07"
+      ],
+      "assetIds": [
+        "M07",
+        "E03"
+      ],
+      "long_card_ids": [
+        "LC-08"
+      ]
+    },
+    {
+      "id": "act-setting",
+      "stage": "S3",
+      "areaId": "actuator",
+      "title": "设置与复核",
+      "icon": "✓",
+      "location": "受控基本设置",
+      "why": "确认前提、记录设置并复核。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "ACT-08",
+        "ACT-09",
+        "ACT-10"
+      ],
+      "assetIds": [
+        "D03"
+      ],
+      "long_card_ids": [
+        "LC-07"
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "ACT-01",
+      "stage": "S3",
+      "cardId": "act-v465",
+      "title": "ACT-01 · V465连接器锁止、针脚和线束是否正常",
+      "prompt": "V465连接器锁止、针脚和线束是否正常？",
+      "purpose": "检查V465、N249、连杆和基本设置线索。",
+      "instructions": "记录连接和响应，不从单项失败跳到换件。",
+      "factKey": "v465_electrical_visual",
+      "fields": [],
+      "assetIds": [
+        "E03"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "正常/未见异常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "loose",
+          "label": "松动",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "pin_damage",
+          "label": "针脚损伤",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "harness_damage",
+          "label": "线束损伤",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "actuator",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-07"
+      ],
+      "capture": null
+    },
+    {
+      "id": "ACT-02",
+      "stage": "S3",
+      "cardId": "act-v465",
+      "title": "ACT-02 · 是否存在V465/G581相关故障码或位置反馈异常",
+      "prompt": "是否存在V465/G581相关故障码或位置反馈异常？",
+      "purpose": "检查V465、N249、连杆和基本设置线索。",
+      "instructions": "记录连接和响应，不从单项失败跳到换件。",
+      "factKey": "v465_diagnostic",
+      "fields": [],
+      "assetIds": [
+        "E03"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "none",
+          "label": "未发现/无",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "dtc_present",
+          "label": "存在相关故障码",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "feedback_implausible",
+          "label": "反馈不可信",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "intermittent",
+          "label": "间歇出现",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "actuator",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-07"
+      ],
+      "capture": null
+    },
+    {
+      "id": "ACT-03",
+      "stage": "S3",
+      "cardId": "act-v465-response",
+      "title": "ACT-03 · 执行输出测试时是否有动作响应",
+      "prompt": "执行输出测试时是否有动作响应？",
+      "purpose": "检查V465、N249、连杆和基本设置线索。",
+      "instructions": "记录连接和响应，不从单项失败跳到换件。",
+      "factKey": "v465_output_test",
+      "fields": [],
+      "assetIds": [
+        "E03"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "moves_smoothly",
+          "label": "动作平顺",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "no_movement",
+          "label": "无动作",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "jerky",
+          "label": "动作卡顿",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "test_rejected",
+          "label": "测试未执行",
+          "outcome": "unavailable",
+          "status_semantics": "not_executed_not_normal"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "actuator",
+      "phase": "diagnostic_observation",
+      "answer_kind": "conditional_operation",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "无 stop_now，具备合适工具/操作者并确认输出测试安全条件；不具备时只记 test_rejected/unavailable。"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-07"
+      ],
+      "capture": null,
+      "operation_kind": "output_test",
+      "execution_conditions": {
+        "bypass_options": [
+          "unavailable",
+          "test_rejected"
+        ],
+        "requirements": [
+          {
+            "allowed": [
+              "none",
+              "caution"
+            ],
+            "label": "接诊安全条件允许输出测试",
+            "intake_key": "safety_gate"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ACT-04",
+      "stage": "S3",
+      "cardId": "act-linkage",
+      "title": "ACT-04 · 推杆、卡簧和连接点是否完整",
+      "prompt": "推杆、卡簧和连接点是否完整？",
+      "purpose": "检查V465、N249、连杆和基本设置线索。",
+      "instructions": "记录连接和响应，不从单项失败跳到换件。",
+      "factKey": "linkage_integrity",
+      "fields": [],
+      "assetIds": [
+        "M07"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "intact",
+          "label": "连接完整",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "loose",
+          "label": "松动",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "clip_missing",
+          "label": "卡簧缺失",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "disconnected",
+          "label": "连接脱开",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "actuator",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-TURBO"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-07"
+      ],
+      "capture": null
+    },
+    {
+      "id": "ACT-05",
+      "stage": "S3",
+      "cardId": "act-linkage",
+      "title": "ACT-05 · 可见活动是否顺畅并能回到稳定位置",
+      "prompt": "可见活动是否顺畅并能回到稳定位置？",
+      "purpose": "检查V465、N249、连杆和基本设置线索。",
+      "instructions": "记录连接和响应，不从单项失败跳到换件。",
+      "factKey": "linkage_movement",
+      "fields": [],
+      "assetIds": [
+        "M07"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "smooth",
+          "label": "活动顺畅",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "binding",
+          "label": "活动受限",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "excessive_play",
+          "label": "间隙异常",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "not_testable",
+          "label": "无法安全测试",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "actuator",
+      "phase": "diagnostic_observation",
+      "answer_kind": "conditional_operation",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "仅安全可见活动，禁止拆解或强制动作；否则 not_testable。"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-TURBO"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-07"
+      ],
+      "capture": null,
+      "operation_kind": "physical_test",
+      "execution_conditions": {
+        "bypass_options": [
+          "not_testable"
+        ],
+        "requirements": [
+          {
+            "allowed": [
+              "none",
+              "caution"
+            ],
+            "label": "接诊安全条件允许安全外部检查",
+            "intake_key": "safety_gate"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ACT-06",
+      "stage": "S3",
+      "cardId": "act-n249",
+      "title": "ACT-06 · N249连接器和安装位置是否正常",
+      "prompt": "N249连接器和安装位置是否正常？",
+      "purpose": "检查V465、N249、连杆和基本设置线索。",
+      "instructions": "记录连接和响应，不从单项失败跳到换件。",
+      "factKey": "n249_visual",
+      "fields": [],
+      "assetIds": [
+        "M07",
+        "E03"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "正常/未见异常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "loose",
+          "label": "松动",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "damaged",
+          "label": "损伤",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "oil_contaminated",
+          "label": "油液污染",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "actuator",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-TURBO",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-08"
+      ],
+      "capture": null
+    },
+    {
+      "id": "ACT-07",
+      "stage": "S3",
+      "cardId": "act-n249",
+      "title": "ACT-07 · 是否存在P2261或负荷切换时异常泄压线索",
+      "prompt": "是否存在P2261或负荷切换时异常泄压线索？",
+      "purpose": "检查V465、N249、连杆和基本设置线索。",
+      "instructions": "记录连接和响应，不从单项失败跳到换件。",
+      "factKey": "n249_function_clue",
+      "fields": [],
+      "assetIds": [
+        "E03"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "none",
+          "label": "未发现/无",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "dtc",
+          "label": "存在相关故障码",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "suspected_leak",
+          "label": "疑似异常泄压",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "intermittent",
+          "label": "间歇出现",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "actuator",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-TURBO",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-08"
+      ],
+      "capture": null
+    },
+    {
+      "id": "ACT-08",
+      "stage": "S3",
+      "cardId": "act-setting",
+      "title": "ACT-08 · 是否满足基本设置前提",
+      "prompt": "是否满足基本设置前提？",
+      "purpose": "检查V465、N249、连杆和基本设置线索。",
+      "instructions": "记录连接和响应，不从单项失败跳到换件。",
+      "factKey": "adaptation_prerequisite",
+      "fields": [],
+      "assetIds": [],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "ready",
+          "label": "前提满足",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "voltage_low",
+          "label": "电压条件不足",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "temperature_invalid",
+          "label": "温度条件不足",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "dtc_blocking",
+          "label": "故障状态阻止",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "actuator",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-07"
+      ],
+      "capture": null
+    },
+    {
+      "id": "ACT-09",
+      "stage": "S3",
+      "cardId": "act-setting",
+      "title": "ACT-09 · 基本设置结果",
+      "prompt": "基本设置结果？",
+      "purpose": "检查V465、N249、连杆和基本设置线索。",
+      "instructions": "记录连接和响应，不从单项失败跳到换件。",
+      "factKey": "adaptation_result",
+      "fields": [],
+      "assetIds": [],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "completed",
+          "label": "已完成",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "failed",
+          "label": "失败",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "aborted",
+          "label": "中止",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "not_supported",
+          "label": "当前不支持",
+          "outcome": "unavailable",
+          "status_semantics": "not_executed_not_normal"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "actuator",
+      "phase": "diagnostic_observation",
+      "answer_kind": "conditional_operation",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [
+          "ACT-08"
+        ],
+        "when": "ACT-08=ready 且操作者确认适用工具/条件；按适用维修资料和诊断设备确认具体程序。"
+      },
+      "dependency_question_ids": [
+        "ACT-08"
+      ],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-07"
+      ],
+      "capture": null,
+      "operation_kind": "basic_setting",
+      "execution_conditions": {
+        "bypass_options": [
+          "unavailable",
+          "not_supported"
+        ],
+        "requirements": [
+          {
+            "ref": "ACT-08",
+            "allowed": [
+              "ready"
+            ],
+            "label": "基本设置前提已满足"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ACT-10",
+      "stage": "S3",
+      "cardId": "act-setting",
+      "title": "ACT-10 · 设置后相同工况增压表现",
+      "prompt": "设置后相同工况增压表现？",
+      "purpose": "检查V465、N249、连杆和基本设置线索。",
+      "instructions": "记录连接和响应，不从单项失败跳到换件。",
+      "factKey": "actuator_retest",
+      "fields": [],
+      "assetIds": [
+        "D03"
+      ],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "recovered",
+          "label": "增压恢复",
+          "outcome": "recovered",
+          "status_semantics": "new_round_result_not_final_report"
+        },
+        {
+          "id": "still_underboost",
+          "label": "仍然增压不足",
+          "outcome": "abnormal",
+          "status_semantics": "new_round_result_not_final_report"
+        },
+        {
+          "id": "boost_ok_symptom_remains",
+          "label": "增压恢复但原症状仍在",
+          "outcome": "abnormal",
+          "status_semantics": "new_round_result_not_final_report"
+        },
+        {
+          "id": "not_comparable",
+          "label": "复检工况不可比",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "actuator",
+      "phase": "after_setting_recheck",
+      "answer_kind": "conditional_operation",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [
+          "ACT-09"
+        ],
+        "when": "ACT-09=completed 后的新采集批次，同工况比较；属于设置后诊断复核，不是首次检查必需项。"
+      },
+      "dependency_question_ids": [
+        "ACT-09"
+      ],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-07"
+      ],
+      "capture": {
+        "batch_kind": "after_setting_new_batch",
+        "batch_id_required": true
+      },
+      "operation_kind": "after_setting_measurement",
+      "execution_conditions": {
+        "bypass_options": [
+          "unavailable"
+        ],
+        "requirements": [
+          {
+            "ref": "ACT-09",
+            "allowed": [
+              "completed"
+            ],
+            "label": "设置已完成并开启设置后新采集批次"
+          }
+        ]
+      }
+    }
+  ],
+  "calculation_rules": [],
+  "focus_rules": [],
+  "conflict_rules": [],
+  "observation_workflow": {
+    "new_batch_on_answer": {
+      "question_id": "ACT-09",
+      "option_id": "completed",
+      "batch_kind": "after_setting_new_batch"
+    }
+  }
+}
