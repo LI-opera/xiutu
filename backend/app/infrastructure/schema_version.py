@@ -1,1 +1,1 @@
-EXPECTED_REVISION = "0026_retire_legacy"
+EXPECTED_REVISION = "0027_reference_package_source"
