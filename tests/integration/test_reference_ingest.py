@@ -162,3 +162,70 @@ def test_known_vehicles_include_template_vehicles(api_rig):  # noqa: F811
     assert response.status_code == 200
     vehicles = response.json()["vehicles"]
     assert vehicles and all(set(v) == {"brand", "model", "year", "engine_code"} for v in vehicles)
+
+
+def package(document_id, guide, reviewed=True, title="涡轮增压器指南", always=("## 3. 处理后怎样确认",)):
+    """The three files of an xiutu-clean guide package, as the page sends them."""
+    sources = '{"schema_version": "xiutu-guide-package/1", "sources": [{"title": "涡轮增压器", "pages_cited": [3]}]}'
+    files = {"guide.md": reference_ingest.file_hash(guide), "sources.json": reference_ingest.file_hash(sources)}
+    review = ({"status": "approved", "reviewer": "李", "reviewed_at": "2026-11-02T10:00:00+00:00",
+               "approved_hashes": dict(files)} if reviewed else
+              {"status": "pending", "reviewer": None, "reviewed_at": None, "approved_hashes": None})
+    manifest = {"schema_version": "xiutu-guide-package/1", "document_id": document_id, "version": "4",
+                "title": title, "always_include": list(always),
+                "applicability": [{"brand": VEHICLE["brand"], "model": VEHICLE["model"], "year_from": VEHICLE["year"],
+                                   "year_to": VEHICLE["year"], "engine_code": VEHICLE["engine_code"]}],
+                "open_gaps": [{"group": "数值", "gap": "间隙标准未给出"}], "review": review,
+                "made_by": {"job": "turbo"}, "files": files}
+    return {"manifest": manifest, "guide": guide, "sources": sources}
+
+
+def import_package(rig, body):
+    return rig.client.post("/api/v2/area-references/packages", json=body, headers=rig.headers)
+
+
+def test_reviewed_package_sets_title_and_sections_of_a_new_version(api_rig, fake_embedder, doc_id):  # noqa: F811
+    first = upload(api_rig, doc_id, always_include=["## 2. 检查 G31 插头"])
+    run_worker(api_rig, first.json()["run_id"])
+
+    pending = import_package(api_rig, package(doc_id, BODY.replace("\n", "\r\n") + "\r\n", reviewed=False))
+    assert pending.status_code == 409 and pending.json()["error"]["code"] == "REFERENCE_PACKAGE_NOT_APPROVED"
+    body = package(doc_id, BODY.replace("\n", "\r\n") + "\r\n## 4. 补充\r\n\r\n新增。\r\n")
+    tampered = {**body, "guide": body["guide"] + "改动"}
+    assert import_package(api_rig, tampered).json()["error"]["code"] == "REFERENCE_PACKAGE_CHANGED"
+
+    imported = import_package(api_rig, body)
+    assert imported.status_code == 202, imported.text
+    assert imported.json()["version"] == "2"
+    second = item(api_rig, doc_id, "2")
+    assert second["title"] == "涡轮增压器指南" and second["source_kind"] == "package"
+    assert second["always_include"] == ["## 3. 处理后怎样确认"], "the package's sections, not the old ones"
+    assert second["package"]["reviewer"] == "李" and second["package"]["open_gaps"] == ["间隙标准未给出"]
+    run_worker(api_rig, imported.json()["run_id"])
+    with api_rig.store.engine.connect() as conn:
+        found = reference_store.candidates(conn, VEHICLE)
+        mine = next(d for d in found if d["id"] == doc_id)
+        assert mine["version"] == "2" and "\r" not in mine["body"]
+        assert mine["provenance"]["package"]["review"]["reviewer"] == "李"
+    again = import_package(api_rig, body)
+    assert again.status_code == 200 and again.json()["reused"] and again.json()["version"] == "2"
+
+
+def test_reviewed_package_creates_a_new_manual(api_rig, fake_embedder, doc_id):  # noqa: F811
+    imported = import_package(api_rig, package(doc_id, BODY))
+    assert imported.status_code == 202 and imported.json()["version"] == "1"
+    created = item(api_rig, doc_id, "1")
+    assert created["vehicle"] == VEHICLE and created["package"]["package_version"] == "4"
+
+
+def test_new_version_can_set_title_and_sections(api_rig, fake_embedder, doc_id):  # noqa: F811
+    upload(api_rig, doc_id, always_include=["## 3. 处理后怎样确认"])
+    response = api_rig.client.post(f"/api/v2/area-references/{doc_id}/versions", json={
+        "content": BODY + "\n## 4. 补充\n\n新增。\n", "title": "演示资料（新）", "always_include": ["## 4. 补充"]},
+        headers=api_rig.headers)
+    assert response.status_code == 202, response.text
+    second = item(api_rig, doc_id, "2")
+    assert second["title"] == "演示资料（新）" and second["always_include"] == ["## 4. 补充"]
+    missing = api_rig.client.post(f"/api/v2/area-references/{doc_id}/versions", json={
+        "content": BODY + "\n## 5. 再补充\n\n正文。\n", "always_include": ["## 9. 不存在"]}, headers=api_rig.headers)
+    assert missing.status_code == 422 and missing.json()["error"]["code"] == "REFERENCE_SECTION_NOT_FOUND"

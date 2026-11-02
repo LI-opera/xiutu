@@ -9,6 +9,7 @@ retrieval); nothing ties a manual to a template or an area. The seed script uses
 processing.
 """
 import hashlib
+import json
 import os
 import re
 from datetime import datetime, timezone
@@ -88,6 +89,72 @@ def validate_content(body, always_include):
     if missing:
         raise DomainError("REFERENCE_SECTION_NOT_FOUND", "必带章节在资料里找不到：" + "、".join(missing),
                           422, details={"missing": missing})
+
+
+# ---------------------------------------------------------------- guide packages (xiutu-clean)
+
+PACKAGE_SCHEMA = "xiutu-guide-package/1"
+
+
+def file_hash(text):
+    """Hash of a package file as it was written (no normalizing: the package hashed its bytes)."""
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def check_package(manifest, guide, sources):
+    """A package exported by xiutu-clean, intact and approved by a person.
+
+    Returns what the import needs: document id, title, vehicle, always-sent sections,
+    the normalized body and the provenance to store. Refuses (DomainError) anything else.
+    """
+    if manifest.get("schema_version") != PACKAGE_SCHEMA:
+        raise DomainError("REFERENCE_PACKAGE_SCHEMA", f"不是资料包（需要 {PACKAGE_SCHEMA} 格式的 manifest.json）。", 422)
+    files = manifest.get("files") or {}
+    changed = [name for name, text in (("guide.md", guide), ("sources.json", sources))
+               if files.get(name) != file_hash(text)]
+    if changed:
+        raise DomainError("REFERENCE_PACKAGE_CHANGED", "资料包文件和 manifest 里记录的哈希不一致（导出后被改动过）："
+                          + "、".join(changed), 422, details={"changed": changed})
+    review = manifest.get("review") or {}
+    if review.get("status") != "approved":
+        raise DomainError("REFERENCE_PACKAGE_NOT_APPROVED",
+                          "资料包还没有通过人工审核。审核后用 xiutu-clean 的 approve.py 标为已通过，再导入。", 409)
+    if review.get("approved_hashes") != {name: files.get(name) for name in ("guide.md", "sources.json")}:
+        raise DomainError("REFERENCE_PACKAGE_CHANGED", "资料包在审核通过之后被改动过，需要重新审核。", 422,
+                          details={"changed": ["approved_hashes"]})
+    if not review.get("reviewer"):
+        raise DomainError("REFERENCE_PACKAGE_NOT_APPROVED", "资料包的审核记录没有审核人。", 409)
+    document_id = str(manifest.get("document_id") or "")
+    if not DOCUMENT_ID.fullmatch(document_id):
+        raise DomainError("REFERENCE_ID_INVALID", "资料编号只能用小写字母、数字和连字符，2～100 个字符。", 422)
+    applicability = (manifest.get("applicability") or [{}])[0]
+    try:
+        vehicle = normalize_vehicle({"brand": str(applicability.get("brand") or ""),
+                                     "model": str(applicability.get("model") or ""),
+                                     "year": int(applicability.get("year_from")),
+                                     "engine_code": str(applicability.get("engine_code") or "")})
+    except (TypeError, ValueError):
+        raise DomainError("REFERENCE_VEHICLE_REQUIRED", "资料包没有写明适用车型（品牌、车型、年款、发动机代码）。", 422) from None
+    try:
+        source_data = json.loads(sources)
+    except ValueError:
+        raise DomainError("REFERENCE_PACKAGE_SCHEMA", "sources.json 不是有效的 JSON。", 422) from None
+    body = normalize(guide)
+    always = list(manifest.get("always_include") or [])
+    validate_content(body, always)
+    title = str(manifest.get("title") or "").strip()
+    if not title or len(title) > 200:
+        raise DomainError("REFERENCE_PACKAGE_SCHEMA", "资料包缺少标题（或超过 200 字）。", 422)
+    provenance = {"package": {
+        "schema_version": PACKAGE_SCHEMA, "package_version": str(manifest.get("version") or ""),
+        "files": {name: files.get(name) for name in ("guide.md", "sources.json")},
+        "review": {k: review.get(k) for k in ("status", "reviewer", "reviewed_at")},
+        "open_gaps": manifest.get("open_gaps") or [], "made_by": manifest.get("made_by") or {},
+        "sources": [{k: s.get(k) for k in ("title", "kind", "pdf_file", "pdf_sha256", "pages_cited")}
+                    for s in source_data.get("sources") or []],
+        "confirmed_facts": source_data.get("confirmed_facts") or []}}
+    return {"document_id": document_id, "title": title, "vehicle": vehicle, "always_include": always,
+            "body": body, "provenance": provenance}
 
 
 def next_version(existing):
@@ -224,13 +291,24 @@ def normalize_vehicle(vehicle):
             "vehicle_engine_code": engine.upper()}
 
 
+def package_of(row):
+    """Review and open gaps of a version imported from a guide package (None otherwise)."""
+    package = (row["provenance"] or {}).get("package")
+    if not package:
+        return None
+    return {"package_version": package.get("package_version"), "reviewer": package["review"].get("reviewer"),
+            "reviewed_at": package["review"].get("reviewed_at"),
+            "open_gaps": [g.get("gap", "") if isinstance(g, dict) else str(g) for g in package.get("open_gaps", [])],
+            "sources": [s.get("title") for s in package.get("sources", [])]}
+
+
 def _summary(row):
     return {"document_id": row["document_id"], "version": row["version"], "title": row["title"],
             "status": row["status"], "error_code": row["error_code"], "source_kind": row["source_kind"],
             "content_hash": row["content_hash"], "chars": len(row["body"]),
             "chunk_count": row["chunk_count"], "chunker_version": row["chunker_version"],
             "vector_fingerprint": row["vector_fingerprint"], "always_include": row["always_include"],
-            "vehicle": vehicle_of(row),
+            "vehicle": vehicle_of(row), "package": package_of(row),
             "created_at": row["created_at"].isoformat(), "updated_at": row["updated_at"].isoformat()}
 
 
@@ -238,7 +316,7 @@ class ReferenceIngestService:
     def __init__(self, engine):
         self.engine = engine
 
-    def _queue(self, conn, actor, document_id, values, body):
+    def _queue(self, conn, actor, document_id, values, body, source_kind="upload"):
         """Insert one queued version (numbered after the existing ones) and schedule its job."""
         from app.services.job_queue import enqueue
         existing = conn.execute(select(documents.c.version).where(
@@ -246,7 +324,7 @@ class ReferenceIngestService:
         version = next_version(existing)
         conn.execute(documents.insert().values(
             document_id=document_id, version=version, body=body, content_hash=content_hash(body),
-            source_kind="upload", status="queued", **values))
+            source_kind=source_kind, status="queued", **values))
         _, run = enqueue(conn, actor, JOB_KIND, {"document_id": document_id, "version": version})
         return 202, {"document_id": document_id, "version": version, "status": "queued",
                      "reused": False, "run_id": run["run_id"]}
@@ -304,19 +382,47 @@ class ReferenceIngestService:
                 raise DomainError("REFERENCE_NOT_FOUND", "找不到这份资料。", 404)
             latest = max(existing, key=lambda r: (int(r["version"]) if r["version"].isdigit() else -1,
                                                   r["created_at"]))
-            # Always-sent sections carry over where the new body still has them.
-            always = [h for h in latest["always_include"] if h in set(headings(body))]
+            # Title and always-sent sections carry over unless given; carried-over sections are
+            # kept where the new body still has them, given ones must all exist.
+            if data.always_include is None:
+                always = [h for h in latest["always_include"] if h in set(headings(body))]
+            else:
+                always = list(data.always_include)
             validate_content(body, always)
+            title = (data.title or "").strip() or latest["title"]
             same = next((r for r in existing if r["content_hash"] == content_hash(body)), None)
             if same is not None:
                 return self._reuse(conn, actor, same)
             return self._queue(conn, actor, document_id, {
-                "title": latest["title"], "always_include": always,
+                "title": title, "always_include": always,
                 **{k: latest[k] for k in ("vehicle_brand", "vehicle_model", "vehicle_year", "vehicle_engine_code")},
                 "provenance": {"upload": {"filename": data.filename, "uploaded_by": str(actor),
                                           "uploaded_at": datetime.now(timezone.utc).isoformat(),
                                           "previous_version": latest["version"]},
                                "images_sent": False}}, body)
+
+    def import_package(self, actor, data):
+        """A reviewed guide package: new document or new version, with the package's own title,
+        vehicle and always-sent sections; the review and sources are kept in provenance."""
+        checked = check_package(data.manifest, data.guide, data.sources)
+        document_id, body = checked["document_id"], checked["body"]
+        with UnitOfWork(self.engine) as u:
+            conn = u.connection
+            self._lock(conn, document_id)
+            existing = conn.execute(select(documents).where(documents.c.document_id == document_id)
+                                    .order_by(documents.c.created_at)).mappings().all()
+            same = next((r for r in existing if r["content_hash"] == content_hash(body)), None)
+            if same is not None:
+                return self._reuse(conn, actor, same)
+            provenance = {**checked["provenance"], "upload": {
+                "filename": "guide.md", "uploaded_by": str(actor),
+                "uploaded_at": datetime.now(timezone.utc).isoformat(),
+                "previous_version": max((r["version"] for r in existing),
+                                        key=lambda v: int(v) if v.isdigit() else -1, default=None)},
+                "images_sent": False}
+            return self._queue(conn, actor, document_id, {
+                "title": checked["title"], "always_include": checked["always_include"], **checked["vehicle"],
+                "provenance": provenance}, body, source_kind="package")
 
     def list(self):
         with self.engine.connect() as conn:

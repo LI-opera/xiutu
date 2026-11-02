@@ -622,6 +622,7 @@ export interface components {
             document_id: string;
             /** Error Code */
             error_code: string | null;
+            package?: components["schemas"]["ReferencePackageInfo"] | null;
             /** Source Kind */
             source_kind: string;
             /** Status */
@@ -640,6 +641,33 @@ export interface components {
         ReferenceList: {
             /** Items */
             items: components["schemas"]["ReferenceItem"][];
+        };
+        /**
+         * ReferencePackageImport
+         * @description A guide package exported by xiutu-clean: the three files' text, exactly as written.
+         */
+        ReferencePackageImport: {
+            /** Guide */
+            guide: string;
+            /** Manifest */
+            manifest: {
+                [key: string]: unknown;
+            };
+            /** Sources */
+            sources: string;
+        };
+        /** ReferencePackageInfo */
+        ReferencePackageInfo: {
+            /** Open Gaps */
+            open_gaps: string[];
+            /** Package Version */
+            package_version: string | null;
+            /** Reviewed At */
+            reviewed_at: string | null;
+            /** Reviewer */
+            reviewer: string | null;
+            /** Sources */
+            sources: (string | null)[];
         };
         /**
          * ReferenceUpload
@@ -690,9 +718,12 @@ export interface components {
         };
         /**
          * ReferenceVersionUpload
-         * @description A new version of an existing manual; title, vehicle and always-sent sections carry over.
+         * @description A new version of an existing manual; the vehicle carries over, and so do the title and the
+         *     always-sent sections unless given (sections still present in the new body).
          */
         ReferenceVersionUpload: {
+            /** Always Include */
+            always_include?: string[] | null;
             /** Content */
             content: string;
             /**
@@ -700,6 +731,8 @@ export interface components {
              * @default
              */
             filename: string;
+            /** Title */
+            title?: string | null;
         };
         /** RepairInput */
         RepairInput: {
