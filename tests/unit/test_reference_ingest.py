@@ -111,9 +111,13 @@ def test_upload_body_needs_a_vehicle_and_no_areas():
                    {**base, "areas": [{"template_id": "t", "template_version": "1", "area_id": "a"}]}):
         with pytest.raises(Exception):
             ReferenceUpload.model_validate(broken)
-    # A new version only brings the file: title, vehicle and sections carry over.
+    # A new version may change its title and always-sent sections (carried over when left out);
+    # the vehicle always carries over.
+    kept = ReferenceVersionUpload.model_validate({"content": "x"})
+    assert kept.title is None and kept.always_include is None
+    assert ReferenceVersionUpload.model_validate({"content": "x", "title": "改名"}).title == "改名"
     with pytest.raises(Exception):
-        ReferenceVersionUpload.model_validate({"content": "x", "title": "改名"})
+        ReferenceVersionUpload.model_validate({"content": "x", "vehicle": vehicle})
 
 
 def test_vehicle_is_trimmed_and_engine_code_upper_cased():
