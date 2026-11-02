@@ -275,7 +275,10 @@ function PackageImportForm({ onUploaded }: { onUploaded: (result: ReferenceUploa
       return apiClient.request<ReferenceUploadResult>('/area-references/packages',
         { method: 'POST', body, idempotencyKey: idempotencyKey('reference-package'), timeoutMs: 60_000 });
     },
-    onSuccess: result => { setMessage(resultText(result)); onUploaded(result); },
+    onSuccess: result => {
+      setMessage(result.reused ? `这份内容已经是第 ${result.version} 版，已按资料包设置标题、必带章节并记下审核。` : resultText(result));
+      onUploaded(result);
+    },
   });
   const chooseFiles = async (list: FileList | null) => {
     upload.reset(); setMessage('');

@@ -411,9 +411,22 @@ class ReferenceIngestService:
             self._lock(conn, document_id)
             existing = conn.execute(select(documents).where(documents.c.document_id == document_id)
                                     .order_by(documents.c.created_at)).mappings().all()
+            latest = max(existing, key=lambda r: (int(r["version"]) if r["version"].isdigit() else -1,
+                                                  r["created_at"]), default=None)
             same = next((r for r in existing if r["content_hash"] == content_hash(body)), None)
-            if same is not None:
+            if same is not None and same["version"] == latest["version"]:
+                # The same text is already the current version (e.g. uploaded on the page before
+                # it was reviewed): attach the review, title, vehicle and sections to it.
+                if ((same["provenance"] or {}).get("package") or {}).get("files") != checked["provenance"]["package"]["files"]:
+                    conn.execute(update(documents).where(documents.c.document_id == document_id,
+                                                         documents.c.version == same["version"])
+                                 .values(title=checked["title"], always_include=checked["always_include"],
+                                         source_kind="package", updated_at=func.now(),
+                                         provenance={**(same["provenance"] or {}), **checked["provenance"]},
+                                         **checked["vehicle"]))
                 return self._reuse(conn, actor, same)
+            # The same text as an older version, or new text: a new version, so the reviewed
+            # text is what analyses read.
             provenance = {**checked["provenance"], "upload": {
                 "filename": "guide.md", "uploaded_by": str(actor),
                 "uploaded_at": datetime.now(timezone.utc).isoformat(),

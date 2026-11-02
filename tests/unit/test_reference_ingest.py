@@ -194,3 +194,13 @@ def test_package_that_is_not_intact_and_approved_is_refused(make, code):
     with pytest.raises(DomainError) as raised:
         ri.check_package(*make())
     assert raised.value.code == code
+
+
+def test_a_guides_gap_list_is_stored_but_never_searched():
+    body = ("# 指南\n\n## 1. 检查壳体\n\n检查 V465。\n\n## 2. 燃油量、品质和供油限制\n\n正文。\n\n"
+            "## 3. 本指南的缺口与限制\n\n- 间隙标准未给出。\n")
+    built = ri.build_chunks("demo", body)
+    searchable = {c["section"]: c["searchable"] for c in built}
+    assert searchable == {"## 1. 检查壳体": True, "## 2. 燃油量、品质和供油限制": True,
+                          "## 3. 本指南的缺口与限制": False}
+    assert [c.section for c in split("demo", body, NAVIGATION)] == ["## 1. 检查壳体", "## 2. 燃油量、品质和供油限制"]

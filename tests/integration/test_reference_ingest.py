@@ -229,3 +229,43 @@ def test_new_version_can_set_title_and_sections(api_rig, fake_embedder, doc_id):
     missing = api_rig.client.post(f"/api/v2/area-references/{doc_id}/versions", json={
         "content": BODY + "\n## 5. 再补充\n\n正文。\n", "always_include": ["## 9. 不存在"]}, headers=api_rig.headers)
     assert missing.status_code == 422 and missing.json()["error"]["code"] == "REFERENCE_SECTION_NOT_FOUND"
+
+
+def test_package_of_text_already_current_attaches_its_review(api_rig, fake_embedder, doc_id):  # noqa: F811
+    first = upload(api_rig, doc_id, always_include=["## 2. 检查 G31 插头"])
+    run_worker(api_rig, first.json()["run_id"])
+    body = package(doc_id, BODY)  # the same text, now reviewed
+    attached = import_package(api_rig, body)
+    assert attached.status_code == 200 and attached.json()["reused"] and attached.json()["version"] == "1"
+    current = item(api_rig, doc_id, "1")
+    assert current["title"] == "涡轮增压器指南" and current["source_kind"] == "package"
+    assert current["always_include"] == ["## 3. 处理后怎样确认"] and current["package"]["reviewer"] == "李"
+    assert current["status"] == "ready", "the text did not change: no reprocessing"
+    with api_rig.store.engine.connect() as conn:
+        mine = next(d for d in reference_store.candidates(conn, VEHICLE) if d["id"] == doc_id)
+        assert mine["provenance"]["upload"]["filename"] == "demo.md", "the upload record is kept"
+
+
+def test_package_of_an_older_versions_text_becomes_a_new_version(api_rig, fake_embedder, doc_id):  # noqa: F811
+    run_worker(api_rig, upload(api_rig, doc_id).json()["run_id"])
+    run_worker(api_rig, new_version(api_rig, doc_id, BODY + "\n## 4. 补充\n\n正文。\n").json()["run_id"])
+    imported = import_package(api_rig, package(doc_id, BODY))
+    assert imported.status_code == 202 and imported.json()["version"] == "3"
+    assert item(api_rig, doc_id, "1")["source_kind"] == "upload", "the old version is left as it was"
+
+
+GUIDE = BODY + "\n## 4. 本指南的缺口与限制\n\n- G31 插头锁止力没有标准。\n"
+
+
+def test_gap_list_stored_as_searchable_earlier_is_not_searched(api_rig, fake_embedder, doc_id):  # noqa: F811
+    run_worker(api_rig, upload(api_rig, doc_id, content=GUIDE).json()["run_id"])
+    with api_rig.store.engine.begin() as conn:
+        # As stored before the gap list became navigation.
+        conn.execute(area_reference_chunks.update().where(
+            area_reference_chunks.c.document_id == doc_id,
+            area_reference_chunks.c.section == "## 4. 本指南的缺口与限制").values(searchable=True))
+    with api_rig.store.engine.connect() as conn:
+        document = next(d for d in reference_store.candidates(conn, VEHICLE) if d["id"] == doc_id)
+        source, _ = reference_store.load(conn, document, None)
+        assert source is not None
+        assert "## 4. 本指南的缺口与限制" not in {c.section for c in source.chunks}
