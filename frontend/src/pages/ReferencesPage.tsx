@@ -110,7 +110,7 @@ function ReferenceDetail({ versions }: { versions: ReferenceItem[] }) {
       <div><dt>上传时间</dt><dd>{current.created_at.slice(0, 16).replace('T', ' ')}</dd></div>
       <div><dt>必带章节</dt><dd>{current.always_include.length ? current.always_include.map(h => h.replace(/^## +/, '')).join('；') : '无'}</dd></div>
       {current.package && <div><dt>审核</dt><dd>{current.package.reviewer ?? '—'}{current.package.reviewed_at ? `（${current.package.reviewed_at.slice(0, 10)}）` : ''}</dd></div>}
-      {current.package && <div><dt>引用手册</dt><dd>{current.package.sources.filter(Boolean).join('、') || '—'}</dd></div>}
+      {current.package && <div><dt>引用手册</dt><dd>{current.package.sources.filter(Boolean).join('；') || '—'}</dd></div>}
     </dl>
     {current.package && current.package.open_gaps.length > 0 && <details className="chunk-panel">
       <summary>资料缺口（{current.package.open_gaps.length}）：手册没有写、指南也没有补的内容</summary>
