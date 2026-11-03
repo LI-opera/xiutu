@@ -1,0 +1,1332 @@
+{
+  "schema_version": "template-module/1",
+  "library_id": "tayron-dkvb",
+  "module_id": "pressure",
+  "module_version": "1",
+  "requires_modules": [],
+  "area": {
+    "id": "pressure",
+    "stage": "S2",
+    "title": "增压压力测量",
+    "icon": "⌁",
+    "description": "先验证信号与工况可信度，再使用压力差路由。",
+    "initialPriority": 2,
+    "componentIds": [
+      "pressure-static",
+      "pressure-g31",
+      "pressure-frame12",
+      "pressure-frame3",
+      "pressure-request"
+    ]
+  },
+  "cards": [
+    {
+      "id": "pressure-static",
+      "stage": "S2",
+      "areaId": "pressure",
+      "title": "静态基准与G31/G71",
+      "icon": "◎",
+      "location": "熄火静态数据",
+      "why": "确认三个静态绝对压力是否一致。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "PRS-01",
+        "PRS-02",
+        "PRS-03",
+        "PRS-04"
+      ],
+      "assetIds": [
+        "M04",
+        "E01",
+        "E02",
+        "D02"
+      ],
+      "long_card_ids": [
+        "LC-04",
+        "LC-05",
+        "LC-06"
+      ]
+    },
+    {
+      "id": "pressure-g31",
+      "stage": "S2",
+      "areaId": "pressure",
+      "title": "G31连接器和线路",
+      "icon": "◈",
+      "location": "G31及线束",
+      "why": "静态离群时检查连接和重复跳变。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "PRS-05",
+        "PRS-06"
+      ],
+      "assetIds": [
+        "M04",
+        "E01"
+      ],
+      "long_card_ids": [
+        "LC-04"
+      ]
+    },
+    {
+      "id": "pressure-frame12",
+      "stage": "S2",
+      "areaId": "pressure",
+      "title": "动态工况与前两帧",
+      "icon": "⌇",
+      "location": "同一负荷工况",
+      "why": "建立可比较工况并记录前两帧。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "PRS-07",
+        "PRS-08",
+        "PRS-09"
+      ],
+      "assetIds": [
+        "D02"
+      ],
+      "long_card_ids": [
+        "LC-06"
+      ]
+    },
+    {
+      "id": "pressure-frame3",
+      "stage": "S2",
+      "areaId": "pressure",
+      "title": "第三帧与趋势",
+      "icon": "⌇",
+      "location": "同一负荷工况",
+      "why": "记录第三帧并自动形成趋势。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "PRS-10",
+        "PRS-11"
+      ],
+      "assetIds": [
+        "D02"
+      ],
+      "long_card_ids": [
+        "LC-06"
+      ]
+    },
+    {
+      "id": "pressure-request",
+      "stage": "S2",
+      "areaId": "pressure",
+      "title": "驾驶请求背景",
+      "icon": "◴",
+      "location": "故障发生工况",
+      "why": "确认压力偏差出现时请求是否保持。",
+      "safety": "记录事实，不根据单项现象直接形成换件结论。",
+      "questionIds": [
+        "PRS-12"
+      ],
+      "assetIds": [
+        "D02"
+      ],
+      "long_card_ids": [
+        "LC-06"
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "PRS-01",
+      "stage": "S2",
+      "cardId": "pressure-static",
+      "title": "PRS-01 · 点火开、发动机停机时环境压力是否已记录",
+      "prompt": "点火开、发动机停机时环境压力是否已记录？",
+      "purpose": "确认压力信号与采集工况是否可信。",
+      "instructions": "先做静态比较，再记录三个可比较负荷帧。",
+      "factKey": "ambient_pressure",
+      "fields": [
+        {
+          "id": "hpa",
+          "label": "环境绝对压力",
+          "unit": "hPa absolute",
+          "defaultValue": "1008",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": true,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        }
+      ],
+      "assetIds": [
+        "D01"
+      ],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "recorded",
+          "label": "已记录",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "pressure",
+      "phase": "diagnostic_observation",
+      "answer_kind": "numeric_with_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-04",
+        "LC-05",
+        "LC-06"
+      ],
+      "capture": {
+        "batch_kind": "engine_off_static",
+        "batch_id_required": true,
+        "unit": "hPa absolute"
+      }
+    },
+    {
+      "id": "PRS-02",
+      "stage": "S2",
+      "cardId": "pressure-static",
+      "title": "PRS-02 · G31静态绝对压力是否已记录",
+      "prompt": "G31静态绝对压力是否已记录？",
+      "purpose": "确认压力信号与采集工况是否可信。",
+      "instructions": "先做静态比较，再记录三个可比较负荷帧。",
+      "factKey": "g31_static",
+      "fields": [
+        {
+          "id": "hpa",
+          "label": "G31静态绝对压力",
+          "unit": "hPa absolute",
+          "defaultValue": "1009",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": true,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        }
+      ],
+      "assetIds": [
+        "M04",
+        "E01"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "recorded",
+          "label": "已记录",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "signal_missing",
+          "label": "信号缺失",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "pressure",
+      "phase": "diagnostic_observation",
+      "answer_kind": "numeric_with_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-04",
+        "LC-05",
+        "LC-06"
+      ],
+      "capture": {
+        "batch_kind": "engine_off_static",
+        "batch_id_required": true,
+        "unit": "hPa absolute"
+      }
+    },
+    {
+      "id": "PRS-03",
+      "stage": "S2",
+      "cardId": "pressure-static",
+      "title": "PRS-03 · G71静态绝对压力是否已记录",
+      "prompt": "G71静态绝对压力是否已记录？",
+      "purpose": "确认压力信号与采集工况是否可信。",
+      "instructions": "先做静态比较，再记录三个可比较负荷帧。",
+      "factKey": "g71_static",
+      "fields": [
+        {
+          "id": "hpa",
+          "label": "G71静态绝对压力",
+          "unit": "hPa absolute",
+          "defaultValue": "1007",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": true,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        }
+      ],
+      "assetIds": [
+        "E02"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "recorded",
+          "label": "已记录",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "signal_missing",
+          "label": "信号缺失",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "pressure",
+      "phase": "diagnostic_observation",
+      "answer_kind": "numeric_with_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-04",
+        "LC-05",
+        "LC-06"
+      ],
+      "capture": {
+        "batch_kind": "engine_off_static",
+        "batch_id_required": true,
+        "unit": "hPa absolute"
+      }
+    },
+    {
+      "id": "PRS-04",
+      "stage": "S2",
+      "cardId": "pressure-static",
+      "title": "PRS-04 · 三个静态值按本模板的比较参考是否一致",
+      "prompt": "三个静态值按本模板的比较参考是否一致？",
+      "purpose": "确认压力信号与采集工况是否可信。",
+      "instructions": "先做静态比较，再记录三个可比较负荷帧。",
+      "factKey": "static_plausibility",
+      "fields": [],
+      "assetIds": [
+        "D02"
+      ],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "consistent",
+          "label": "静态值一致",
+          "outcome": "normal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "g31_outlier",
+          "label": "G31离群",
+          "outcome": "abnormal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "g71_outlier",
+          "label": "G71离群",
+          "outcome": "abnormal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "multiple_outliers",
+          "label": "多个值异常",
+          "outcome": "abnormal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "pressure",
+      "phase": "diagnostic_observation",
+      "answer_kind": "automatic_derived",
+      "submission_semantics": "server_derived_only",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [
+          "PRS-01",
+          "PRS-02",
+          "PRS-03"
+        ],
+        "when": "all applicable saved inputs; otherwise insufficient"
+      },
+      "dependency_question_ids": [
+        "PRS-01",
+        "PRS-02",
+        "PRS-03"
+      ],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-04",
+        "LC-05",
+        "LC-06"
+      ],
+      "capture": null,
+      "derived_rule_id": "D-STATIC-CONSISTENCY"
+    },
+    {
+      "id": "PRS-05",
+      "stage": "S2",
+      "cardId": "pressure-g31",
+      "title": "PRS-05 · G31连接器锁止、针脚、潮气和线束外观",
+      "prompt": "G31连接器锁止、针脚、潮气和线束外观？",
+      "purpose": "确认压力信号与采集工况是否可信。",
+      "instructions": "先做静态比较，再记录三个可比较负荷帧。",
+      "factKey": "g31_connector",
+      "fields": [],
+      "assetIds": [
+        "M04",
+        "E01"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "正常/未见异常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "loose",
+          "label": "松动",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "pin_damage",
+          "label": "针脚损伤",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "moisture",
+          "label": "存在潮气",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "harness_damage",
+          "label": "线束损伤",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "pressure",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-04"
+      ],
+      "capture": null
+    },
+    {
+      "id": "PRS-06",
+      "stage": "S2",
+      "cardId": "pressure-g31",
+      "title": "PRS-06 · 摇动线束时信号是否跳变",
+      "prompt": "摇动线束时信号是否跳变？",
+      "purpose": "确认压力信号与采集工况是否可信。",
+      "instructions": "先做静态比较，再记录三个可比较负荷帧。",
+      "factKey": "g31_wiggle_result",
+      "fields": [],
+      "assetIds": [
+        "E01"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL",
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "stable",
+          "label": "信号稳定",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "intermittent",
+          "label": "间歇出现",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "signal_lost",
+          "label": "信号丢失",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "pressure",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR",
+        "SRC-WIRING-DKVB-70"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-04"
+      ],
+      "capture": null
+    },
+    {
+      "id": "PRS-07",
+      "stage": "S2",
+      "cardId": "pressure-frame12",
+      "title": "PRS-07 · 负荷工况是否稳定且三帧可比较",
+      "prompt": "负荷工况是否稳定且三帧可比较？",
+      "purpose": "确认压力信号与采集工况是否可信。",
+      "instructions": "先做静态比较，再记录三个可比较负荷帧。",
+      "factKey": "frame_comparability",
+      "fields": [],
+      "assetIds": [
+        "D02"
+      ],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "comparable",
+          "label": "工况可比较",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "rpm_varied",
+          "label": "转速变化过大",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "load_varied",
+          "label": "负荷变化过大",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "throttle_lifted",
+          "label": "驾驶请求中断",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "pressure",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-06"
+      ],
+      "capture": null
+    },
+    {
+      "id": "PRS-08",
+      "stage": "S2",
+      "cardId": "pressure-frame12",
+      "title": "PRS-08 · 第一帧目标/实际压力",
+      "prompt": "第一帧目标/实际压力",
+      "purpose": "确认压力信号与采集工况是否可信。",
+      "instructions": "先做静态比较，再记录三个可比较负荷帧。",
+      "factKey": "frame_1",
+      "fields": [
+        {
+          "id": "rpm",
+          "label": "转速",
+          "unit": "rpm",
+          "defaultValue": "2800",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": true,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        },
+        {
+          "id": "load",
+          "label": "发动机负荷",
+          "unit": "%",
+          "defaultValue": "72",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": true,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        },
+        {
+          "id": "request",
+          "label": "驾驶请求",
+          "defaultValue": "保持",
+          "type": "text",
+          "demo_default_only": true,
+          "required_when_recorded": false,
+          "validation": "trimmed text; no default-as-fact"
+        },
+        {
+          "id": "target",
+          "label": "目标绝对压力",
+          "unit": "hPa absolute",
+          "defaultValue": "1850",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": true,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        },
+        {
+          "id": "actual",
+          "label": "实际绝对压力",
+          "unit": "hPa absolute",
+          "defaultValue": "1460",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": true,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        },
+        {
+          "id": "captured_at",
+          "label": "采集时间",
+          "type": "text",
+          "defaultValue": "",
+          "demo_default_only": false,
+          "required_when_recorded": true,
+          "validation": "ISO timestamp or documented relative time"
+        },
+        {
+          "id": "gear",
+          "label": "挡位/采集工况",
+          "type": "text",
+          "defaultValue": "",
+          "demo_default_only": false,
+          "required_when_recorded": true,
+          "validation": "nonempty"
+        }
+      ],
+      "assetIds": [
+        "D02"
+      ],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "recorded",
+          "label": "已记录",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "pressure",
+      "phase": "diagnostic_observation",
+      "answer_kind": "numeric_with_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-06"
+      ],
+      "capture": {
+        "batch_kind": "comparable_load_frames",
+        "batch_id_required": true,
+        "unit": "hPa absolute"
+      }
+    },
+    {
+      "id": "PRS-09",
+      "stage": "S2",
+      "cardId": "pressure-frame12",
+      "title": "PRS-09 · 第二帧目标/实际压力",
+      "prompt": "第二帧目标/实际压力",
+      "purpose": "确认压力信号与采集工况是否可信。",
+      "instructions": "先做静态比较，再记录三个可比较负荷帧。",
+      "factKey": "frame_2",
+      "fields": [
+        {
+          "id": "rpm",
+          "label": "转速",
+          "unit": "rpm",
+          "defaultValue": "2900",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": true,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        },
+        {
+          "id": "load",
+          "label": "发动机负荷",
+          "unit": "%",
+          "defaultValue": "74",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": true,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        },
+        {
+          "id": "request",
+          "label": "驾驶请求",
+          "defaultValue": "保持",
+          "type": "text",
+          "demo_default_only": true,
+          "required_when_recorded": false,
+          "validation": "trimmed text; no default-as-fact"
+        },
+        {
+          "id": "target",
+          "label": "目标绝对压力",
+          "unit": "hPa absolute",
+          "defaultValue": "1885",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": true,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        },
+        {
+          "id": "actual",
+          "label": "实际绝对压力",
+          "unit": "hPa absolute",
+          "defaultValue": "1480",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": true,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        },
+        {
+          "id": "captured_at",
+          "label": "采集时间",
+          "type": "text",
+          "defaultValue": "",
+          "demo_default_only": false,
+          "required_when_recorded": true,
+          "validation": "ISO timestamp or documented relative time"
+        },
+        {
+          "id": "gear",
+          "label": "挡位/采集工况",
+          "type": "text",
+          "defaultValue": "",
+          "demo_default_only": false,
+          "required_when_recorded": true,
+          "validation": "nonempty"
+        }
+      ],
+      "assetIds": [
+        "D02"
+      ],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "recorded",
+          "label": "已记录",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "pressure",
+      "phase": "diagnostic_observation",
+      "answer_kind": "numeric_with_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-06"
+      ],
+      "capture": {
+        "batch_kind": "comparable_load_frames",
+        "batch_id_required": true,
+        "unit": "hPa absolute"
+      }
+    },
+    {
+      "id": "PRS-10",
+      "stage": "S2",
+      "cardId": "pressure-frame3",
+      "title": "PRS-10 · 第三帧目标/实际压力",
+      "prompt": "第三帧目标/实际压力",
+      "purpose": "确认压力信号与采集工况是否可信。",
+      "instructions": "先做静态比较，再记录三个可比较负荷帧。",
+      "factKey": "frame_3",
+      "fields": [
+        {
+          "id": "rpm",
+          "label": "转速",
+          "unit": "rpm",
+          "defaultValue": "3000",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": true,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        },
+        {
+          "id": "load",
+          "label": "发动机负荷",
+          "unit": "%",
+          "defaultValue": "76",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": true,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        },
+        {
+          "id": "request",
+          "label": "驾驶请求",
+          "defaultValue": "保持",
+          "type": "text",
+          "demo_default_only": true,
+          "required_when_recorded": false,
+          "validation": "trimmed text; no default-as-fact"
+        },
+        {
+          "id": "target",
+          "label": "目标绝对压力",
+          "unit": "hPa absolute",
+          "defaultValue": "1920",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": true,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        },
+        {
+          "id": "actual",
+          "label": "实际绝对压力",
+          "unit": "hPa absolute",
+          "defaultValue": "1500",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": true,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        },
+        {
+          "id": "captured_at",
+          "label": "采集时间",
+          "type": "text",
+          "defaultValue": "",
+          "demo_default_only": false,
+          "required_when_recorded": true,
+          "validation": "ISO timestamp or documented relative time"
+        },
+        {
+          "id": "gear",
+          "label": "挡位/采集工况",
+          "type": "text",
+          "defaultValue": "",
+          "demo_default_only": false,
+          "required_when_recorded": true,
+          "validation": "nonempty"
+        }
+      ],
+      "assetIds": [
+        "D02"
+      ],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "recorded",
+          "label": "已记录",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "pressure",
+      "phase": "diagnostic_observation",
+      "answer_kind": "numeric_with_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-06"
+      ],
+      "capture": {
+        "batch_kind": "comparable_load_frames",
+        "batch_id_required": true,
+        "unit": "hPa absolute"
+      }
+    },
+    {
+      "id": "PRS-11",
+      "stage": "S2",
+      "cardId": "pressure-frame3",
+      "title": "PRS-11 · 三帧趋势分类",
+      "prompt": "三帧趋势分类",
+      "purpose": "确认压力信号与采集工况是否可信。",
+      "instructions": "先做静态比较，再记录三个可比较负荷帧。",
+      "factKey": "boost_trend",
+      "fields": [],
+      "assetIds": [
+        "D02"
+      ],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "tracks_target",
+          "label": "持续跟随目标",
+          "outcome": "normal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "persistent_underboost",
+          "label": "连续增压不足",
+          "outcome": "abnormal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "intermittent_drop",
+          "label": "间歇掉压",
+          "outcome": "abnormal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "overshoot",
+          "label": "压力过冲",
+          "outcome": "abnormal",
+          "status_semantics": "derived_state_not_user_submittable"
+        },
+        {
+          "id": "unreliable",
+          "label": "数据不可信",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "pressure",
+      "phase": "diagnostic_observation",
+      "answer_kind": "automatic_derived",
+      "submission_semantics": "server_derived_only",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [
+          "PRS-07",
+          "PRS-08",
+          "PRS-09",
+          "PRS-10"
+        ],
+        "when": "all applicable saved inputs; otherwise insufficient"
+      },
+      "dependency_question_ids": [
+        "PRS-07",
+        "PRS-08",
+        "PRS-09",
+        "PRS-10"
+      ],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-06"
+      ],
+      "capture": null,
+      "derived_rule_id": "D-PRESSURE-TREND"
+    },
+    {
+      "id": "PRS-12",
+      "stage": "S2",
+      "cardId": "pressure-request",
+      "title": "PRS-12 · 故障发生时节气门/驾驶请求是否仍保持",
+      "prompt": "故障发生时节气门/驾驶请求是否仍保持？",
+      "purpose": "确认压力信号与采集工况是否可信。",
+      "instructions": "先做静态比较，再记录三个可比较负荷帧。",
+      "factKey": "torque_request_context",
+      "fields": [],
+      "assetIds": [],
+      "sources": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "options": [
+        {
+          "id": "request_held",
+          "label": "驾驶请求保持",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "request_reduced",
+          "label": "驾驶请求降低",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unknown",
+          "label": "无法确认",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "pressure",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-06"
+      ],
+      "capture": null
+    }
+  ],
+  "calculation_rules": [
+    {
+      "id": "static-pressure-comparison",
+      "operator": "numeric_reference_consistency",
+      "target_question_id": "PRS-04",
+      "same_batch_kind": "engine_off_static",
+      "unit": "hPa absolute",
+      "parameters": {
+        "max_difference": 30
+      },
+      "inputs": [
+        {
+          "question_id": "PRS-01",
+          "field": "hpa",
+          "valid_option_ids": [
+            "recorded"
+          ]
+        },
+        {
+          "question_id": "PRS-02",
+          "field": "hpa",
+          "valid_option_ids": [
+            "recorded"
+          ]
+        },
+        {
+          "question_id": "PRS-03",
+          "field": "hpa",
+          "valid_option_ids": [
+            "recorded"
+          ]
+        }
+      ],
+      "outputs": {
+        "consistent": "consistent",
+        "single_outlier": {
+          "PRS-02": "g31_outlier",
+          "PRS-03": "g71_outlier"
+        },
+        "multiple_outliers": "multiple_outliers"
+      },
+      "reasons": {
+        "consistent": "三项同批静态值落在本模板 30 hPa 比较带内；该带宽仅用于提示核查，不是厂家判废值。",
+        "g31_outlier": "G31 静态值偏离环境参考超过本模板 30 hPa 比较带；先核对单位、工况与传感器数据来源。",
+        "g71_outlier": "G71 静态值偏离环境参考超过本模板 30 hPa 比较带；先核对单位、工况与传感器数据来源。",
+        "multiple_outliers": "静态值差异超过本模板比较带；不能直接据此判定某个部件失效。"
+      },
+      "source_refs": [
+        "14-增压压力测量检查与维修参考-详细版.md",
+        "legacy_topic_projection.py:editorial-comparison"
+      ]
+    },
+    {
+      "id": "load-frame-comparison",
+      "operator": "numeric_series_gap",
+      "target_question_id": "PRS-11",
+      "same_batch_kind": "comparable_load_frames",
+      "unit": "hPa absolute",
+      "parameters": {
+        "close_abs_max": 150,
+        "large_positive_min": 250
+      },
+      "comparability_gate": {
+        "question_id": "PRS-07",
+        "allowed_option_ids": [
+          "comparable"
+        ]
+      },
+      "inputs": [
+        {
+          "question_id": "PRS-08",
+          "target_field": "target",
+          "actual_field": "actual",
+          "valid_option_ids": [
+            "recorded"
+          ]
+        },
+        {
+          "question_id": "PRS-09",
+          "target_field": "target",
+          "actual_field": "actual",
+          "valid_option_ids": [
+            "recorded"
+          ]
+        },
+        {
+          "question_id": "PRS-10",
+          "target_field": "target",
+          "actual_field": "actual",
+          "valid_option_ids": [
+            "recorded"
+          ]
+        }
+      ],
+      "outputs": {
+        "tracks": "tracks_target",
+        "persistent_positive_gap": "persistent_underboost",
+        "intermittent_positive_gap": "intermittent_drop"
+      },
+      "reasons": {
+        "tracks_target": "三帧目标与实际差值均在本模板 150 hPa 比较带内；仍需结合工况与症状。",
+        "persistent_underboost": "三帧目标高于实际且差值均超过本模板 250 hPa 关注带；先验证数据可靠性。",
+        "intermittent_drop": "三帧中既有大差值又有接近目标的帧；复核工况一致性与间歇线索。"
+      },
+      "source_refs": [
+        "14-增压压力测量检查与维修参考-详细版.md",
+        "legacy_topic_projection.py:editorial-comparison"
+      ]
+    }
+  ],
+  "focus_rules": [
+    {
+      "id": "pressure-signal-followup",
+      "all": [
+        {
+          "question_id": "PRS-06",
+          "option_ids": [
+            "intermittent",
+            "signal_lost"
+          ]
+        }
+      ],
+      "question_ids": [
+        "PRS-01",
+        "PRS-02",
+        "PRS-03",
+        "PRS-05"
+      ]
+    }
+  ],
+  "conflict_rules": []
+}

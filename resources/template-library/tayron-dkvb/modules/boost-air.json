@@ -1,0 +1,1422 @@
+{
+  "schema_version": "template-module/1",
+  "library_id": "tayron-dkvb",
+  "module_id": "boost-air",
+  "module_version": "1",
+  "requires_modules": [],
+  "area": {
+    "id": "boost-air",
+    "stage": "S1",
+    "title": "增压空气通路",
+    "icon": "↝",
+    "description": "从可见、低风险且资料充分的空气路径开始。",
+    "initialPriority": 1,
+    "componentIds": [
+      "air-intake",
+      "air-hose",
+      "air-connector",
+      "air-intercooler",
+      "air-leak-test"
+    ]
+  },
+  "cards": [
+    {
+      "id": "air-intake",
+      "stage": "S1",
+      "areaId": "boost-air",
+      "title": "空气滤清器与进气导管",
+      "icon": "⌁",
+      "location": "发动机舱进气入口至涡轮前",
+      "why": "排除进气受限和前导管异常。",
+      "safety": "压力检漏不得超过0.5 bar；条件不足时保守交接。",
+      "questionIds": [
+        "AIR-01",
+        "AIR-02",
+        "AIR-03"
+      ],
+      "assetIds": [
+        "M08",
+        "M02"
+      ],
+      "long_card_ids": [
+        "LC-01"
+      ]
+    },
+    {
+      "id": "air-hose",
+      "stage": "S1",
+      "areaId": "boost-air",
+      "title": "涡轮出口至中冷器软管",
+      "icon": "↝",
+      "location": "涡轮出口至中冷器",
+      "why": "寻找软管损伤、干涉与油雾线索。",
+      "safety": "压力检漏不得超过0.5 bar；条件不足时保守交接。",
+      "questionIds": [
+        "AIR-04",
+        "AIR-05",
+        "AIR-06"
+      ],
+      "assetIds": [
+        "M02"
+      ],
+      "long_card_ids": [
+        "LC-01"
+      ]
+    },
+    {
+      "id": "air-connector",
+      "stage": "S1",
+      "areaId": "boost-air",
+      "title": "快插接头、密封圈与卡箍",
+      "icon": "⛓",
+      "location": "增压管路各快插连接",
+      "why": "形成近期拆装后的处理闭环。",
+      "safety": "压力检漏不得超过0.5 bar；条件不足时保守交接。",
+      "questionIds": [
+        "AIR-07",
+        "AIR-08",
+        "AIR-09",
+        "AIR-10"
+      ],
+      "assetIds": [
+        "M03"
+      ],
+      "long_card_ids": [
+        "LC-02"
+      ]
+    },
+    {
+      "id": "air-intercooler",
+      "stage": "S1",
+      "areaId": "boost-air",
+      "title": "中冷器及两侧接口",
+      "icon": "▦",
+      "location": "前保险杠后方中冷器",
+      "why": "观察撞击、变形与接口线索。",
+      "safety": "压力检漏不得超过0.5 bar；条件不足时保守交接。",
+      "questionIds": [
+        "AIR-11",
+        "AIR-12"
+      ],
+      "assetIds": [
+        "M02"
+      ],
+      "long_card_ids": [
+        "LC-01"
+      ]
+    },
+    {
+      "id": "air-leak-test",
+      "stage": "S1",
+      "areaId": "boost-air",
+      "title": "增压系统加压检漏",
+      "icon": "◎",
+      "location": "增压空气系统",
+      "why": "用受控压力定位解释性泄漏。",
+      "safety": "压力检漏不得超过0.5 bar；条件不足时保守交接。",
+      "questionIds": [
+        "AIR-13",
+        "AIR-14",
+        "AIR-15",
+        "AIR-16"
+      ],
+      "assetIds": [
+        "M05",
+        "M06"
+      ],
+      "long_card_ids": [
+        "LC-03"
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "AIR-01",
+      "stage": "S1",
+      "cardId": "air-intake",
+      "title": "AIR-01 · 空滤壳上下盖是否完全闭合、卡扣是否到位",
+      "prompt": "空滤壳上下盖是否完全闭合、卡扣是否到位？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "intake_housing_state",
+      "fields": [],
+      "assetIds": [
+        "M08"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "正常/未见异常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "open_or_misaligned",
+          "label": "未闭合或错位",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "damaged",
+          "label": "损伤",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-AIRFILTER",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null
+    },
+    {
+      "id": "AIR-02",
+      "stage": "S1",
+      "cardId": "air-intake",
+      "title": "AIR-02 · 滤芯是否存在明显堵塞、潮湿、变形或错误安装",
+      "prompt": "滤芯是否存在明显堵塞、潮湿、变形或错误安装？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "air_filter_state",
+      "fields": [],
+      "assetIds": [
+        "M08"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "clean",
+          "label": "清洁通畅",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "restricted",
+          "label": "明显受限",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "wet",
+          "label": "潮湿",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "misinstalled",
+          "label": "安装错误",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-AIRFILTER",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null
+    },
+    {
+      "id": "AIR-03",
+      "stage": "S1",
+      "cardId": "air-intake",
+      "title": "AIR-03 · 空滤至涡轮入口导管是否松脱、压扁或破裂",
+      "prompt": "空滤至涡轮入口导管是否松脱、压扁或破裂？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "pre_turbo_duct_state",
+      "fields": [],
+      "assetIds": [
+        "M02"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "正常/未见异常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "loose",
+          "label": "松动",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "collapsed",
+          "label": "压扁",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "cracked",
+          "label": "破裂",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-AIRFILTER",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null
+    },
+    {
+      "id": "AIR-04",
+      "stage": "S1",
+      "cardId": "air-hose",
+      "title": "AIR-04 · 软管表面是否有裂纹、擦伤、鼓包或压扁",
+      "prompt": "软管表面是否有裂纹、擦伤、鼓包或压扁？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "boost_hose_surface",
+      "fields": [],
+      "assetIds": [
+        "M02"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "正常/未见异常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "crack",
+          "label": "裂纹",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "abrasion",
+          "label": "擦伤",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "bulge",
+          "label": "鼓包",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "collapsed",
+          "label": "压扁",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null
+    },
+    {
+      "id": "AIR-05",
+      "stage": "S1",
+      "cardId": "air-hose",
+      "title": "AIR-05 · 接头周围油雾分布如何",
+      "prompt": "接头周围油雾分布如何？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "oil_trace_pattern",
+      "fields": [],
+      "assetIds": [
+        "M03"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "none",
+          "label": "未发现/无",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "light_uniform",
+          "label": "轻微均匀油雾",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "localized_heavy",
+          "label": "局部集中油雾",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "fresh_wet",
+          "label": "新鲜湿痕",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null
+    },
+    {
+      "id": "AIR-06",
+      "stage": "S1",
+      "cardId": "air-hose",
+      "title": "AIR-06 · 软管是否与支架、风扇罩或其他部件干涉",
+      "prompt": "软管是否与支架、风扇罩或其他部件干涉？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "hose_interference",
+      "fields": [],
+      "assetIds": [
+        "M02"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "clear",
+          "label": "无干涉",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "light_contact",
+          "label": "轻微接触",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "rub_mark",
+          "label": "存在摩擦痕",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "active_interference",
+          "label": "正在干涉",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null
+    },
+    {
+      "id": "AIR-07",
+      "stage": "S1",
+      "cardId": "air-connector",
+      "title": "AIR-07 · 快插接头是否推至止挡并可靠锁止",
+      "prompt": "快插接头是否推至止挡并可靠锁止？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "connector_seating",
+      "fields": [],
+      "assetIds": [
+        "M03"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "seated",
+          "label": "推至止挡并锁止",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "partially_seated",
+          "label": "未完全座合",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "not_locked",
+          "label": "未锁止",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-02"
+      ],
+      "capture": null
+    },
+    {
+      "id": "AIR-08",
+      "stage": "S1",
+      "cardId": "air-connector",
+      "title": "AIR-08 · 手动轻拉接头时是否出现异常移动",
+      "prompt": "手动轻拉接头时是否出现异常移动？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "connector_retention",
+      "fields": [],
+      "assetIds": [
+        "M03"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "secure",
+          "label": "保持可靠",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "small_play",
+          "label": "存在小幅异常移动",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "pulls_out",
+          "label": "可被直接拉出",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-02"
+      ],
+      "capture": null
+    },
+    {
+      "id": "AIR-09",
+      "stage": "S1",
+      "cardId": "air-connector",
+      "title": "AIR-09 · 资料图所示安装标记是否对齐",
+      "prompt": "资料图所示安装标记是否对齐？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "clamp_alignment",
+      "fields": [],
+      "assetIds": [
+        "M03"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "aligned",
+          "label": "标记对齐",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "misaligned",
+          "label": "标记未对齐",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "mark_unreadable",
+          "label": "标记不可读",
+          "outcome": "abnormal",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-02"
+      ],
+      "capture": null
+    },
+    {
+      "id": "AIR-10",
+      "stage": "S1",
+      "cardId": "air-connector",
+      "title": "AIR-10 · 可见密封圈状态如何",
+      "prompt": "可见密封圈状态如何？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "seal_state",
+      "fields": [],
+      "assetIds": [
+        "M03"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "正常/未见异常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "twisted",
+          "label": "密封圈扭曲",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "pinched",
+          "label": "密封圈夹伤",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "missing_or_damaged",
+          "label": "缺失或损伤",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "not_visible",
+          "label": "不可见",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-02"
+      ],
+      "capture": null
+    },
+    {
+      "id": "AIR-11",
+      "stage": "S1",
+      "cardId": "air-intercooler",
+      "title": "AIR-11 · 中冷器外观是否有撞击、变形或明显污染",
+      "prompt": "中冷器外观是否有撞击、变形或明显污染？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "intercooler_external",
+      "fields": [],
+      "assetIds": [
+        "M02"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "正常/未见异常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "impact",
+          "label": "碰撞痕迹",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "deformed",
+          "label": "变形",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "contaminated",
+          "label": "明显污染",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null
+    },
+    {
+      "id": "AIR-12",
+      "stage": "S1",
+      "cardId": "air-intercooler",
+      "title": "AIR-12 · 左右接口是否松脱或存在局部油雾/新鲜湿痕",
+      "prompt": "左右接口是否松脱或存在局部油雾/新鲜湿痕？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "intercooler_joint",
+      "fields": [],
+      "assetIds": [
+        "M02"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "正常/未见异常",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "left_suspect",
+          "label": "左侧接口可疑",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "right_suspect",
+          "label": "右侧接口可疑",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "both_suspect",
+          "label": "两侧均可疑",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null
+    },
+    {
+      "id": "AIR-13",
+      "stage": "S1",
+      "cardId": "air-leak-test",
+      "title": "AIR-13 · 是否具备V.A.G 1687或等效安全检漏能力",
+      "prompt": "是否具备V.A.G 1687或等效安全检漏能力？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "leak_test_capability",
+      "fields": [],
+      "assetIds": [
+        "M05",
+        "M06"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "available",
+          "label": "具备指定检漏能力",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "alternative_safe_tool",
+          "label": "具备等效安全工具",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-03"
+      ],
+      "capture": null
+    },
+    {
+      "id": "AIR-14",
+      "stage": "S1",
+      "cardId": "air-leak-test",
+      "title": "AIR-14 · 加压过程是否遵守最大0.5 bar",
+      "prompt": "加压过程是否遵守最大0.5 bar？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "leak_test_safety",
+      "fields": [
+        {
+          "id": "pressureBar",
+          "label": "实际加压值",
+          "unit": "bar",
+          "defaultValue": "0.5",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": false,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        },
+        {
+          "id": "tool",
+          "label": "受控检漏工具",
+          "type": "text",
+          "defaultValue": "",
+          "demo_default_only": false,
+          "required_when_recorded": true,
+          "validation": "nonempty when within_limit"
+        }
+      ],
+      "assetIds": [
+        "M05",
+        "M06"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "within_limit",
+          "label": "未超过0.5 bar",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "not_performed",
+          "label": "尚未执行",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        },
+        {
+          "id": "unsafe_stop",
+          "label": "已安全停止",
+          "outcome": "unavailable",
+          "status_semantics": "not_executed_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "conditional_operation",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [
+          "AIR-13"
+        ],
+        "when": "AIR-13=available|alternative_safe_tool，设备受控且安全条件已确认；超过0.5 bar禁止提交完成。"
+      },
+      "dependency_question_ids": [
+        "AIR-13"
+      ],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-03"
+      ],
+      "capture": null,
+      "operation_kind": "controlled_leak_test",
+      "execution_conditions": {
+        "bypass_options": [
+          "not_performed",
+          "unsafe_stop"
+        ],
+        "requirements": [
+          {
+            "ref": "AIR-13",
+            "allowed": [
+              "available",
+              "alternative_safe_tool"
+            ],
+            "label": "安全检漏工具可用"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AIR-15",
+      "stage": "S1",
+      "cardId": "air-leak-test",
+      "title": "AIR-15 · 泄漏响应位于哪里",
+      "prompt": "泄漏响应位于哪里？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "leak_location",
+      "fields": [
+        {
+          "id": "location",
+          "label": "位置补充",
+          "defaultValue": "管路接头",
+          "type": "text",
+          "demo_default_only": true,
+          "required_when_recorded": false,
+          "validation": "trimmed text; no default-as-fact"
+        }
+      ],
+      "assetIds": [
+        "M05",
+        "M06"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "none",
+          "label": "未发现/无",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "hose",
+          "label": "软管",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "connector",
+          "label": "接头",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "intercooler",
+          "label": "中冷器",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "throttle_side",
+          "label": "节气门侧",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "multiple",
+          "label": "多处泄漏响应",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "conditional_operation",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [
+          "AIR-13",
+          "AIR-14"
+        ],
+        "when": "已执行合规检漏，或记录其它可定位证据及方法；无法执行可记录 unavailable。"
+      },
+      "dependency_question_ids": [
+        "AIR-13",
+        "AIR-14"
+      ],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-03"
+      ],
+      "capture": null,
+      "operation_kind": "leak_localization",
+      "execution_conditions": {
+        "bypass_options": [
+          "unavailable"
+        ],
+        "requirements": [
+          {
+            "ref": "AIR-13",
+            "allowed": [
+              "available",
+              "alternative_safe_tool"
+            ],
+            "label": "安全检漏工具可用"
+          },
+          {
+            "ref": "AIR-14",
+            "allowed": [
+              "within_limit"
+            ],
+            "label": "合规检漏已完成"
+          }
+        ]
+      }
+    },
+    {
+      "id": "AIR-16",
+      "stage": "S1",
+      "cardId": "air-leak-test",
+      "title": "AIR-16 · 泄漏证据强度",
+      "prompt": "泄漏证据强度？",
+      "purpose": "从可见且低风险的空气路径寻找限制、松脱或泄漏。",
+      "instructions": "沿空气路径检查；加压不得超过0.5 bar。",
+      "factKey": "leak_evidence_strength",
+      "fields": [],
+      "assetIds": [
+        "M05",
+        "M06"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "audible_or_bubble",
+          "label": "声音或气泡明确定位",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "ultrasonic",
+          "label": "超声定位",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "trace_only",
+          "label": "仅痕迹线索",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "inconclusive",
+          "label": "无法形成定位",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查/无法取得",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "conditional_operation",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [
+          "AIR-15"
+        ],
+        "when": "已有定位观察；油雾/痕迹单独不能升级为已定位泄漏。"
+      },
+      "dependency_question_ids": [
+        "AIR-15"
+      ],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-03"
+      ],
+      "capture": null,
+      "operation_kind": "evidence_grading",
+      "execution_conditions": {
+        "bypass_options": [
+          "unavailable"
+        ],
+        "requirements": [
+          {
+            "ref": "AIR-15",
+            "allowed": [
+              "hose",
+              "connector",
+              "intercooler",
+              "throttle_side",
+              "multiple"
+            ],
+            "label": "先记录已定位的泄漏位置"
+          }
+        ]
+      }
+    }
+  ],
+  "calculation_rules": [],
+  "focus_rules": [
+    {
+      "id": "air-joint-followup",
+      "all": [
+        {
+          "question_id": "AIR-07",
+          "option_ids": [
+            "partially_seated",
+            "not_locked"
+          ]
+        }
+      ],
+      "question_ids": [
+        "AIR-08",
+        "AIR-09",
+        "AIR-10"
+      ]
+    }
+  ],
+  "conflict_rules": [
+    {
+      "id": "joint-seating-tension",
+      "all": [
+        {
+          "question_id": "AIR-07",
+          "option_ids": [
+            "seated"
+          ]
+        },
+        {
+          "question_id": "AIR-08",
+          "option_ids": [
+            "pulls_out"
+          ]
+        }
+      ],
+      "reason": "接头外观已到位与手动拉拔脱出并存；复核锁止和两次检查的部位。"
+    }
+  ]
+}
