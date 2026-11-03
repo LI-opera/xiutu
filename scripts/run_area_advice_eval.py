@@ -9,6 +9,10 @@ Compare how much manual text is sent (experiment; "current" is what the product 
 
     uv run python -B scripts/run_area_advice_eval.py --reading current,full,answered,answered-top1
 
+Compare the manuals in the repository with reviewed guide packages (old against new):
+
+    uv run python -B scripts/run_area_advice_eval.py --documents repo,packages --packages ../xiutu-clean/packages
+
 Results go to .local-data/evals/area-advice/<time>/ (report.md, summary.json, raw results).
 """
 import argparse
@@ -87,13 +91,20 @@ def steps_md(result):
 
 
 GROUNDING = ("codes_grounded", "values_grounded")
+DOCUMENT_SETS = {"repo": "仓库里的资料（resources/knowledge）", "packages": "审核过的资料包（--packages 文件夹里各资料的最新版本）"}
+
+
+def describe(mode):
+    reading, _, documents = mode.partition("@")
+    text = ev.READING_MODES[reading]
+    return f"{text}；{DOCUMENT_SETS[documents]}" if documents else text
 
 
 def mode_table(modes, runs, chars):
     """One row per reading mode: input size, cost and pass counts, to compare at a glance."""
     lines = ["## 资料发送方式对比", "",
-             "| 方式 | 说明 | 平均输入（字） | 平均费用（元） | 题目检查 | 引用存在 | 编号有依据 | 数值有依据 | 失败 |",
-             "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+             "| 方式 | 说明 | 平均输入（字） | 平均费用（元） | 题目检查 | 引用存在 | 编号有依据 | 数值有依据 | 异常记录有安排 | 失败 |",
+             "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
     for mode in modes:
         rows = [r for r in runs if r["reading"] == mode]
         graded = [g for r in rows if r["graded"] for g in r["graded"]]
@@ -103,10 +114,11 @@ def mode_table(modes, runs, chars):
             return f"{sum(g['passed'] for g in items)}/{len(items)}"
         size = [c for (cid, m), c in chars.items() if m == mode]
         cost = [Decimal(r["cost_cny"]) for r in rows if r["usage"]]
-        lines.append(f"| {mode} | {ev.READING_MODES[mode]} | {sum(size) // max(len(size), 1)} | "
+        lines.append(f"| {mode} | {describe(mode)} | {sum(size) // max(len(size), 1)} | "
                      f"{(sum(cost) / len(cost)) if cost else 0:.3f} | "
-                     f"{count({'refs_exist', 'retired_fields_empty', *GROUNDING}, include=False)} | "
+                     f"{count({'refs_exist', 'retired_fields_empty', 'records_planned', *GROUNDING}, include=False)} | "
                      f"{count({'refs_exist'})} | {count({'codes_grounded'})} | {count({'values_grounded'})} | "
+                     f"{count({'records_planned'})} | "
                      f"{sum(1 for r in rows if r['error'])} |")
     lines += ["", "\"题目检查\"是每道题自己的检查项合计；\"数值有依据\"可能把模型自行换算的数值也算进去，请看下面的详情。", ""]
     return lines
@@ -159,12 +171,21 @@ def main():
     parser.add_argument("--max-cny", type=Decimal, default=Decimal("1"))
     parser.add_argument("--reading", default="current",
                         help="comma separated: " + ",".join(ev.READING_MODES) + "; only current is the product")
+    parser.add_argument("--documents", default="repo",
+                        help="comma separated: repo (manuals in the repository), packages (reviewed guide packages)")
+    parser.add_argument("--packages", type=Path, default=ROOT.parent / "xiutu-clean" / "packages",
+                        help="folder of guide packages for --documents packages")
     args = parser.parse_args()
     if not 1 <= args.runs <= 5:
         parser.error("--runs must be 1..5")
-    modes = [m for m in args.reading.split(",") if m]
-    if not modes or set(modes) - set(ev.READING_MODES):
-        parser.error("unknown --reading: " + ",".join(sorted(set(modes) - set(ev.READING_MODES))))
+    readings = [m for m in args.reading.split(",") if m]
+    if not readings or set(readings) - set(ev.READING_MODES):
+        parser.error("unknown --reading: " + ",".join(sorted(set(readings) - set(ev.READING_MODES))))
+    document_sets = [d for d in args.documents.split(",") if d]
+    if not document_sets or set(document_sets) - set(DOCUMENT_SETS):
+        parser.error("unknown --documents: " + ",".join(sorted(set(document_sets) - set(DOCUMENT_SETS))))
+    # One document set keeps the old mode names; several are told apart as reading@documents.
+    modes = [r if len(document_sets) == 1 else f"{r}@{d}" for d in document_sets for r in readings]
 
     spec = ev.load_cases()
     wanted = {c for c in args.cases.split(",") if c}
@@ -185,16 +206,19 @@ def main():
         max_output = settings.area_analysis_max_output_tokens
 
     topic = ev.load_topic(spec["template"])
-    references = ev.load_references(spec["template"])
+    references = {d: ev.load_references(spec["template"]) if d == "repo" else ev.load_package_references(args.packages)
+                  for d in document_sets}
     # Same section choice as the service: local vectors, loaded from the project settings.
     from app.config import load_settings
     from app.services.area_analysis_service import reading_embeddings
     embeddings = reading_embeddings(settings or load_settings(project_env=True))
-    payloads = {(c["id"], mode): ev.build_payload(spec, c, topic=topic, references=references,
+    def documents_of(mode):
+        return mode.partition("@")[2] or document_sets[0]
+    payloads = {(c["id"], mode): ev.build_payload(spec, c, topic=topic, references=references[documents_of(mode)],
                                                   embeddings=embeddings, max_output_tokens=max_output,
-                                                  reading=mode)
+                                                  reading=mode.partition("@")[0])
                 for c in cases for mode in modes}
-    unavailable = [d for (_, mode), p in payloads.items() if mode != "full"
+    unavailable = [d for (_, mode), p in payloads.items() if not mode.startswith("full")
                    for g in p["reference_reading_guide"] for d in g["documents"] if d["status"] != "selected"]
     if unavailable:
         sys.exit(f"资料章节没有按检索选出（{unavailable[0]['status']}），检查本地向量模型。未调用。")
@@ -240,7 +264,7 @@ def main():
             spent += spent_now
             if usage:
                 observed.append(spent_now)
-            graded = ev.grade(case, payload, result) if result else None
+            graded = ev.grade(case, payload, result, topic) if result else None
             row = {"case": case["id"], "reading": mode, "run": n, "seconds": seconds, "error": error, "sent": sent, "usage": usage,
                    "cost_cny": f"{spent_now:.4f}", "result": result, "graded": graded,
                    "raw_response": meta.get("raw_response")}
@@ -261,7 +285,7 @@ def main():
 
     meta = {"started_at": stamp, "model": settings.deepseek_model,
             "prompt_version": sorted({p["prompt_version"] for p in payloads.values()}),
-            "cases_version": spec["version"], "reading": modes, "runs": args.runs, "calls": len(runs),
+            "cases_version": spec["version"], "reading": modes, "documents": document_sets, "runs": args.runs, "calls": len(runs),
             "cost_cny": f"{spent:.3f}"}
     summary = {**meta, "input_chars": {f"{cid}.{mode}": n for (cid, mode), n in chars.items()},
                "results": [{k: r[k] for k in ("case", "reading", "run", "error", "sent", "usage", "cost_cny", "graded")}

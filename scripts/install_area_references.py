@@ -21,7 +21,7 @@ from scripts.workbench import STATE, environment  # noqa: E402
 
 KNOWN = {"0019_case_area_rankings", "0020_area_analysis", "0021_area_input_identity",
          "0022_area_analysis_failed_retry", "0023_template_repair_retest", "0024_reference_ingest",
-         "0025_reference_vehicle", EXPECTED_REVISION}
+         "0025_reference_vehicle", "0026_retire_legacy", EXPECTED_REVISION}
 
 
 def main():

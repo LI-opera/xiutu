@@ -4,12 +4,13 @@ import { apiClient, idempotencyKey } from '../lib/api-client';
 import { ColumnHeader } from '../components/ColumnHeader';
 import { EmptyState, ErrorState, LoadingState, StatusBadge } from '../components/States';
 import {
-  groupReferences, isWorking, MAX_REFERENCE_CHARS, REFERENCE_ID, referenceIdFrom, sectionHeadings,
+  groupReferences, isWorking, MAX_REFERENCE_CHARS, readPackage, REFERENCE_ID, referenceIdFrom, sectionHeadings,
   statusLabel, statusTone, suggestions, vehicleText,
 } from '../lib/references';
+import type { GuidePackage } from '../lib/references';
 import type {
-  KnownVehicles, ReferenceChunkList, ReferenceItem, ReferenceList, ReferenceUpload, ReferenceUploadResult,
-  ReferenceVersionUpload,
+  KnownVehicles, ReferenceChunkList, ReferenceItem, ReferenceList, ReferencePackageImport, ReferenceUpload,
+  ReferenceUploadResult, ReferenceVersionUpload,
 } from '../lib/types';
 
 export function ReferencesPage() {
@@ -35,6 +36,9 @@ export function ReferencesPage() {
   return <div className="references-page">
     <section className="page-card upload-card"><ColumnHeader eyebrow="UPLOAD" title="上传资料" />
       <UploadForm onUploaded={uploaded} />
+    </section>
+    <section className="page-card upload-card"><ColumnHeader eyebrow="PACKAGE" title="导入资料包" />
+      <PackageImportForm onUploaded={uploaded} />
     </section>
     <section className="page-card reference-card">
       <ColumnHeader eyebrow="MANUALS" title="维修资料" action={
@@ -63,7 +67,7 @@ export function ReferencesPage() {
                 onClick={() => setNewVersionOf(newVersionOf === group.documentId ? null : group.documentId)}>上传新版本</button></td>
             </tr>
             {newVersionOf === group.documentId && <tr className="reference-expanded"><td colSpan={7}>
-              <NewVersionForm documentId={group.documentId} title={group.title}
+              <NewVersionForm documentId={group.documentId} title={group.title} always={latest.always_include}
                 onClose={() => setNewVersionOf(null)} onUploaded={result => { setNewVersionOf(null); uploaded(result); }} />
             </td></tr>}
             {open && <tr className="reference-expanded"><td colSpan={7}><ReferenceDetail versions={group.versions} /></td></tr>}
@@ -91,7 +95,7 @@ function ReferenceDetail({ versions }: { versions: ReferenceItem[] }) {
       <h3>第 {current.version} 版</h3>
       <div className="badge-row">
         <StatusBadge value={statusLabel[current.status] ?? current.status} tone={statusTone(current.status)} />
-        <StatusBadge value={current.source_kind === 'upload' ? '页面上传' : '脚本导入'} />
+        <StatusBadge value={sourceLabel[current.source_kind] ?? current.source_kind} />
         <StatusBadge value={current.vector_fingerprint ? `向量 ${current.vector_fingerprint}` : '没有向量'} tone={current.vector_fingerprint ? 'good' : 'warn'} />
       </div>
       {versions.length > 1 && <div className="history" role="group" aria-label="历史版本"><span className="muted">全部版本：</span>
@@ -105,7 +109,13 @@ function ReferenceDetail({ versions }: { versions: ReferenceItem[] }) {
       <div><dt>字数</dt><dd>{current.chars}</dd></div>
       <div><dt>上传时间</dt><dd>{current.created_at.slice(0, 16).replace('T', ' ')}</dd></div>
       <div><dt>必带章节</dt><dd>{current.always_include.length ? current.always_include.map(h => h.replace(/^## +/, '')).join('；') : '无'}</dd></div>
+      {current.package && <div><dt>审核</dt><dd>{current.package.reviewer ?? '—'}{current.package.reviewed_at ? `（${current.package.reviewed_at.slice(0, 10)}）` : ''}</dd></div>}
+      {current.package && <div><dt>引用手册</dt><dd>{current.package.sources.filter(Boolean).join('；') || '—'}</dd></div>}
     </dl>
+    {current.package && current.package.open_gaps.length > 0 && <details className="chunk-panel">
+      <summary>资料缺口（{current.package.open_gaps.length}）：手册没有写、指南也没有补的内容</summary>
+      <ul>{current.package.open_gaps.map((gap, i) => <li key={i}>{gap}</li>)}</ul>
+    </details>}
     {current.status === 'ready' && <details className="chunk-panel">
       <summary>切块（{current.chunk_count ?? chunks.data?.items.length ?? '…'}）</summary>
       <label className="inline-check"><input type="checkbox" checked={onlySearchable} onChange={e => setOnlySearchable(e.target.checked)} />只看参与检索的</label>
@@ -122,6 +132,8 @@ function ReferenceDetail({ versions }: { versions: ReferenceItem[] }) {
     </details>}
   </div>;
 }
+
+const sourceLabel: Record<string, string> = { upload: '页面上传', package: '资料包导入', seed: '脚本导入' };
 
 const resultText = (result: ReferenceUploadResult) => result.reused
   ? `这份内容已经是第 ${result.version} 版${result.status === 'queued' ? '，已重新排队处理' : ''}。`
@@ -204,16 +216,20 @@ function UploadForm({ onUploaded }: { onUploaded: (result: ReferenceUploadResult
   </div>;
 }
 
-/** A new version of an existing manual: only the file; its title, vehicle and sections carry over. */
-function NewVersionForm({ documentId, title, onClose, onUploaded }: {
-  documentId: string; title: string; onClose: () => void; onUploaded: (result: ReferenceUploadResult) => void;
+/** A new version of an existing manual: the file, and its title and always-sent sections (the
+ * previous version's by default, where the new file still has them); the vehicle carries over. */
+function NewVersionForm({ documentId, title, always, onClose, onUploaded }: {
+  documentId: string; title: string; always: string[]; onClose: () => void; onUploaded: (result: ReferenceUploadResult) => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [content, setContent] = useState('');
+  const [newTitle, setNewTitle] = useState(title);
+  const [chosen, setChosen] = useState<string[]>([]);
   const headings = useMemo(() => sectionHeadings(content), [content]);
+  const toggleHeading = (heading: string) => setChosen(prev => prev.includes(heading) ? prev.filter(h => h !== heading) : [...prev, heading]);
   const upload = useMutation({
     mutationFn: () => {
-      const body: ReferenceVersionUpload = { filename: file?.name ?? '', content };
+      const body: ReferenceVersionUpload = { filename: file?.name ?? '', content, title: newTitle.trim(), always_include: chosen };
       return apiClient.request<ReferenceUploadResult>(`/area-references/${encodeURIComponent(documentId)}/versions`,
         { method: 'POST', body, idempotencyKey: idempotencyKey('reference-version'), timeoutMs: 60_000 });
     },
@@ -221,17 +237,70 @@ function NewVersionForm({ documentId, title, onClose, onUploaded }: {
   });
   const chooseFile = async (next: File | null) => {
     setFile(next); upload.reset();
-    setContent(next ? await next.text() : '');
+    const text = next ? await next.text() : '';
+    setContent(text);
+    const present = new Set(sectionHeadings(text));
+    setChosen(always.filter(h => present.has(h)));
   };
+  const dropped = file ? always.filter(h => !headings.includes(h)) : [];
   const problem = file && !headings.length ? '文件里没有 "## " 二级标题，无法按章节切块'
-    : content.length > MAX_REFERENCE_CHARS ? `资料超过 ${MAX_REFERENCE_CHARS} 字` : '';
+    : content.length > MAX_REFERENCE_CHARS ? `资料超过 ${MAX_REFERENCE_CHARS} 字`
+    : !newTitle.trim() ? '请填写标题' : '';
   return <div className="new-version-form">
     <label>{title} 的新版本（Markdown）<input type="file" accept=".md,.markdown" onChange={e => chooseFile(e.target.files?.[0] ?? null)} /></label>
-    <p className="muted">标题、适用车型和必带章节沿用上一版；处理完成后，分析改读新版本。</p>
+    <label>标题<input value={newTitle} maxLength={200} onChange={e => setNewTitle(e.target.value)} /></label>
+    <p className="muted">适用车型沿用上一版；标题和必带章节默认沿用，可以修改。处理完成后，分析改读新版本。</p>
+    {headings.length > 0 && <fieldset className="choice-group"><legend>必带章节（每次分析都发给 AI）</legend>
+      <div className="heading-choices">{headings.map(h => <label className="inline-check" key={h}><input type="checkbox" checked={chosen.includes(h)} onChange={() => toggleHeading(h)} />{h.replace(/^## +/, '')}</label>)}</div>
+      {dropped.length > 0 && <p className="muted">上一版的必带章节在新文件里找不到：{dropped.map(h => h.replace(/^## +/, '')).join('；')}。请在上面重新勾选。</p>}
+    </fieldset>}
     {problem && <p className="inline-error">{problem}</p>}
     <div className="upload-actions">
       <button type="button" disabled={!file || !!problem || upload.isPending} onClick={() => upload.mutate()}>{upload.isPending ? '正在上传' : '上传新版本'}</button>
       <button type="button" className="text-button" onClick={onClose}>取消</button>
+    </div>
+    {upload.error && <ErrorState error={upload.error} />}
+  </div>;
+}
+
+/** A guide package from xiutu-clean (manifest.json + guide.md + sources.json), approved by a person.
+ * Title, vehicle and always-sent sections come from the package; the server checks the hashes. */
+function PackageImportForm({ onUploaded }: { onUploaded: (result: ReferenceUploadResult) => void }) {
+  const [pkg, setPkg] = useState<GuidePackage | null>(null);
+  const [problems, setProblems] = useState<string[]>([]);
+  const [message, setMessage] = useState('');
+  const upload = useMutation({
+    mutationFn: () => {
+      const body: ReferencePackageImport = { manifest: pkg!.manifest, guide: pkg!.guide, sources: pkg!.sources };
+      return apiClient.request<ReferenceUploadResult>('/area-references/packages',
+        { method: 'POST', body, idempotencyKey: idempotencyKey('reference-package'), timeoutMs: 60_000 });
+    },
+    onSuccess: result => {
+      setMessage(result.reused ? `这份内容已经是第 ${result.version} 版，已按资料包设置标题、必带章节并记下审核。` : resultText(result));
+      onUploaded(result);
+    },
+  });
+  const chooseFiles = async (list: FileList | null) => {
+    upload.reset(); setMessage('');
+    const files = await Promise.all([...(list ?? [])].map(async f => ({ name: f.name, text: await f.text() })));
+    const read = files.length ? readPackage(files) : { pkg: null, problems: [] };
+    setPkg(read.pkg); setProblems(read.problems);
+  };
+  return <div className="upload-form">
+    <p className="section-note">导入资料整理平台（xiutu-clean）生成并审核通过的资料包：同时选中资料包文件夹里的 manifest.json、guide.md、sources.json。标题、适用车型、必带章节按资料包设置；已有同编号的资料时作为新版本。</p>
+    <label>资料包文件<input type="file" multiple accept=".json,.md" onChange={e => chooseFiles(e.target.files)} /></label>
+    {pkg && <dl className="detail-grid">
+      <div><dt>标题</dt><dd>{pkg.title}</dd></div>
+      <div><dt>资料编号</dt><dd>{pkg.documentId}（资料包第 {pkg.packageVersion} 版）</dd></div>
+      <div><dt>适用车型</dt><dd>{pkg.vehicle || '未填写'}</dd></div>
+      <div><dt>审核</dt><dd>{pkg.approved ? `已通过：${pkg.reviewer}` : '未审核'}</dd></div>
+      <div><dt>必带章节</dt><dd>{pkg.alwaysInclude.map(h => h.replace(/^## +/, '')).join('；') || '无'}</dd></div>
+      <div><dt>资料缺口</dt><dd>{pkg.openGaps} 条</dd></div>
+    </dl>}
+    <div className="upload-actions">
+      <button type="button" disabled={!pkg || problems.length > 0 || upload.isPending} onClick={() => upload.mutate()}>{upload.isPending ? '正在导入' : '导入并处理'}</button>
+      {problems.length > 0 && <ul className="inline-error">{problems.map(p => <li key={p}>{p}</li>)}</ul>}
+      {message && <p role="status">{message}</p>}
     </div>
     {upload.error && <ErrorState error={upload.error} />}
   </div>;

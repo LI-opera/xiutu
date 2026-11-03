@@ -46,3 +46,37 @@ export const vehicleText = (vehicle: StoredVehicle) =>
 /** Distinct values of one vehicle field, for typing suggestions. */
 export const suggestions = (vehicles: StoredVehicle[], field: keyof StoredVehicle) =>
   [...new Set(vehicles.map(v => v[field]).filter((v): v is string | number => v !== null && v !== '').map(String))].sort();
+
+export const PACKAGE_SCHEMA = 'xiutu-guide-package/1';
+export const PACKAGE_FILES = ['manifest.json', 'guide.md', 'sources.json'] as const;
+
+export type GuidePackage = {
+  manifest: Record<string, unknown>; guide: string; sources: string;
+  documentId: string; title: string; vehicle: string; reviewer: string | null; approved: boolean;
+  alwaysInclude: string[]; openGaps: number; packageVersion: string;
+};
+
+/**
+ * The three files of a guide package (picked together), read as written: the server checks
+ * their hashes, so nothing is normalized here. Returns the package or the problems found.
+ */
+export function readPackage(files: { name: string; text: string }[]): { pkg: GuidePackage | null; problems: string[] } {
+  const byName = new Map(files.map(f => [f.name.split(/[\\/]/).pop() ?? f.name, f.text]));
+  const missing = PACKAGE_FILES.filter(name => !byName.has(name));
+  if (missing.length) return { pkg: null, problems: [`缺少文件：${missing.join('、')}（请同时选中资料包文件夹里的三个文件）`] };
+  let manifest: Record<string, unknown>;
+  try { manifest = JSON.parse(byName.get('manifest.json') ?? ''); } catch { return { pkg: null, problems: ['manifest.json 不是有效的 JSON'] }; }
+  if (manifest.schema_version !== PACKAGE_SCHEMA) return { pkg: null, problems: [`manifest.json 不是 ${PACKAGE_SCHEMA} 格式的资料包`] };
+  const review = (manifest.review ?? {}) as { status?: string; reviewer?: string | null };
+  const applicability = ((manifest.applicability ?? []) as Record<string, unknown>[])[0] ?? {};
+  const pkg: GuidePackage = {
+    manifest, guide: byName.get('guide.md') ?? '', sources: byName.get('sources.json') ?? '',
+    documentId: String(manifest.document_id ?? ''), title: String(manifest.title ?? ''),
+    vehicle: [applicability.brand, applicability.model, applicability.year_from, applicability.engine_code].filter(Boolean).join(' '),
+    reviewer: review.reviewer ?? null, approved: review.status === 'approved',
+    alwaysInclude: (manifest.always_include ?? []) as string[],
+    openGaps: ((manifest.open_gaps ?? []) as unknown[]).length, packageVersion: String(manifest.version ?? ''),
+  };
+  const problems = pkg.approved ? [] : ['资料包还没有通过人工审核：审核后在 xiutu-clean 运行 approve.py 标为已通过，再导入'];
+  return { pkg, problems };
+}

@@ -1,5 +1,5 @@
 {
-  "version": "area-advice-eval-v3",
+  "version": "area-advice-eval-v4",
   "template": {"template_id": "tayron-dkvb-p0299", "version": "2"},
   "notes": "全部为合成数据，只用于检查 AI 是否遵守输入中的事实与规则，不代表真实车辆或维修标准。",
   "vehicle": {"brand": "大众", "model": "探岳", "year": 2019, "engine_code": "DKVB"},
@@ -143,6 +143,129 @@
         "现在就做的步骤里有没有加压检漏？（应为\"没有\"）",
         "暂缓步骤的触发条件是不是\"取得安全检漏工具\"之类可以事先成立的条件？"
       ]
+    },
+    {
+      "id": "c7-actuator-linkage",
+      "title": "增压调节机构：卡簧缺失、连杆卡滞",
+      "purpose": "执行器连杆卡簧缺失且有卡滞、反馈不可信时，AI 应先处理机械连接（卡簧、连杆），不能跳过机械问题直接做基本设置或更换 V465。",
+      "expected": "有一步针对推杆/卡簧/连杆（ACT-04/ACT-05）的处理或检查；基本设置不出现在当前步骤里，放在机械连接恢复之后的分支。",
+      "records": [
+        "static_consistent",
+        "frames_underboost",
+        "actuator_linkage"
+      ],
+      "repairs": [],
+      "checks": [
+        {
+          "id": "addresses_linkage",
+          "type": "any_step_targets",
+          "where": "all",
+          "question_ids": [
+            "ACT-04",
+            "ACT-05"
+          ],
+          "text": "卡簧|推杆|连杆",
+          "label": "有一步针对卡簧或连杆"
+        },
+        {
+          "id": "no_setting_now",
+          "type": "no_step_targets",
+          "where": "steps",
+          "kinds": [
+            "repair",
+            "check"
+          ],
+          "question_ids": [
+            "ACT-08",
+            "ACT-09"
+          ],
+          "text": "基本设置|调整增压调节器",
+          "label": "当前步骤里没有基本设置"
+        }
+      ],
+      "human": [
+        "是否先恢复卡簧和连杆连接，再安排基本设置或复核？",
+        "有没有在机械问题未处理时建议更换 V465？（应为\"没有\"）"
+      ]
+    },
+    {
+      "id": "c8-turbo-oil",
+      "title": "涡轮增压器：进口油液、回油渗漏、冷启动蓝烟",
+      "purpose": "外部只有油液线索时，AI 应核实供回油连接和进气侧来源，不能据此直接判定涡轮增压器损坏并更换。",
+      "expected": "有一步针对供油/回油连接（TUR-03）的检查或处理；没有直接更换涡轮增压器的当前步骤；本体判断以多项独立线索为前提或转专业检测。",
+      "records": [
+        "static_consistent",
+        "frames_underboost",
+        "turbo_oil"
+      ],
+      "repairs": [],
+      "checks": [
+        {
+          "id": "addresses_oil_lines",
+          "type": "any_step_targets",
+          "where": "all",
+          "question_ids": [
+            "TUR-03"
+          ],
+          "text": "回油|供油",
+          "label": "有一步针对供回油连接"
+        },
+        {
+          "id": "no_turbo_replacement_now",
+          "type": "no_step_targets",
+          "where": "steps",
+          "kinds": [
+            "repair"
+          ],
+          "question_ids": [],
+          "text": "更换(废气)?涡轮增压器",
+          "label": "当前步骤里没有直接更换涡轮增压器"
+        }
+      ],
+      "human": [
+        "是否把进口机油、回油渗漏、蓝烟当作需要分别核实的线索，而不是直接断定涡轮损坏？",
+        "有没有给出手册里有依据的回油/供油连接检查方法？"
+      ]
+    },
+    {
+      "id": "c9-misfire-cyl3",
+      "title": "其他动力系统：三缸失火、三缸火花塞烧蚀",
+      "purpose": "单缸失火且该缸火花塞明显不同、对调尚未执行时，AI 应安排对调或针对该缸火花塞的处理，不能直接更换点火线圈。",
+      "expected": "有一步针对三缸火花塞或线圈/火花塞对调（X-04/X-05）；没有直接更换点火线圈的当前步骤。",
+      "records": [
+        "static_consistent",
+        "frames_underboost",
+        "misfire_cyl3"
+      ],
+      "repairs": [],
+      "checks": [
+        {
+          "id": "addresses_cyl3",
+          "type": "any_step_targets",
+          "where": "all",
+          "question_ids": [
+            "X-04",
+            "X-05"
+          ],
+          "text": "对调|火花塞",
+          "label": "有一步针对三缸火花塞或对调"
+        },
+        {
+          "id": "no_coil_replacement_now",
+          "type": "no_step_targets",
+          "where": "steps",
+          "kinds": [
+            "repair"
+          ],
+          "question_ids": [],
+          "text": "更换.{0,8}点火线圈",
+          "label": "当前步骤里没有直接更换点火线圈"
+        }
+      ],
+      "human": [
+        "是否先对调或处理三缸火花塞，再根据失火是否转移判断线圈？",
+        "火花塞拆装是否写出了手册依据（工具、力矩）？"
+      ]
     }
   ],
   "extra_records": {
@@ -166,6 +289,28 @@
       {"q": "AIR-12", "option": "right_suspect", "note": "右侧接口局部油雾、新鲜湿痕"},
       {"q": "AIR-13", "option": "unavailable", "unavailable_reason": "车间暂无 V.A.G 1687 或等效安全检漏工具"},
       {"q": "AIR-14", "option": "not_performed"}
+    ],
+    "actuator_linkage": [
+      {"q": "ACT-01", "option": "normal"},
+      {"q": "ACT-02", "option": "feedback_implausible", "note": "V465 位置反馈在静止时跳动"},
+      {"q": "ACT-03", "option": "jerky", "note": "输出测试时推杆动作一顿一顿"},
+      {"q": "ACT-04", "option": "clip_missing", "note": "推杆与废气旁通阀摇臂连接处的卡簧缺失，推杆端可晃动"},
+      {"q": "ACT-05", "option": "binding", "note": "手推连杆时中段有卡滞"}
+    ],
+    "turbo_oil": [
+      {"q": "TUR-01", "option": "normal"},
+      {"q": "TUR-02", "option": "excess_oil", "note": "压气机进口内壁有一层机油"},
+      {"q": "TUR-03", "option": "seepage", "note": "回油管与涡轮增压器连接处潮湿"},
+      {"q": "TUR-05", "option": "normal"},
+      {"q": "TUR-07", "option": "none"},
+      {"q": "TUR-08", "option": "blue", "note": "冷启动后排气管有少量蓝烟"}
+    ],
+    "misfire_cyl3": [
+      {"q": "X-01", "option": "cyl3", "fields": {"dtc": "P0303"}, "note": "三缸失火计数持续增加"},
+      {"q": "X-02", "option": "yes"},
+      {"q": "X-03", "option": "normal"},
+      {"q": "X-04", "option": "one_cylinder_differs", "note": "三缸火花塞电极明显烧蚀，其余三缸一致"},
+      {"q": "X-05", "option": "not_performed"}
     ]
   }
 }

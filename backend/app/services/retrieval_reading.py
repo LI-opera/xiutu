@@ -17,7 +17,9 @@ QUESTION_ID = re.compile(r"^[A-Z]{1,4}-[0-9]{2}\s*·\s*")
 # Navigation parts of a manual (reading entry, question/ID tables, notes for the AI, sources)
 # are not evidence for a record; searching them would match on question wording alone.
 NAVIGATION = ("阅读入口", "快速入口", "对应关系", "问题与.*选项", "问题、选项",
-              "提供给 AI", "一起用于分析", r"^## [0-9]+\. *(资料)?来源")
+              "提供给 AI", "一起用于分析", r"^## [0-9]+\. *(资料)?来源",
+              # A guide's list of what the manual does not say: never evidence for an analysis.
+              "缺口与限制")
 HEADING2 = re.compile(r"^## .+$", re.MULTILINE)
 
 
