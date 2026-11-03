@@ -9,7 +9,7 @@
 
 ## 题目
 
-`cases.json` 里共 6 道题，每道题写明考什么（`purpose`）、标准答案（`expected`）、程序检查（`checks`）和人工核对问题（`human`）。
+`cases.json` 里共 9 道题，每道题写明考什么（`purpose`）、标准答案（`expected`）、程序检查（`checks`）和人工核对问题（`human`）。
 
 | 题 | 场景 | 核心要求 |
 | --- | --- | --- |
@@ -19,6 +19,9 @@
 | c4 | 已维修，复检工况不同（怠速） | 不判定已解决；要求在全负荷下补做复检 |
 | c5 | 规则算出 G71 离群，三帧工况不可比较 | 采用规则结论；不用不可比较的数据下结论 |
 | c6 | 没有安全检漏工具 | 加压检漏只能放在暂缓分支 |
+| c7 | 增压调节机构：卡簧缺失、连杆卡滞、反馈不可信 | 先处理卡簧和连杆；当前步骤里不做基本设置 |
+| c8 | 涡轮增压器：进口机油、回油渗漏、冷启动蓝烟 | 核实供回油连接；不直接更换涡轮增压器 |
+| c9 | 其他动力系统：三缸失火、三缸火花塞烧蚀 | 对调或处理三缸火花塞；不直接更换点火线圈 |
 
 输入由 `scripts/area_advice_eval.py` 生成，用的是项目真实的代码：模板计划、规则计算、资料阅读指南、`build_matched_input`。资料正文来自 `resources/knowledge/tayron`，和导入数据库时用同一份清单。所以考的就是 AI 实际会收到的输入，不需要数据库。
 
@@ -29,6 +32,18 @@
 3. 以后可以加"AI 评委"，并用人工勾选的结果检验评委判得准不准。
 
 模型每次回答都可能不同，所以每题建议跑 3 次，看通过率。
+
+## 新旧资料对比
+
+`--documents repo,packages` 用同一套题目，分别配仓库里的资料（`resources/knowledge`）和审核过的资料包
+（`--packages` 文件夹，默认 `../xiutu-clean/packages`，每份资料取最新版本）各跑一遍，报告里按"方式@资料"分列：
+
+```powershell
+uv run python -B scripts/run_area_advice_eval.py --documents repo,packages                       # 演习
+uv run python -B scripts/run_area_advice_eval.py --documents repo,packages --paid --runs 1 --max-cny 1
+```
+
+每次运行另有一项程序检查"每条异常记录都有对应的行动或待确认项"（`services/advice_coverage.py`，与页面上的提醒相同）。
 
 ## 怎么运行
 
@@ -63,7 +78,7 @@ uv run python -B scripts/run_area_advice_eval.py --reading current,full,answered
 
 ### 2026-10-22 的比较结果
 
-6 题 × 4 种方式 × 2 次，共 48 次调用，约 3.8 元（deepseek-flash，提示词 matched-area-advice-v18/v19）：
+6 题 × 4 种方式 × 2 次，共 48 次调用，约 3.8 元（deepseek-flash，当时的提示词 matched-area-advice-v18/v19）：
 
 | 方式 | 平均输入 token | 每次费用 | 题目检查 | 编号有依据 |
 | --- | --- | --- | --- | --- |

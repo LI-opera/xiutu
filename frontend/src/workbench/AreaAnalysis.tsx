@@ -11,7 +11,8 @@ type Result = { summary: string; directions: Array<{ title: string; explanation?
 type Attempt = { id: string; status: string; input_revision: number; stale: boolean; model: string; error_code: string | null; created_at: string;
   result: Result | null; documents: Reference[]; questions: Array<{ id: string; title: string }>;
   observations: Array<{ id: string; question_id: string; question: string; option_labels: string[]; fields: Record<string, unknown> }>;
-  usage: { input_tokens?: number; output_tokens?: number; total_tokens?: number } | null };
+  usage: { input_tokens?: number; output_tokens?: number; total_tokens?: number } | null;
+  unplanned?: Array<{ observation_id: string; question_id: string; question: string | null; option_labels: string[] }> };
 type Analysis = { area?: { id: string; title: string }; areas?: Array<{ id: string; title: string; document_ids: string[]; observation_ids: string[]; unknown_question_ids: string[] }>;
   revision: number; available: boolean; documents: Reference[];
   observations: Attempt['observations'];
@@ -57,6 +58,11 @@ function Advice({ item, onQuestion }: { item: Attempt; onQuestion: (id: string) 
     {result && <>
       <section className="formal-v2-guidance-judgment"><h3>当前判断</h3><p className="formal-v2-guidance-lead">{result.summary}</p>
       </section>
+      {(item.unplanned?.length ?? 0) > 0 && <section className="formal-advice-cautions" aria-label="未安排的异常记录">
+        <h3>这些异常记录没有对应的行动</h3>
+        <p>以下已保存的异常结果，建议里没有安排处理、核实或交接（由程序核对，不是模型结论）。请人工确认是否需要处理。</p>
+        <ul>{item.unplanned!.map(entry => <li key={entry.observation_id}>{(entry.question ?? entry.question_id).replace(/^[A-Z]{1,4}-\d{2}\s*·\s*/, '')}：{entry.option_labels.join('、') || '已记录'} {questionLink(entry.question_id)}</li>)}</ul>
+      </section>}
       {result.precautions.length > 0 && <section className="formal-advice-cautions" aria-label="操作提醒">
         <h3>操作提醒</h3><ul>{result.precautions.map((text, i) => <li key={i}>{text}</li>)}</ul>
       </section>}

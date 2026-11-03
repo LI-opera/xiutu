@@ -20,6 +20,7 @@ from app.infrastructure.model_gateway import (
 from app.infrastructure.orm import area_analysis_attempts as attempts
 from app.infrastructure.orm import template_repair_rounds as repair_rounds
 from app.infrastructure.uow import UnitOfWork
+from app.services.advice_coverage import unplanned_records
 from app.services.analysis_context import enrich, model_payload
 from app.services.reference_store import candidates as stored_candidates
 from app.services.reference_store import pool as stored_pool
@@ -29,11 +30,11 @@ from app.services.write_guards import lock_case
 from app.services.workbench_observation_service import TopicService
 from app.services.workbench_templates import is_template
 
-PROMPT_VERSION = "area-advice-v11"
+PROMPT_VERSION = "area-advice-v12"
 MATCHED_SCOPE_ID = "__matched_areas__"
-MATCHED_PROMPT_VERSION = "matched-area-advice-v18"
+MATCHED_PROMPT_VERSION = "matched-area-advice-v20"
 # Templates with observation rules also send rule_conflicts.
-MATCHED_RULES_PROMPT_VERSION = "matched-area-advice-v19"
+MATCHED_RULES_PROMPT_VERSION = "matched-area-advice-v21"
 ANALYSIS_PRINCIPLES = """
 先利用已有结果，再决定新增动作。综合判断车辆、主诉、记录及资料，不按区域逐一复述，不预设区域数量、故障结论或固定维修顺序。
 
@@ -48,11 +49,13 @@ documents.body 中的章节由系统按记录和未记录问题的题目检索�
 行动组织：先识别会阻止启动、运行、负荷、拆装或测量的条件，约束整份建议中所有依赖这些条件的动作。允许的静态检查可以并行；必须等待风险解除或结果确认的动作进入 conditional_branches。不能只在 precautions 写停止要求，却在 steps/retest/conditional_branches 安排被禁止的动作。prerequisites 写明确的放行条件，stop_condition 写实际相关的中止条件；无此条件才留空。
 分支 trigger 必须是执行该分支之前能够成立的条件；不得以该分支内检查的结果作为启动该检查的条件。尚未取得的结果先安排采集，拿到不同结果后再分支处理。某一步结束不自动证明另一步前提成立。
 一个行动对应一个能操作并单独验证的目标。同一连接、同一操作可合并；工具、对象、验证方式不同的独立异常分开。无需把所有问题凑成一条线，也不得把多个系统塞进“检查其他方向”。重要已记录异常应有处理、核实、交接或明确暂缓理由，不要求所有区域检查完才推进。
+已保存的记录如实引用：正文描述某项检查时须与该记录的 option_labels 一致，不得把已有记录的检查写成“未记录”“未涉及”“尚未检查”。每条异常记录都应出现在某个 steps 或 conditional_branches 行动的 question_ids 或 basis_observation_ids 中；确实暂缓的，在 missing 或相关行动中写明理由。
 
 每项行动的 title 是简短的对象加动作；action 根据资料写清当前所需对象、工具或测量方式、操作及结果区分。资料已有方法不能退化成“按资料检查”“核对电路”“进一步检测”。缺少精确规格时不编造阈值、针脚、扭矩；仍写出有依据的定位方法和需要核对的参数。reason 只解释哪些已有结果支持此动作、新动作解决什么不确定性；retest 写处理后新的观察及结果对下一步的影响，不能忽略安全条件。已记录结果不再作为待取得结果。
 
 summary 只用短段落说当前优先决定、可并行事项及关键阻碍，避免逐区域列异常。steps 放当前有依据可推进的行动。conditional_branches 放条件未满足的后续动作。missing 只列会改变当前决定且未在步骤中安排的事实缺口，说明获得方法与影响，不让用户替你判断去向；无法对应实际问题 ID 时写入相关行动，不编造 ID。
-directions 只保留未在 summary/steps 说过的竞争解释或反证；没有新增信息留空。uncertainty、precautions 同样不重复清单。verification 与 if_unresolved 一律留空：每项行动的复检写在该行动的 retest，处理后的实际复检由用户在维修复检中另行记录；当前行动全部完成后仍未解决时的去向，写成 trigger 为“当前行动完成后仍未解决”的 conditional_branches，或写入 directions。不为了填满栏目加内容，也不通过删除执行条件缩短篇幅。
+directions 只保留未在 summary/steps 说过的竞争解释或反证；没有新增信息留空。uncertainty、precautions 同样不重复清单。precautions 只写与本次 steps、conditional_branches 实际操作相关的安全和操作要求，不照抄资料中与本次行动无关的提醒。
+说明依据时区分来源：资料中标“整理推断”的内容、资料自行划分的区域边界和你的推断，不说成“手册规定”或“手册明确”。verification 与 if_unresolved 一律留空：每项行动的复检写在该行动的 retest，处理后的实际复检由用户在维修复检中另行记录；当前行动全部完成后仍未解决时的去向，写成 trigger 为“当前行动完成后仍未解决”的 conditional_branches，或写入 directions。不为了填满栏目加内容，也不通过删除执行条件缩短篇幅。
 输出前逐项核对：是否重复已完成验证？是否把不同限制误认作因果？分支是否循环？停止要求是否与后续行动冲突？重要异常是否只被提到而无安排？每项具体操作是否足以推进？删除重复但保留必要条件。
 保持给定 JSON 结构，不固定行动数量。source_ids、question_ids、basis_observation_ids 仅引用输入中存在且支持该行动的对象；内部编号放引用字段，不在正文堆题号。资料支持与推断分开，建议不等于已维修。中文输出。
 
@@ -313,6 +316,8 @@ class AreaAnalysisService:
                 "source": "real_model", "created_at": row["created_at"],
                 "error_code": "REQUEST_OUTCOME_UNKNOWN" if uncertain else row["error_code"],
                 "result": row["result_json"], "documents": snapshot["documents"],
+                "unplanned": unplanned_records(row["result_json"], snapshot["observations"],
+                                               view["topic"]["questions"]),
                 "observations": snapshot["observations"], "questions": snapshot["questions"],
                 "usage": (row["diagnostic_json"] or {}).get("usage")})
         return jsonable_encoder({"area": payload.get("area"), "areas": payload.get("areas"),
