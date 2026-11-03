@@ -3196,7 +3196,7 @@
     {
       "template_id": "tayron-dkvb-p0236",
       "version": "4",
-      "content_hash": "afae81042c241dd926c96f27d27907b46e6de66b1ffa6671709710e375b2f6c3",
+      "content_hash": "c1031ab959ba7b03ed69d8fbbbfd36fe8b634a2ae7efca6b213e6b428d08e733",
       "questions": {
         "AIR-01": {
           "definition_hash": "7ea3dd5c916d5294365cba1036e928bb29bfe13e87273d6e9d0566cc5f3c6cd3",
@@ -3242,7 +3242,7 @@
           }
         },
         "AIR-04": {
-          "definition_hash": "146fdadd4ddb40a319a485d491d58ca7e2773bc12566d59cb77b595d62258c00",
+          "definition_hash": "a89ca69fd15aedab8a02eddd0c3bc87ec91f21d546b63619e67aa9444d68a772",
           "role": "observation",
           "option_roles": {
             "normal": "observation",
@@ -3254,7 +3254,7 @@
           }
         },
         "AIR-06": {
-          "definition_hash": "1acf6bc49f8482add6270b47572e17af2d86f1c8f69f7666108640b5de096b96",
+          "definition_hash": "bd81bdaf946a2ff051fafe9a581e4c3cf0447cac96f1dfc68ba81b89b4726b53",
           "role": "observation",
           "option_roles": {
             "clear": "observation",
@@ -3265,7 +3265,7 @@
           }
         },
         "AIR-05": {
-          "definition_hash": "5068e9b8d100c91c5e8a3b0284f74f03a97cc886ee91141ec2cfb921bebc79a2",
+          "definition_hash": "60bee49ff09d94cefd50733ffb372501d9aaf58b040e46716cc9545e1be23b7a",
           "role": "observation",
           "option_roles": {
             "none": "observation",
@@ -3276,7 +3276,7 @@
           }
         },
         "AIR-07": {
-          "definition_hash": "4ceb21b90e0da4a8ce420b84a8057c3e56d7bede0736bcfb7f5da5571ca6a8ab",
+          "definition_hash": "5018206f4607acd34793baa8971feedb849cd43c9156cbf84a6a2d4027c4d241",
           "role": "observation",
           "option_roles": {
             "inserted": "observation",
@@ -3285,7 +3285,7 @@
           }
         },
         "AIR-08": {
-          "definition_hash": "ff48fb729dc9bbe6f35294e9ca8370a828a377dde703fda637ef85e13acdd769",
+          "definition_hash": "3205aa7bdbe7865acfca5d9c79ef48d6ff52b50a585f46c9ecf3ac9329cb05b7",
           "role": "observation",
           "option_roles": {
             "aligned": "observation",
@@ -3295,7 +3295,7 @@
           }
         },
         "AIR-09": {
-          "definition_hash": "8ce7e04fb60297c94d1846530a2b4b8301608d7c86ead8c2a00e5e7cc6a8495e",
+          "definition_hash": "d1f63e5a05b55ff26b7871862dd9fb0f78df16cbafad1eb5aa2ed19b82c17a45",
           "role": "observation",
           "option_roles": {
             "secure": "observation",
@@ -3305,7 +3305,7 @@
           }
         },
         "AIR-10": {
-          "definition_hash": "6885acdb9e1973cb7310a2ce773d48ba6c97bb0b381ca3c9e0a87ccf03974183",
+          "definition_hash": "4b5ecf3b60a147085ca57638f3742ce400545031ac50f33f14636a6cb1c3d55a",
           "role": "observation",
           "option_roles": {
             "normal": "observation",
@@ -3315,7 +3315,7 @@
           }
         },
         "AIR-11": {
-          "definition_hash": "dd813c742eff0536b7f21e4888103050f657195a4b8933c76af0db2c55132939",
+          "definition_hash": "73c267ffdc27c3561b37a139a42a53dc9a2e91321a592798012f905cf58f6172",
           "role": "observation",
           "option_roles": {
             "normal": "observation",
@@ -3326,7 +3326,7 @@
           }
         },
         "AIR-12": {
-          "definition_hash": "b3e50d61f58e5081239893647006e58aa2bc22cef613e8a9b7953a9842e19854",
+          "definition_hash": "8c37a9b4672c68e048d4d00daa2d21682484421c80f7c61dbbdf486fe6b99445",
           "role": "observation",
           "option_roles": {
             "normal": "observation",
@@ -3346,7 +3346,7 @@
           }
         },
         "AIR-14": {
-          "definition_hash": "dcdb72e3848bc66119ac50302f5ad01dda28113b34cfc2b1ed8d8e8e93bced08",
+          "definition_hash": "92a7c71a5a526158df308a2f58cac1b39b37b1db1365576834e66b23b0d32a47",
           "role": "observation",
           "option_roles": {
             "within_limit": "observation",
@@ -3355,7 +3355,7 @@
           }
         },
         "AIR-15": {
-          "definition_hash": "159e262ec0e58aeea3425589c0359706aa04fb5a189eb2388c7a60bbec3c63b6",
+          "definition_hash": "0b589fd01932535988561bc0d1f7291172db8fbb5264e2afd443d70ef4df8a71",
           "role": "observation",
           "option_roles": {
             "none": "observation",
@@ -3368,7 +3368,7 @@
           }
         },
         "AIR-16": {
-          "definition_hash": "9388889d60f93328f8535608c9cd42f44cce10c9c076ad5b51964fa897b337da",
+          "definition_hash": "29e45160dc44502fc6e6073b4f6cfe09e430c3e2bf02708bd5758e16144a7f1f",
           "role": "observation",
           "option_roles": {
             "audible_or_bubble": "observation",
@@ -3606,7 +3606,7 @@
     {
       "template_id": "tayron-dkvb-p0299",
       "version": "4",
-      "content_hash": "11a862624bdc6c3d4dee0d5471f8ae406d55ad235c2855cf0f01dbe50e74ffdd",
+      "content_hash": "496074180a345e452986776a45cde69fae005983b69e6edc16a5aa29b41a0c8e",
       "questions": {
         "AIR-01": {
           "definition_hash": "e88058a196d0de53c484fbec417304f441a045fc3c408e28bdb9e31fab3ff269",
@@ -3652,7 +3652,7 @@
           }
         },
         "AIR-04": {
-          "definition_hash": "8c50248a4d025e49062f168f4bcd74408328be136ee119b828f16fe0139bf58f",
+          "definition_hash": "4fe4561261acc04241c9cf3310b54df6f480913e41fa8aba0931ee1c3200c863",
           "role": "observation",
           "option_roles": {
             "normal": "observation",
@@ -3664,7 +3664,7 @@
           }
         },
         "AIR-06": {
-          "definition_hash": "ba5966404b198fb0ff376062f1dc3089858e298c1ac1bf35e8f031527b2d3fad",
+          "definition_hash": "6f88498d9bdf91d247d3b812b04662368ef4109f7857b0cb03a819905ad94282",
           "role": "observation",
           "option_roles": {
             "clear": "observation",
@@ -3675,7 +3675,7 @@
           }
         },
         "AIR-05": {
-          "definition_hash": "bdf5aae4993db84cf4e3e7e8fabc123c09fa7236ba04c79eb962bdbaffb4c3b7",
+          "definition_hash": "34f353e4715b95c5c96c347c677394d28a23cb0869d2e46d4eb306936b8a3ae3",
           "role": "observation",
           "option_roles": {
             "none": "observation",
@@ -3686,7 +3686,7 @@
           }
         },
         "AIR-07": {
-          "definition_hash": "c54f3a10ff207949088fa2cf89a95e3eb0e23510bc3cd42082233b236bc44843",
+          "definition_hash": "e6c3cf20ed7e9ec887376cbc5c7a81fc0d73ddb58a66599b7c0fd23a7f17da70",
           "role": "observation",
           "option_roles": {
             "inserted": "observation",
@@ -3695,7 +3695,7 @@
           }
         },
         "AIR-08": {
-          "definition_hash": "dbf817cb6c68f7998f6f96f06d66ea599239aff1509f8cf39bab8abb8a23e7e6",
+          "definition_hash": "7e040e80218666926330cf7a128eaf0b1a4f1b7ba62a7fba1b44de9877c8cbc1",
           "role": "observation",
           "option_roles": {
             "aligned": "observation",
@@ -3705,7 +3705,7 @@
           }
         },
         "AIR-09": {
-          "definition_hash": "071265b96aed8200f69eea190df22a1289ef74fb20684c4cd8b070b461db3e84",
+          "definition_hash": "afcc4a8d2afc6cacb606e0a729084d6dad832221bc7475a4d87a9398afc420c3",
           "role": "observation",
           "option_roles": {
             "secure": "observation",
@@ -3715,7 +3715,7 @@
           }
         },
         "AIR-10": {
-          "definition_hash": "e2cc0528f87edb98ba423fe881dbc385d42f7f6b76a9e2c08ddda9cb3c2509b0",
+          "definition_hash": "718cded270a3d17901f9f8298cc088496abe19093f3d55a1a65748d7f6b3584c",
           "role": "observation",
           "option_roles": {
             "normal": "observation",
@@ -3725,7 +3725,7 @@
           }
         },
         "AIR-11": {
-          "definition_hash": "e275d0e04fb9699324c35153f7ef115dab31711eac45be4db889a3bb2bda6b88",
+          "definition_hash": "0a01322af781e9b5ffd903928bb47799c0b66a75089e10e8036aea6e53c8e124",
           "role": "observation",
           "option_roles": {
             "normal": "observation",
@@ -3736,7 +3736,7 @@
           }
         },
         "AIR-12": {
-          "definition_hash": "ab59950eb95d6b1366f9644cc35b225671d7a48cfae23800fc04bfb92d299445",
+          "definition_hash": "ac0e212bce22fd20c49e79721852bfaa025a04e1e4205d4ceaba30d44bd60c2c",
           "role": "observation",
           "option_roles": {
             "normal": "observation",
@@ -3756,7 +3756,7 @@
           }
         },
         "AIR-14": {
-          "definition_hash": "c41132ca4bb50dce1392d0fd25edbcef3ebc6e578290a162d4e9b11ef47cb85a",
+          "definition_hash": "4336d1d294bcc9e0b57698439273e198ea37fb18c6b9fc43f58316def3c12f0b",
           "role": "observation",
           "option_roles": {
             "within_limit": "observation",
@@ -3765,7 +3765,7 @@
           }
         },
         "AIR-15": {
-          "definition_hash": "292dc6cba25b113d4f3ce2fe8c23bf1e494d6d82e38ba3f79be5df2ad3d4280a",
+          "definition_hash": "67fb7ec6e5a9ad78d9e9648a9fc79fc2c87619a1f813e7ad867f32d1823264c9",
           "role": "observation",
           "option_roles": {
             "none": "observation",
@@ -3778,7 +3778,7 @@
           }
         },
         "AIR-16": {
-          "definition_hash": "f5d1f1afeb51197481ac126241e06d156ca1196239091b1d5014b7892e53be09",
+          "definition_hash": "1b01174f2244bc8125fd19b13ac22b164ad2f32669a8a424664043c65744fb59",
           "role": "observation",
           "option_roles": {
             "audible_or_bubble": "observation",
