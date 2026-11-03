@@ -186,3 +186,12 @@ def test_v5_carries_other_areas_and_has_reviewed_pressure_roles():
             assert without_hash(v5[qid]) == without_hash(v4[qid])
         assert v5["PRS-02"]["option_roles"]["signal_missing"] == "inspection_status"
         assert v5["PRS-13"]["option_roles"]["unavailable"] == "inspection_status"
+
+
+def test_v6_carries_unchanged_questions_and_has_reviewed_actuator_roles():
+    for template_id in ("tayron-dkvb-p0299", "tayron-dkvb-p0236"):
+        v5, v6 = roles_of(template_id, "5"), roles_of(template_id, "6")
+        assert set(v6) == set(v5) | {f"ACT-{n}" for n in range(11, 17)}
+        for qid in (q for q in v5 if not q.startswith("ACT-") or q in ("ACT-08", "ACT-09", "ACT-10")):
+            assert without_hash(v6[qid]) == without_hash(v5[qid])
+        assert v6["ACT-12"]["option_roles"]["wire_mismatch"] == "observation"

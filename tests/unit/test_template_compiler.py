@@ -13,7 +13,7 @@ LIBRARY = ROOT / "resources/template-library/tayron-dkvb"
 def test_modules_reassemble_the_published_templates_exactly():
     results = run(LIBRARY)
     assert {item["recipe"] for item in results} == {f"tayron-dkvb-{code}-v{version}.json"
-                                                    for code in ("p0299", "p0236") for version in (2, 3, 4, 5)}
+                                                    for code in ("p0299", "p0236") for version in (2, 3, 4, 5, 6)}
     for item in results:
         published = json.loads((ROOT / item["output"]).read_text(encoding="utf-8"))
         assert item["status"] == "identical"
@@ -118,3 +118,17 @@ def test_v5_changes_only_the_pressure_area():
             for item in rule["inputs"]:
                 fields = {f["id"] for f in new_q[item["question_id"]]["fields"]}
                 assert {item[k] for k in ("field", "target_field", "actual_field") if k in item} <= fields
+
+
+def test_v6_changes_only_the_actuator_area():
+    """actuator v2 was drafted from the reviewed guide: ACT-01..07 rewritten, ACT-08..10 (basic
+    setting) kept unchanged, ACT-11..16 new."""
+    folder = ROOT / "resources/templates/tayron-v2"
+    for code in ("p0299", "p0236"):
+        old = json.loads((folder / f"tayron-dkvb-{code}-v5.json").read_text(encoding="utf-8"))
+        new = json.loads((folder / f"tayron-dkvb-{code}-v6.json").read_text(encoding="utf-8"))
+        old_q = {q["id"]: q for q in old["questions"]}
+        new_q = {q["id"]: q for q in new["questions"]}
+        assert set(new_q) - set(old_q) == {f"ACT-{n}" for n in range(11, 17)} and set(old_q) <= set(new_q)
+        assert {i for i in old_q if old_q[i] != new_q[i]} == {f"ACT-{n:02d}" for n in range(1, 8)}
+        assert "不是输出测试" in new_q["ACT-03"]["instructions"]
