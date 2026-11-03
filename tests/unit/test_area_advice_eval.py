@@ -250,3 +250,35 @@ def test_grounding_flags_codes_and_values_not_in_the_input():
     ids_only = step("check", "检查接头", ["AIR-07"])
     ids_only["source_ids"] = [payload["documents"][0]["id"]]
     assert by_id(ev.grade(case, payload, result([ids_only])))["codes_grounded"]
+
+
+def test_guide_packages_load_as_references_per_area(tmp_path):
+    import json as _json
+    areas = _json.loads(ev.AREA_DOCUMENTS.read_text(encoding="utf-8"))["areas"]
+    for area_id, document_id in areas.items():
+        for version, text in (("4", "# 旧\r\n\r\n## 1. 检查\r\n\r\n旧\r\n"), ("10", "# 新\r\n\r\n## 1. 检查\r\n\r\n新\r\n")):
+            folder = tmp_path / document_id / version
+            folder.mkdir(parents=True)
+            (folder / "guide.md").write_text(text, encoding="utf-8", newline="")
+            (folder / "manifest.json").write_text(_json.dumps({"title": f"{area_id} 指南",
+                "review": {"status": "approved", "reviewer": "李"}}), encoding="utf-8")
+    loaded = ev.load_package_references(tmp_path)
+    assert set(loaded) == set(areas)
+    newest = loaded["boost-air"][0]
+    assert newest["version"] == "10" and newest["body"].startswith("# 新\n") and "\r" not in newest["body"]
+    assert "李" in newest["provenance"]["coverage"]
+
+
+def test_missing_package_is_named(tmp_path):
+    with pytest.raises(ValueError, match="tayron-dkvb-"):
+        ev.load_package_references(tmp_path)
+
+
+def test_abnormal_records_without_an_action_fail_the_records_check():
+    spec = ev.load_cases()
+    case = next(c for c in spec["cases"] if c["id"].startswith("c1"))
+    topic = ev.load_topic(spec["template"])
+    payload = ev.build_payload(spec, case, topic=topic)
+    empty = {"summary": "s", "steps": [], "conditional_branches": [], "missing": [], "directions": []}
+    check = ev.records_planned(payload, empty, topic)
+    assert not check["passed"] and "AIR-07" in check["detail"]

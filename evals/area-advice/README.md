@@ -30,6 +30,18 @@
 
 模型每次回答都可能不同，所以每题建议跑 3 次，看通过率。
 
+## 新旧资料对比
+
+`--documents repo,packages` 用同一套题目，分别配仓库里的资料（`resources/knowledge`）和审核过的资料包
+（`--packages` 文件夹，默认 `../xiutu-clean/packages`，每份资料取最新版本）各跑一遍，报告里按"方式@资料"分列：
+
+```powershell
+uv run python -B scripts/run_area_advice_eval.py --documents repo,packages                       # 演习
+uv run python -B scripts/run_area_advice_eval.py --documents repo,packages --paid --runs 1 --max-cny 1
+```
+
+每次运行另有一项程序检查"每条异常记录都有对应的行动或待确认项"（`services/advice_coverage.py`，与页面上的提醒相同）。
+
 ## 怎么运行
 
 ```powershell

@@ -66,6 +66,31 @@ def load_references(template):
     return by_area
 
 
+def load_package_references(folder):
+    """Documents per area from reviewed guide packages (xiutu-clean packages/<id>/<version>/),
+    the newest version of each area's document; same shape as load_references()."""
+    from app.services.reference_ingest import content_hash, normalize
+    areas = json.loads(AREA_DOCUMENTS.read_text(encoding="utf-8"))["areas"]
+    by_area, missing = {}, []
+    for area_id, document_id in areas.items():
+        versions = sorted((d for d in (Path(folder) / document_id).glob("*")
+                           if d.name.isdigit() and (d / "guide.md").is_file()), key=lambda d: int(d.name))
+        if not versions:
+            missing.append(document_id)
+            continue
+        latest = versions[-1]
+        manifest = json.loads((latest / "manifest.json").read_text(encoding="utf-8"))
+        body = normalize((latest / "guide.md").read_text(encoding="utf-8"))
+        review = manifest.get("review") or {}
+        by_area[area_id] = [{"id": document_id, "version": latest.name, "title": manifest.get("title", document_id),
+                             "body": body, "content_hash": content_hash(body),
+                             "provenance": {"coverage": f"资料包第 {latest.name} 版（审核：{review.get('status')}，"
+                                                        f"{review.get('reviewer') or '无审核人'}）"}}]
+    if missing:
+        raise ValueError("资料包里找不到这些资料：" + "、".join(missing))
+    return by_area
+
+
 def _id(case_id, *parts):
     """Stable IDs keep the model input identical between runs of the same case."""
     return str(uuid5(NAMESPACE_URL, "xiutu-area-advice-eval:" + ":".join([case_id, *map(str, parts)])))
@@ -336,6 +361,15 @@ def grounding_checks(payload, result):
 HUMAN_GROUNDING = "建议里有没有在资料和记录中找不到依据的具体说法（数值、零件、操作方法）？如有，请写出来。"
 
 
+def records_planned(payload, result, topic):
+    """Every abnormal saved record is referenced by an action or a missing-fact entry."""
+    from app.services.advice_coverage import unplanned_records
+    found = unplanned_records(result, payload["observations"], topic["questions"])
+    return {"id": "records_planned", "label": "每条异常记录都有对应的行动或待确认项",
+            "passed": not found,
+            "detail": "；".join(f"{f['question_id']} {'、'.join(f['option_labels'])}" for f in found) or "都有安排"}
+
+
 def generic_checks(payload, result):
     """Checks every case gets: no invented references, retired fields left empty."""
     known = {
@@ -368,8 +402,10 @@ def generic_checks(payload, result):
     ]
 
 
-def grade(case, payload, result):
+def grade(case, payload, result, topic=None):
     graded = generic_checks(payload, result) + grounding_checks(payload, result)
+    if topic is not None:
+        graded.append(records_planned(payload, result, topic))
     for check in case["checks"]:
         passed, detail = check_result(check, result)
         graded.append({"id": check["id"], "label": check["label"], "passed": passed, "detail": detail})
