@@ -146,3 +146,18 @@ it('lists only deferred steps after the current actions and leaves retesting to 
   fireEvent.click(screen.getByText('当前行动完成后仍未解决'));
   expect(screen.getByText('交由专业检测')).toBeTruthy();
 });
+
+it('lists abnormal records the advice leaves without an action', async () => {
+  vi.spyOn(apiClient, 'request').mockImplementation(async (path) => path.endsWith('/template-repairs') ? { rounds: [] } : ({ ...baseline, history: [{
+    id: 'attempt', status: 'completed', input_revision: 12, stale: false, model: 'test', error_code: null,
+    documents: [doc], observations: [], questions: [{ id: 'AIR-11', title: '中冷器外观' }], usage: null,
+    unplanned: [{ observation_id: 'o11', question_id: 'AIR-11', question: 'AIR-11 · 中冷器外观', option_labels: ['碰撞痕迹'] }],
+    result: { summary: '处理接头', directions: [], missing: [], precautions: [], conditional_branches: [], steps: [] },
+  }] }));
+  const onQuestion = vi.fn();
+  mount(onQuestion);
+  expect(await screen.findByRole('heading', { name: '这些异常记录没有对应的行动' })).toBeTruthy();
+  expect(screen.getByText(/中冷器外观：碰撞痕迹/)).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: '前往 中冷器外观' }));
+  expect(onQuestion).toHaveBeenCalledWith('AIR-11');
+});

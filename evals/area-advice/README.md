@@ -63,7 +63,7 @@ uv run python -B scripts/run_area_advice_eval.py --reading current,full,answered
 
 ### 2026-10-22 的比较结果
 
-6 题 × 4 种方式 × 2 次，共 48 次调用，约 3.8 元（deepseek-flash，提示词 matched-area-advice-v18/v19）：
+6 题 × 4 种方式 × 2 次，共 48 次调用，约 3.8 元（deepseek-flash，当时的提示词 matched-area-advice-v18/v19）：
 
 | 方式 | 平均输入 token | 每次费用 | 题目检查 | 编号有依据 |
 | --- | --- | --- | --- | --- |
