@@ -606,6 +606,16 @@
             ],
             "title": "Error Code"
           },
+          "package": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReferencePackageInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "source_kind": {
             "title": "Source Kind",
             "type": "string"
@@ -675,6 +685,103 @@
           "items"
         ],
         "title": "ReferenceList",
+        "type": "object"
+      },
+      "ReferencePackageImport": {
+        "additionalProperties": false,
+        "description": "A guide package exported by xiutu-clean: the three files' text, exactly as written.",
+        "properties": {
+          "guide": {
+            "maxLength": 2000000,
+            "minLength": 1,
+            "title": "Guide",
+            "type": "string"
+          },
+          "manifest": {
+            "additionalProperties": true,
+            "title": "Manifest",
+            "type": "object"
+          },
+          "sources": {
+            "maxLength": 2000000,
+            "minLength": 2,
+            "title": "Sources",
+            "type": "string"
+          }
+        },
+        "required": [
+          "manifest",
+          "guide",
+          "sources"
+        ],
+        "title": "ReferencePackageImport",
+        "type": "object"
+      },
+      "ReferencePackageInfo": {
+        "properties": {
+          "open_gaps": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Open Gaps",
+            "type": "array"
+          },
+          "package_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Package Version"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "reviewer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewer"
+          },
+          "sources": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Sources",
+            "type": "array"
+          }
+        },
+        "required": [
+          "package_version",
+          "reviewer",
+          "reviewed_at",
+          "open_gaps",
+          "sources"
+        ],
+        "title": "ReferencePackageInfo",
         "type": "object"
       },
       "ReferenceUpload": {
@@ -806,8 +913,23 @@
       },
       "ReferenceVersionUpload": {
         "additionalProperties": false,
-        "description": "A new version of an existing manual; title, vehicle and always-sent sections carry over.",
+        "description": "A new version of an existing manual; the vehicle carries over, and so do the title and the\nalways-sent sections unless given (sections still present in the new body).",
         "properties": {
+          "always_include": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 50,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Always Include"
+          },
           "content": {
             "maxLength": 2000000,
             "minLength": 1,
@@ -819,6 +941,18 @@
             "maxLength": 255,
             "title": "Filename",
             "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
           }
         },
         "required": [
@@ -1431,6 +1565,158 @@
           }
         },
         "summary": "Upload Reference",
+        "tags": [
+          "area-references"
+        ]
+      }
+    },
+    "/api/v2/area-references/packages": {
+      "post": {
+        "description": "Import a reviewed guide package (manifest.json + guide.md + sources.json).",
+        "operationId": "import_reference_package_api_v2_area_references_packages_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReferencePackageImport"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceUploadResult"
+                }
+              }
+            },
+            "description": "Same content: existing version"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceUploadResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Request Entity Too Large"
+          },
+          "415": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unsupported Media Type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Bad Gateway"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorEnvelope"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Import Reference Package",
         "tags": [
           "area-references"
         ]

@@ -35,10 +35,29 @@ class ReferenceUpload(BaseModel):
 
 
 class ReferenceVersionUpload(BaseModel):
-    """A new version of an existing manual; title, vehicle and always-sent sections carry over."""
+    """A new version of an existing manual; the vehicle carries over, and so do the title and the
+    always-sent sections unless given (sections still present in the new body)."""
     model_config = ConfigDict(extra="forbid")
     filename: str = Field(default="", max_length=255)
     content: str = Field(min_length=1, max_length=2_000_000)
+    title: str | None = Field(default=None, max_length=200)
+    always_include: list[str] | None = Field(default=None, max_length=50)
+
+
+class ReferencePackageImport(BaseModel):
+    """A guide package exported by xiutu-clean: the three files' text, exactly as written."""
+    model_config = ConfigDict(extra="forbid")
+    manifest: dict
+    guide: str = Field(min_length=1, max_length=2_000_000)
+    sources: str = Field(min_length=2, max_length=2_000_000)
+
+
+class ReferencePackageInfo(BaseModel):
+    package_version: str | None
+    reviewer: str | None
+    reviewed_at: str | None
+    open_gaps: list[str]
+    sources: list[str | None]
 
 
 class ReferenceUploadResult(BaseModel):
@@ -63,6 +82,7 @@ class ReferenceItem(BaseModel):
     vector_fingerprint: str | None
     always_include: list[str]
     vehicle: StoredVehicle
+    package: ReferencePackageInfo | None = None
     created_at: str
     updated_at: str
 
@@ -99,6 +119,14 @@ class KnownVehicles(BaseModel):
              responses={200: {"model": ReferenceUploadResult, "description": "Same content: existing version"}})
 def upload_reference(body: ReferenceUpload, request: Request, principal=Depends(writing)):
     status, result = request.app.state.reference_ingest_service.upload(principal.actor_id, body)
+    return JSONResponse(status_code=status, content=result)
+
+
+@router.post("/packages", status_code=202, response_model=ReferenceUploadResult,
+             responses={200: {"model": ReferenceUploadResult, "description": "Same content: existing version"}})
+def import_reference_package(body: ReferencePackageImport, request: Request, principal=Depends(writing)):
+    """Import a reviewed guide package (manifest.json + guide.md + sources.json)."""
+    status, result = request.app.state.reference_ingest_service.import_package(principal.actor_id, body)
     return JSONResponse(status_code=status, content=result)
 
 

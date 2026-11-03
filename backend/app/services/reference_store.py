@@ -10,6 +10,8 @@ work happens changes:
 A document without usable stored data (not processed, other chunker or model, body changed)
 falls back to computing, so an analysis never fails for that reason.
 """
+import re
+
 from sqlalchemy import bindparam, func, select, text
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.types import Text
@@ -19,6 +21,7 @@ from app.infrastructure.orm import area_reference_chunks as chunks
 from app.infrastructure.orm import area_reference_documents as documents
 from app.retrieval.section_search import BM25, Chunk, identifiers
 from app.services.reference_ingest import CHUNKER_VERSION, content_hash
+from app.services.retrieval_reading import NAVIGATION
 
 EXACT = text("""
     SELECT ordinal,
@@ -79,6 +82,9 @@ def load(conn, document, embeddings):
     rows = conn.execute(select(chunks).where(
         chunks.c.document_id == document["id"], chunks.c.version == document["version"],
         chunks.c.searchable).order_by(chunks.c.ordinal)).mappings().all()
+    # Versions stored before a section kind became navigation (e.g. a guide's gap list) keep
+    # it marked searchable; leave it out here so stored and computed sections stay the same.
+    rows = [r for r in rows if not any(re.search(p, r["section"]) for p in NAVIGATION)]
     if not rows:
         return None, always
     fingerprint = getattr(embeddings, "fingerprint", None) if embeddings is not None else None
