@@ -13,7 +13,7 @@ LIBRARY = ROOT / "resources/template-library/tayron-dkvb"
 def test_modules_reassemble_the_published_templates_exactly():
     results = run(LIBRARY)
     assert {item["recipe"] for item in results} == {f"tayron-dkvb-{code}-v{version}.json"
-                                                    for code in ("p0299", "p0236") for version in (2, 3, 4)}
+                                                    for code in ("p0299", "p0236") for version in (2, 3, 4, 5)}
     for item in results:
         published = json.loads((ROOT / item["output"]).read_text(encoding="utf-8"))
         assert item["status"] == "identical"
@@ -97,3 +97,24 @@ def test_v4_changes_only_the_boost_air_area():
         assert {i for i in old_q if old_q[i] != new_q[i]} == {f"AIR-{n:02d}" for n in range(1, 17)}
         assert [a for a in new["areas"] if a["id"] != "boost-air"] == [a for a in old["areas"] if a["id"] != "boost-air"]
         assert all(q["reference_section"] for q in new["questions"] if q["area_id"] == "boost-air")
+
+
+def test_v5_changes_only_the_pressure_area():
+    """pressure v2 was drafted from the reviewed guide: PRS-01..12 keep their ids, PRS-13 is new,
+    the calculation rules still find their questions, fields and options."""
+    folder = ROOT / "resources/templates/tayron-v2"
+    for code in ("p0299", "p0236"):
+        old = json.loads((folder / f"tayron-dkvb-{code}-v4.json").read_text(encoding="utf-8"))
+        new = json.loads((folder / f"tayron-dkvb-{code}-v5.json").read_text(encoding="utf-8"))
+        old_q = {q["id"]: q for q in old["questions"]}
+        new_q = {q["id"]: q for q in new["questions"]}
+        assert set(new_q) - set(old_q) == {"PRS-13"} and set(old_q) <= set(new_q)
+        assert {i for i in old_q if old_q[i] != new_q[i]} == {f"PRS-{n:02d}" for n in range(1, 13)}
+        assert new["calculation_rules"] == old["calculation_rules"]
+        for rule in (r for r in new["calculation_rules"]["rules"] if r.get("target_question_id", "").startswith("PRS-")):
+            outputs = rule["outputs"].values()
+            names = {v for v in outputs if isinstance(v, str)} | {x for v in outputs if isinstance(v, dict) for x in v.values()}
+            assert names <= {o["id"] for o in new_q[rule["target_question_id"]]["options"]}
+            for item in rule["inputs"]:
+                fields = {f["id"] for f in new_q[item["question_id"]]["fields"]}
+                assert {item[k] for k in ("field", "target_field", "actual_field") if k in item} <= fields

@@ -176,3 +176,13 @@ def test_v4_carries_other_areas_and_has_reviewed_boost_air_roles():
         assert set(v4["AIR-13"]["option_roles"].values()) == {"inspection_status"}
         assert v4["AIR-14"]["option_roles"]["unsafe_stop"] == "inspection_status"
         assert v4["AIR-17"]["option_roles"]["unavailable"] == "inspection_status"
+
+
+def test_v5_carries_other_areas_and_has_reviewed_pressure_roles():
+    for template_id in ("tayron-dkvb-p0299", "tayron-dkvb-p0236"):
+        v4, v5 = roles_of(template_id, "4"), roles_of(template_id, "5")
+        assert set(v5) == set(v4) | {"PRS-13"}
+        for qid in (q for q in v4 if not q.startswith("PRS-")):
+            assert without_hash(v5[qid]) == without_hash(v4[qid])
+        assert v5["PRS-02"]["option_roles"]["signal_missing"] == "inspection_status"
+        assert v5["PRS-13"]["option_roles"]["unavailable"] == "inspection_status"
