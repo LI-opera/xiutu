@@ -9,12 +9,13 @@ import { AreaAnalysis } from './AreaAnalysis';
 import { TemplateRepairRetest } from './TemplateRepairRetest';
 import { MatchedVehicleForm } from './MatchedVehicleIntake';
 import './workbench-base.css';
+import { nextSelection } from './selection';
 import './workbench-content.css';
 import './workbench.css';
 
 type Option = { id: string; label: string; outcome: string };
 type Field = { id: string; label: string; type: string; unit?: string; required_when_recorded?: boolean };
-type Question = { id: string; stage: string; cardId: string; area_id: string | null; title: string; purpose: string; instructions: string; answer_kind: string; phase: string; options: Option[]; fields: Field[]; assetIds: string[]; capture?: { batch_kind: string; batch_id_required: boolean } | null; prerequisites: { refs: string[]; when: string }; execution_conditions?: { bypass_options: string[] } };
+type Question = { id: string; stage: string; cardId: string; area_id: string | null; title: string; purpose: string; instructions: string; answer_kind: string; phase: string; options: Option[]; fields: Field[]; assetIds: string[]; capture?: { batch_kind: string; batch_id_required: boolean } | null; prerequisites: { refs: string[]; when: string }; execution_conditions?: { bypass_options: string[] }; exclusive_options?: string[] };
 type Card = { id: string; stage: string; areaId?: string; title: string; icon: string; location: string; why: string; safety: string; questionIds: string[]; assetIds: string[] };
 type Area = { id: string; title: string; icon: string; description: string; initialPriority: number; componentIds: string[] };
 type AreaRanking = { status: 'not_requested' | 'running' | 'completed' | 'failed'; source: 'template' | 'ai'; order: string[]; reasons: Record<string, string>; available: boolean; error_code: string | null; model: string | null; requested_at: string | null; finished_at: string | null };
@@ -202,12 +203,8 @@ type Autosave = ReturnType<typeof useAnswerSaving>;
 function AnswerForm({ question, existing, autosave, blockers: pendingConditions }: { question: Question; existing?: Observation; autosave: Autosave; blockers: ConditionBlocker[] }) {
   const draft = autosave.drafts[question.id] ?? fromSaved(existing);
   const state = autosave.statuses[question.id] ?? { phase: existing ? 'saved' : 'idle' };
-  const choose = (id: string) => autosave.change(question, existing, old => {
-    if (question.answer_kind !== 'multi_choice') return { ...old, selected: [id] };
-    const exclusive = new Set(['none', 'none_known']);
-    const selected = old.selected.includes(id) ? old.selected.filter(item => item !== id) : exclusive.has(id) ? [id] : [...old.selected.filter(item => !exclusive.has(item)), id];
-    return { ...old, selected };
-  }, after => !needsManualSave(question, after));
+  const choose = (id: string) => autosave.change(question, existing,
+    old => ({ ...old, selected: nextSelection(question, old.selected, id) }), after => !needsManualSave(question, after));
   const unavailable = isUnavailable(question, draft.selected);
   const fields = visibleFields(question, draft.selected);
   const manual = needsManualSave(question, draft);
