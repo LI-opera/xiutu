@@ -202,3 +202,10 @@ def test_v7_keeps_the_disposition_question_roles():
     assert set(v7) == set(v6) | {f"TUR-{n}" for n in range(11, 16)}
     for qid in (q for q in v6 if not q.startswith("TUR-") or q in ("TUR-09", "TUR-10")):
         assert without_hash(v7[qid]) == without_hash(v6[qid])
+
+
+def test_v8_keeps_the_handoff_question_roles():
+    v7, v8 = roles_of("tayron-dkvb-p0299", "7"), roles_of("tayron-dkvb-p0299", "8")
+    assert set(v8) == set(v7) | {f"X-{n}" for n in range(15, 22)}
+    for qid in (q for q in v7 if not q.startswith("X-") or q in ("X-13", "X-14")):
+        assert without_hash(v8[qid]) == without_hash(v7[qid])

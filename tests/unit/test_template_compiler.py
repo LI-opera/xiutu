@@ -13,7 +13,7 @@ LIBRARY = ROOT / "resources/template-library/tayron-dkvb"
 def test_modules_reassemble_the_published_templates_exactly():
     results = run(LIBRARY)
     assert {item["recipe"] for item in results} == {f"tayron-dkvb-{code}-v{version}.json"
-                                                    for code in ("p0299", "p0236") for version in (2, 3, 4, 5, 6)} | {"tayron-dkvb-p0299-v7.json"}
+                                                    for code in ("p0299", "p0236") for version in (2, 3, 4, 5, 6)} | {"tayron-dkvb-p0299-v7.json", "tayron-dkvb-p0299-v8.json"}
     for item in results:
         published = json.loads((ROOT / item["output"]).read_text(encoding="utf-8"))
         assert item["status"] == "identical"
@@ -145,6 +145,23 @@ def test_v7_changes_only_the_turbo_area_and_its_rule():
     assert set(new_q) - set(old_q) == {f"TUR-{n}" for n in range(11, 16)} and set(old_q) <= set(new_q)
     assert {i for i in old_q if old_q[i] != new_q[i]} == {f"TUR-{n:02d}" for n in range(1, 9)}
     rule = next(r for r in new["calculation_rules"]["rules"] if r["target_question_id"] == "TUR-09")
+    for group in rule["groups"]:
+        for cond in group["any"]:
+            assert set(cond["option_ids"]) <= {o["id"] for o in new_q[cond["question_id"]]["options"]}
+
+
+def test_v8_changes_only_the_powertrain_area_and_its_rule():
+    """powertrain v2: X-01..12 rewritten, X-15..21 new, X-13/14 kept; the direction rule of X-13
+    names only questions and options that exist, and still tells cylinders apart."""
+    folder = ROOT / "resources/templates/tayron-v2"
+    old = json.loads((folder / "tayron-dkvb-p0299-v7.json").read_text(encoding="utf-8"))
+    new = json.loads((folder / "tayron-dkvb-p0299-v8.json").read_text(encoding="utf-8"))
+    old_q = {q["id"]: q for q in old["questions"]}
+    new_q = {q["id"]: q for q in new["questions"]}
+    assert set(new_q) - set(old_q) == {f"X-{n}" for n in range(15, 22)} and set(old_q) <= set(new_q)
+    assert {i for i in old_q if old_q[i] != new_q[i]} == {f"X-{n:02d}" for n in range(1, 13)}
+    assert {"cyl1", "cyl2", "cyl3", "cyl4"} <= {o["id"] for o in new_q["X-01"]["options"]}
+    rule = next(r for r in new["calculation_rules"]["rules"] if r["target_question_id"] == "X-13")
     for group in rule["groups"]:
         for cond in group["any"]:
             assert set(cond["option_ids"]) <= {o["id"] for o in new_q[cond["question_id"]]["options"]}

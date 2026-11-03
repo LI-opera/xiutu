@@ -224,6 +224,27 @@
       ],
       "source": "02-五区域诊断流程与分支协议.md",
       "content_file": "tayron-dkvb-p0299-v7.json"
+    },
+    {
+      "id": "tayron-2019-dkvb-p0299-v8",
+      "brand": "大众",
+      "model": "探岳",
+      "year_from": 2019,
+      "year_to": 2019,
+      "engine_code": "DKVB",
+      "fault_code": "P0299",
+      "template_id": "tayron-dkvb-p0299",
+      "version": "8",
+      "title": "增压不足初始排查",
+      "area_ids": [
+        "boost-air",
+        "pressure",
+        "actuator",
+        "turbo",
+        "powertrain"
+      ],
+      "source": "02-五区域诊断流程与分支协议.md",
+      "content_file": "tayron-dkvb-p0299-v8.json"
     }
   ]
 }
