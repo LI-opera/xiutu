@@ -111,9 +111,13 @@ def test_upload_body_needs_a_vehicle_and_no_areas():
                    {**base, "areas": [{"template_id": "t", "template_version": "1", "area_id": "a"}]}):
         with pytest.raises(Exception):
             ReferenceUpload.model_validate(broken)
-    # A new version only brings the file: title, vehicle and sections carry over.
+    # A new version may change its title and always-sent sections (carried over when left out);
+    # the vehicle always carries over.
+    kept = ReferenceVersionUpload.model_validate({"content": "x"})
+    assert kept.title is None and kept.always_include is None
+    assert ReferenceVersionUpload.model_validate({"content": "x", "title": "改名"}).title == "改名"
     with pytest.raises(Exception):
-        ReferenceVersionUpload.model_validate({"content": "x", "title": "改名"})
+        ReferenceVersionUpload.model_validate({"content": "x", "vehicle": vehicle})
 
 
 def test_vehicle_is_trimmed_and_engine_code_upper_cased():
@@ -130,3 +134,73 @@ def test_reading_config_still_matches_seeded_bodies():
     hashes = {(d["document_id"], d["version"]): d["content_hash"] for d in DOCUMENTS}
     for entry in config["documents"]:
         assert hashes.get((entry["id"], entry["version"])) == entry["content_hash"]
+
+
+# ---------------------------------------------------------------- guide packages (xiutu-clean)
+
+PACKAGE_BODY = "# 涡轮增压器指南\r\n\r\n## 1. 本区域检查什么\r\n\r\n正文。\r\n\r\n## 2. 检查壳体\r\n\r\n检查 V465。\r\n"
+
+
+def package(**change):
+    """A package as xiutu-clean writes it (Windows line ends), approved."""
+    guide = change.pop("guide", PACKAGE_BODY)
+    sources = change.pop("sources", json.dumps({"schema_version": ri.PACKAGE_SCHEMA, "sources": [
+        {"title": "涡轮增压器", "kind": "local_manual", "pdf_file": "x.pdf", "pdf_sha256": "a", "pages_cited": [3]}],
+        "confirmed_facts": []}, ensure_ascii=False))
+    files = {"guide.md": ri.file_hash(guide), "sources.json": ri.file_hash(sources)}
+    manifest = {"schema_version": ri.PACKAGE_SCHEMA, "document_id": "demo-turbo", "version": "4",
+                "title": "涡轮增压器指南", "always_include": ["## 1. 本区域检查什么"],
+                "applicability": [{"brand": "大众", "model": "探岳", "year_from": 2019, "year_to": 2019,
+                                   "engine_code": "dkvb"}],
+                "open_gaps": [{"group": "数值", "gap": "间隙标准未给出"}],
+                "review": {"status": "approved", "reviewer": "李", "reviewed_at": "2026-11-02T10:00:00+00:00",
+                           "approved_hashes": dict(files)},
+                "made_by": {"job": "turbo"}, "files": files}
+    for key, value in change.items():
+        manifest[key] = value
+    return manifest, guide, sources
+
+
+def test_approved_package_gives_title_vehicle_sections_and_provenance():
+    checked = ri.check_package(*package())
+    assert checked["document_id"] == "demo-turbo" and checked["title"] == "涡轮增压器指南"
+    assert checked["vehicle"] == {"vehicle_brand": "大众", "vehicle_model": "探岳", "vehicle_year": 2019,
+                                  "vehicle_engine_code": "DKVB"}
+    assert checked["always_include"] == ["## 1. 本区域检查什么"]
+    assert "\r" not in checked["body"]
+    stored = checked["provenance"]["package"]
+    assert stored["review"]["reviewer"] == "李" and stored["package_version"] == "4"
+    assert stored["open_gaps"][0]["gap"] == "间隙标准未给出" and stored["sources"][0]["pages_cited"] == [3]
+
+
+def pending(manifest):
+    return {**manifest["review"], "status": "pending", "reviewer": None, "approved_hashes": None}
+
+
+@pytest.mark.parametrize("make,code", [
+    (lambda: package(schema_version="other"), "REFERENCE_PACKAGE_SCHEMA"),
+    (lambda: (lambda m, g, s: (m, g + "改动", s))(*package()), "REFERENCE_PACKAGE_CHANGED"),
+    (lambda: (lambda m, g, s: (m, g.replace("\r\n", "\n"), s))(*package()), "REFERENCE_PACKAGE_CHANGED"),
+    (lambda: (lambda m, g, s: ({**m, "review": pending(m)}, g, s))(*package()), "REFERENCE_PACKAGE_NOT_APPROVED"),
+    (lambda: (lambda m, g, s: ({**m, "review": {**m["review"], "approved_hashes": {"guide.md": "old", "sources.json": "old"}}}, g, s))(*package()),
+     "REFERENCE_PACKAGE_CHANGED"),
+    (lambda: (lambda m, g, s: ({**m, "review": {**m["review"], "reviewer": ""}}, g, s))(*package()), "REFERENCE_PACKAGE_NOT_APPROVED"),
+    (lambda: package(document_id="Bad ID"), "REFERENCE_ID_INVALID"),
+    (lambda: package(applicability=[{"brand": "大众"}]), "REFERENCE_VEHICLE_REQUIRED"),
+    (lambda: package(always_include=["## 9. 不存在"]), "REFERENCE_SECTION_NOT_FOUND"),
+    (lambda: package(title=" "), "REFERENCE_PACKAGE_SCHEMA"),
+])
+def test_package_that_is_not_intact_and_approved_is_refused(make, code):
+    with pytest.raises(DomainError) as raised:
+        ri.check_package(*make())
+    assert raised.value.code == code
+
+
+def test_a_guides_gap_list_is_stored_but_never_searched():
+    body = ("# 指南\n\n## 1. 检查壳体\n\n检查 V465。\n\n## 2. 燃油量、品质和供油限制\n\n正文。\n\n"
+            "## 3. 本指南的缺口与限制\n\n- 间隙标准未给出。\n")
+    built = ri.build_chunks("demo", body)
+    searchable = {c["section"]: c["searchable"] for c in built}
+    assert searchable == {"## 1. 检查壳体": True, "## 2. 燃油量、品质和供油限制": True,
+                          "## 3. 本指南的缺口与限制": False}
+    assert [c.section for c in split("demo", body, NAVIGATION)] == ["## 1. 检查壳体", "## 2. 燃油量、品质和供油限制"]

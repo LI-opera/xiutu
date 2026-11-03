@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { apiClient } from '../src/lib/api-client';
 import { ReferencesPage } from '../src/pages/ReferencesPage';
-import { groupReferences, referenceIdFrom, sectionHeadings, suggestions, vehicleText } from '../src/lib/references';
+import { groupReferences, PACKAGE_SCHEMA, readPackage, referenceIdFrom, sectionHeadings, suggestions, vehicleText } from '../src/lib/references';
 import type { ReferenceItem } from '../src/lib/types';
 
 const vehicle = { brand: '大众', model: '探岳', year: 2019, engine_code: 'DKVB' };
@@ -37,7 +37,23 @@ function mount() {
 
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
+const manifest = (review: Record<string, unknown> = { status: 'approved', reviewer: '李' }) => ({
+  schema_version: PACKAGE_SCHEMA, document_id: 'tayron-dkvb-turbo', version: '4', title: '涡轮增压器指南',
+  always_include: ['## 1. 本区域检查什么'], open_gaps: [{ group: '数值', gap: '间隙标准' }],
+  applicability: [{ brand: '大众', model: '探岳', year_from: 2019, year_to: 2019, engine_code: 'DKVB' }], review,
+});
+
 describe('reference helpers', () => {
+  it('reads a guide package from its three files and says what keeps it from being imported', () => {
+    const files = (m: unknown) => [{ name: 'manifest.json', text: JSON.stringify(m) }, { name: 'guide.md', text: 'g' }, { name: 'sources.json', text: 's' }];
+    const ok = readPackage(files(manifest()));
+    expect(ok.problems).toEqual([]);
+    expect(ok.pkg).toMatchObject({ documentId: 'tayron-dkvb-turbo', reviewer: '李', approved: true, openGaps: 1, vehicle: '大众 探岳 2019 DKVB' });
+    expect(readPackage(files(manifest({ status: 'pending', reviewer: null }))).problems[0]).toContain('approve.py');
+    expect(readPackage(files(manifest()).slice(0, 2)).problems[0]).toContain('sources.json');
+    expect(readPackage(files({ schema_version: 'x' })).pkg).toBeNull();
+  });
+
   it('derives a valid document ID from a file name', () => {
     expect(referenceIdFrom('Boost Air_v3.md')).toBe('boost-air-v3');
     expect(referenceIdFrom('增压资料.md', () => 'abc123')).toBe('doc-abc123');
@@ -117,7 +133,7 @@ describe('ReferencesPage', () => {
       always_include: ['## 2. 怎样确认'], vehicle }]);
   });
 
-  it('uploads a new version from the manual itself with only the file', async () => {
+  it('uploads a new version keeping the title and the sections the new file still has', async () => {
     const posted: unknown[] = [];
     serve((path, options) => {
       if (path === '/area-references/boost-manual/versions' && options?.body) {
@@ -125,16 +141,41 @@ describe('ReferencesPage', () => {
         return { document_id: 'boost-manual', version: '2', status: 'queued', reused: false, run_id: 'r2' };
       }
       return undefined;
-    }, [item('1', 'ready')]);
+    }, [item('1', 'ready', { always_include: ['## 1. 检查什么', '## 3. 已删除'] })]);
     mount();
     await userEvent.click(await screen.findByRole('button', { name: '上传新版本' }));
-    const markdown = '# 增压\n\n## 1. 检查什么\n\n新正文\n';
+    const markdown = '# 增压\n\n## 1. 检查什么\n\n新正文\n\n## 2. 复检\n\n正文\n';
     fireEvent.change(screen.getByLabelText('增压空气通路 的新版本（Markdown）'), { target: { files: [new File([markdown], 'v2.md')] } });
+    expect(await screen.findByText(/上一版的必带章节在新文件里找不到：3\. 已删除/)).toBeTruthy();
+    expect((screen.getByLabelText('1. 检查什么') as HTMLInputElement).checked).toBe(true);
+    await userEvent.click(screen.getByLabelText('2. 复检'));
     const send = screen.getAllByRole('button', { name: '上传新版本' }).find(b => b.closest('.new-version-form'))!;
     await waitFor(() => expect((send as HTMLButtonElement).disabled).toBe(false));
     await userEvent.click(send);
-    await waitFor(() => expect(posted).toEqual([{ filename: 'v2.md', content: markdown }]));
+    await waitFor(() => expect(posted).toEqual([{ filename: 'v2.md', content: markdown, title: '增压空气通路',
+      always_include: ['## 1. 检查什么', '## 2. 复检'] }]));
     expect(screen.queryByLabelText('增压空气通路 的新版本（Markdown）')).toBeNull();
+  });
+
+  it('imports an approved guide package with the files exactly as written', async () => {
+    const posted: unknown[] = [];
+    serve((path, options) => {
+      if (path === '/area-references/packages' && options?.body) {
+        posted.push(options.body);
+        return { document_id: 'tayron-dkvb-turbo', version: '5', status: 'queued', reused: false, run_id: 'r3' };
+      }
+      return undefined;
+    });
+    mount();
+    const guide = '# 涡轮\r\n\r\n## 1. 本区域检查什么\r\n\r\n正文\r\n';
+    const sources = '{"sources": []}';
+    const files = [new File([JSON.stringify(manifest())], 'manifest.json'), new File([guide], 'guide.md'), new File([sources], 'sources.json')];
+    fireEvent.change(await screen.findByLabelText('资料包文件'), { target: { files } });
+    expect(await screen.findByText('已通过：李')).toBeTruthy();
+    expect(screen.getByText('大众 探岳 2019 DKVB')).toBeTruthy();
+    await userEvent.click(screen.getByRole('button', { name: '导入并处理' }));
+    expect(await screen.findByText(/已受理为第 5 版/)).toBeTruthy();
+    expect(posted).toEqual([{ manifest: manifest(), guide, sources }]);
   });
 
   it('refuses a file without ## sections before sending anything', async () => {
