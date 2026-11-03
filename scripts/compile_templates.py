@@ -1,7 +1,7 @@
 """Assemble complete template files from area modules (resources/template-library/<library>/).
 
 A library holds catalog.json (stages, shared assets and sources, rule engine versions),
-modules/<area>.json (one area with its cards, questions and the rules that belong to it)
+modules/<area>/<version>.json (one area with its cards, questions and the rules that belong to it)
 and recipes/<template>.json (which modules, in which order, plus template-level text).
 
 Default is --check: compile every recipe and compare with its published output file.
@@ -91,7 +91,10 @@ def compile_recipe(library, recipe_path):
     if len(set(chosen)) != len(chosen):
         raise CompileError(f"{recipe_path.name}: a module is listed twice")
     for entry in recipe["modules"]:
-        module = load(library / "modules" / f"{entry['id']}.json", MODULE_SCHEMA)
+        path = library / "modules" / entry["id"] / f"{entry['version']}.json"
+        if not path.is_file():
+            raise CompileError(f"{recipe_path.name}: library has no module {entry['id']} v{entry['version']}")
+        module = load(path, MODULE_SCHEMA)
         if module["module_id"] != entry["id"] or module["module_version"] != entry["version"]:
             raise CompileError(f"{recipe_path.name}: wants {entry['id']} v{entry['version']}, "
                                f"library has {module['module_id']} v{module['module_version']}")

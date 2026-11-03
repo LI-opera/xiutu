@@ -131,3 +131,81 @@ def test_changed_options_stop_for_manual_review():
     topic["questions"][0]["options"][0]["status_semantics"] = "not_executed_not_normal"
     with pytest.raises(ReviewRequired, match="not executed"):
         derive_template(ROLES_DATA, relation, topic)
+
+
+CLAMP_QUESTIONS = {"AIR-07", "AIR-08", "AIR-09", "AIR-10"}
+
+
+def roles_of(template_id, version, config=ROLES_DATA):
+    return next(t for t in config["templates"]
+                if t["template_id"] == template_id and t["version"] == version)["questions"]
+
+
+def without_hash(spec):
+    return {k: v for k, v in spec.items() if k != "definition_hash"}
+
+
+def test_v3_carries_unchanged_roles_from_v2():
+    for template_id in ("tayron-dkvb-p0299", "tayron-dkvb-p0236"):
+        v2, v3 = roles_of(template_id, "2"), roles_of(template_id, "3")
+        assert set(v2) == set(v3)
+        for qid in set(v3) - CLAMP_QUESTIONS:
+            assert without_hash(v3[qid]) == without_hash(v2[qid])
+        assert roles_of(template_id, "3")["AIR-07"]["option_roles"]["unavailable"] == "inspection_status"
+
+
+def test_changed_questions_need_a_review_and_stale_reviews_are_rejected():
+    config = deepcopy(ROLES_DATA)
+    config["templates"] = [t for t in config["templates"] if t["version"] != "3"]
+    with pytest.raises(ReviewRequired, match="AIR-07: options changed"):
+        build(config)
+    reviews = {qid: without_hash(roles_of("tayron-dkvb-p0299", "3")[qid]) for qid in CLAMP_QUESTIONS}
+    result, _ = build(config, reviews=reviews)
+    for template_id in ("tayron-dkvb-p0299", "tayron-dkvb-p0236"):
+        assert roles_of(template_id, "3", result) == roles_of(template_id, "3")
+    with pytest.raises(ReviewRequired, match="not needed"):
+        build(ROLES_DATA, reviews=reviews)
+
+
+def test_v4_carries_other_areas_and_has_reviewed_boost_air_roles():
+    for template_id in ("tayron-dkvb-p0299", "tayron-dkvb-p0236"):
+        v3, v4 = roles_of(template_id, "3"), roles_of(template_id, "4")
+        assert set(v4) == set(v3) | {"AIR-17"}
+        for qid in (q for q in v3 if not q.startswith("AIR-")):
+            assert without_hash(v4[qid]) == without_hash(v3[qid])
+        assert set(v4["AIR-13"]["option_roles"].values()) == {"inspection_status"}
+        assert v4["AIR-14"]["option_roles"]["unsafe_stop"] == "inspection_status"
+        assert v4["AIR-17"]["option_roles"]["unavailable"] == "inspection_status"
+
+
+def test_v5_carries_other_areas_and_has_reviewed_pressure_roles():
+    for template_id in ("tayron-dkvb-p0299", "tayron-dkvb-p0236"):
+        v4, v5 = roles_of(template_id, "4"), roles_of(template_id, "5")
+        assert set(v5) == set(v4) | {"PRS-13"}
+        for qid in (q for q in v4 if not q.startswith("PRS-")):
+            assert without_hash(v5[qid]) == without_hash(v4[qid])
+        assert v5["PRS-02"]["option_roles"]["signal_missing"] == "inspection_status"
+        assert v5["PRS-13"]["option_roles"]["unavailable"] == "inspection_status"
+
+
+def test_v6_carries_unchanged_questions_and_has_reviewed_actuator_roles():
+    for template_id in ("tayron-dkvb-p0299", "tayron-dkvb-p0236"):
+        v5, v6 = roles_of(template_id, "5"), roles_of(template_id, "6")
+        assert set(v6) == set(v5) | {f"ACT-{n}" for n in range(11, 17)}
+        for qid in (q for q in v5 if not q.startswith("ACT-") or q in ("ACT-08", "ACT-09", "ACT-10")):
+            assert without_hash(v6[qid]) == without_hash(v5[qid])
+        assert v6["ACT-12"]["option_roles"]["wire_mismatch"] == "observation"
+
+
+def test_v7_keeps_the_disposition_question_roles():
+    v6, v7 = roles_of("tayron-dkvb-p0299", "6"), roles_of("tayron-dkvb-p0299", "7")
+    assert set(v7) == set(v6) | {f"TUR-{n}" for n in range(11, 16)}
+    for qid in (q for q in v6 if not q.startswith("TUR-") or q in ("TUR-09", "TUR-10")):
+        assert without_hash(v7[qid]) == without_hash(v6[qid])
+
+
+def test_v8_keeps_the_handoff_question_roles():
+    v7, v8 = roles_of("tayron-dkvb-p0299", "7"), roles_of("tayron-dkvb-p0299", "8")
+    assert set(v8) == set(v7) | {f"X-{n}" for n in range(15, 22)}
+    for qid in (q for q in v7 if not q.startswith("X-") or q in ("X-13", "X-14")):
+        assert without_hash(v8[qid]) == without_hash(v7[qid])

@@ -1,0 +1,1480 @@
+{
+  "schema_version": "template-module/1",
+  "library_id": "tayron-dkvb",
+  "module_id": "boost-air",
+  "module_version": "3",
+  "requires_modules": [],
+  "area": {
+    "id": "boost-air",
+    "stage": "S1",
+    "title": "增压空气通路",
+    "icon": "↝",
+    "description": "沿气流方向先查空滤与进气导管，再查增压软管、接头卡箍和中冷器，最后加压检漏定位泄漏。",
+    "initialPriority": 1,
+    "componentIds": [
+      "air-intake",
+      "air-hose",
+      "air-connector",
+      "air-intercooler",
+      "air-leak-test"
+    ]
+  },
+  "cards": [
+    {
+      "id": "air-intake",
+      "stage": "S1",
+      "areaId": "boost-air",
+      "title": "空气滤清器与进气导管",
+      "icon": "⌁",
+      "location": "发动机舱内空气滤清器总成，及空气流量计 G70 到涡轮增压器入口的空气导流软管",
+      "why": "先排除上游进气受限、未闭合和未计量空气进入，避免干扰下游判断。",
+      "safety": "",
+      "questionIds": [
+        "AIR-01",
+        "AIR-02",
+        "AIR-03",
+        "AIR-17"
+      ],
+      "assetIds": [
+        "M08",
+        "M02"
+      ],
+      "long_card_ids": [
+        "LC-01"
+      ]
+    },
+    {
+      "id": "air-hose",
+      "stage": "S1",
+      "areaId": "boost-air",
+      "title": "涡轮出口至中冷器软管",
+      "icon": "↝",
+      "location": "涡轮增压器出口、中冷器接口与发动机进气侧之间的各段增压空气软管",
+      "why": "区分软管表面裂纹、擦伤、鼓包、压扁，与周边部件干涉，以及接头周围油雾分布",
+      "safety": "热车刚停机时涡轮出口一侧软管和中冷器很烫，冷却后再触摸。散热器风扇会自动运转，有受伤危险；手需要伸到风扇护罩附近时，先脱开风扇电气连接插头〔手册·散热器、散热器风扇 p4〕。",
+      "questionIds": [
+        "AIR-04",
+        "AIR-06",
+        "AIR-05"
+      ],
+      "assetIds": [
+        "M02"
+      ],
+      "long_card_ids": [
+        "LC-01"
+      ]
+    },
+    {
+      "id": "air-connector",
+      "stage": "S1",
+      "areaId": "boost-air",
+      "title": "增压软管接头与螺旋卡箍",
+      "icon": "⛓",
+      "location": "增压空气软管与空气管的各接头处",
+      "why": "区分软管止动位置与标记对齐、螺旋卡箍紧固与类型状态，确认接头座合符合手册要求",
+      "safety": "热车刚停机时涡轮出口一侧软管和中冷器很烫，冷却后再触摸。",
+      "questionIds": [
+        "AIR-07",
+        "AIR-08",
+        "AIR-09",
+        "AIR-10"
+      ],
+      "assetIds": [
+        "M03"
+      ],
+      "long_card_ids": [
+        "LC-02"
+      ]
+    },
+    {
+      "id": "air-intercooler",
+      "stage": "S1",
+      "areaId": "boost-air",
+      "title": "中冷器及两侧接口",
+      "icon": "▦",
+      "location": "散热器附近的中冷器本体及其左右两侧软管接口",
+      "why": "区分中冷器本体撞击、变形、污染，以及左右接口座合、卡箍与油雾湿痕",
+      "safety": "热车刚停机时涡轮出口一侧软管和中冷器很烫，冷却后再触摸。散热器风扇会自动运转，有受伤危险；手需要伸到风扇护罩附近时，先脱开风扇电气连接插头〔手册·散热器、散热器风扇 p4〕。",
+      "questionIds": [
+        "AIR-11",
+        "AIR-12"
+      ],
+      "assetIds": [
+        "M02"
+      ],
+      "long_card_ids": [
+        "LC-01"
+      ]
+    },
+    {
+      "id": "air-leak-test",
+      "stage": "S1",
+      "areaId": "boost-air",
+      "title": "增压系统加压检漏",
+      "icon": "◎",
+      "location": "涡轮增压器进气管接头处连接测试仪，沿增压空气通路逐段检查",
+      "why": "确认检漏工具可用、加压不超过 0.5 bar，并定位泄漏响应位置与证据强度",
+      "safety": "加压检漏时压力不得超过 0.5 bar，压力设定过高会造成损坏；拆下转接器之前，要通过将软管接头分离来给测试回路减压。",
+      "questionIds": [
+        "AIR-13",
+        "AIR-14",
+        "AIR-15",
+        "AIR-16"
+      ],
+      "assetIds": [
+        "M05",
+        "M06"
+      ],
+      "long_card_ids": [
+        "LC-03"
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "AIR-01",
+      "stage": "S1",
+      "cardId": "air-intake",
+      "title": "AIR-01 · 空气滤清器壳体上下两部分是否贴合、卡扣是否扣住",
+      "prompt": "空气滤清器壳体上下两部分是否贴合、卡扣是否扣住？",
+      "purpose": "区分壳体闭合正常、装配未扣合、壳体或卡扣已损坏，以及无法看清接缝",
+      "instructions": "发动机停机、点火开关关闭。目视壳体四周接缝，看上下两部分是否贴合、有无明显缝隙或错位，并按压感受是否松动。",
+      "factKey": "intake_housing_state",
+      "fields": [],
+      "assetIds": [
+        "M08"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "四周贴合、按压无松动",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "open_or_misaligned",
+          "label": "有缝隙、错位或卡扣未扣住",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "damaged",
+          "label": "壳体或卡扣有裂纹、断裂、变形",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法看清接缝或被其他部件遮挡",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-AIRFILTER"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null,
+      "reference_section": "3.1 空气滤清器壳体上下盖闭合与卡扣的检查"
+    },
+    {
+      "id": "AIR-02",
+      "stage": "S1",
+      "cardId": "air-intake",
+      "title": "AIR-02 · 滤芯滤材是否被灰尘、树叶、盐残留物明显覆盖、透光差，或潮湿、变形、装反",
+      "prompt": "滤芯滤材是否被灰尘、树叶、盐残留物明显覆盖、透光差，或潮湿、变形、装反？",
+      "purpose": "区分滤芯通畅、进气受限、受潮、装配或零件状态异常，以及无法取出查看",
+      "instructions": "发动机停机、点火开关关闭。需打开壳体取出滤芯，按本车结构操作。取出滤芯，在光线充足处观察滤材表面，对着光看透光是否均匀，用手感受是否潮湿发软，检查外形与密封边是否完整、安装方向与嵌入件是否配合正确。",
+      "factKey": "air_filter_state",
+      "fields": [],
+      "assetIds": [
+        "M08"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "clean",
+          "label": "滤材透光均匀、无覆盖、干燥、形状完整、安装到位",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "restricted",
+          "label": "滤材被灰尘、树叶、盐残留物明显覆盖、透光差",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "wet",
+          "label": "滤材潮湿",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "misinstalled",
+          "label": "滤芯变形、密封边破损、装反或未落入嵌入件",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法取出或无法看清滤材",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "multi_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-AIRFILTER"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null,
+      "reference_section": "3.2 滤芯状态的检查",
+      "exclusive_options": [
+        "clean",
+        "unavailable"
+      ]
+    },
+    {
+      "id": "AIR-03",
+      "stage": "S1",
+      "cardId": "air-intake",
+      "title": "AIR-03 · 空气导流软管是否有松脱、局部压扁折死或管壁裂口破洞",
+      "prompt": "空气导流软管是否有松脱、局部压扁折死或管壁裂口破洞？",
+      "purpose": "区分导流软管在位圆整、装配松脱、通流截面受限、管壁破损，以及无法接近查看",
+      "instructions": "发动机停机、点火开关关闭。沿软管全长目视有无脱开错位，用手沿走向轻压感受是否被压扁折死，仔细观察管壁有无裂口破洞，并查看走向上是否有部件挤压它。",
+      "factKey": "pre_turbo_duct_state",
+      "fields": [],
+      "assetIds": [
+        "M02"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "两端连接在位、管形圆整、无裂口",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "loose",
+          "label": "一端或两端松脱",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "collapsed",
+          "label": "局部压扁、折死",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "cracked",
+          "label": "管壁有裂口或破洞",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法接近或无法看清",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "multi_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-AIRFILTER"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null,
+      "reference_section": "4.1 空气导流软管松脱、压扁与破裂的检查",
+      "exclusive_options": [
+        "normal",
+        "unavailable"
+      ]
+    },
+    {
+      "id": "AIR-17",
+      "stage": "S1",
+      "cardId": "air-intake",
+      "title": "AIR-17 · 空气导流软管两端是否插到止动位置、卡箍是否压在配合段上并紧固",
+      "prompt": "空气导流软管两端是否插到止动位置、卡箍是否压在配合段上并紧固？",
+      "purpose": "区分导流软管座合与卡箍正常、未插到底、卡箍松动或位置不对，以及无法检查",
+      "instructions": "发动机停机、点火开关关闭。沿轴向推拉软管确认已到底不能继续推进；检查卡箍是否压在接头配合段上、未偏到边缘之外，并按本车结构确认卡箍已收紧无松动。",
+      "factKey": "pre_turbo_duct_seating",
+      "fields": [],
+      "assetIds": [
+        "M02"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "seated_and_clamped",
+          "label": "已插到止动位置、卡箍压在配合段上且紧固、类型正确",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "not_at_stop",
+          "label": "未插到止动位置",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "clamp_loose_or_misplaced",
+          "label": "卡箍松动或位置不对（没压在接头上）",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "clamp_wrong_type_or_damaged",
+          "label": "卡箍类型与原厂不同、损坏或蜗杆打滑",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "multi_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-AIRFILTER"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null,
+      "reference_section": "4.2 空气导流软管座合与卡箍的检查",
+      "exclusive_options": [
+        "seated_and_clamped",
+        "unavailable"
+      ]
+    },
+    {
+      "id": "AIR-04",
+      "stage": "S1",
+      "cardId": "air-hose",
+      "title": "AIR-04 · 增压空气软管表面是否有裂纹、擦伤、局部鼓包或压扁",
+      "prompt": "增压空气软管表面是否有裂纹、擦伤、局部鼓包或压扁？",
+      "purpose": "区分软管表面完整、裂纹、擦伤、鼓包、压扁，以及无法接近查看",
+      "instructions": "发动机停机、点火开关关闭。热车刚停机时涡轮出口一侧软管和中冷器很烫，冷却后再触摸。沿每段软管全长目视外表面，用手沿走向轻压感受是否有局部鼓包、发软或压扁，重点看接头附近和弯折处，并记录发现位置属于哪一段软管。",
+      "factKey": "boost_hose_surface",
+      "fields": [],
+      "assetIds": [
+        "M02"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "表面完整、管形圆整、按压有弹性",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "crack",
+          "label": "表面有裂纹",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "abrasion",
+          "label": "表面有擦伤",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "bulge",
+          "label": "局部鼓包",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "collapsed",
+          "label": "局部压扁",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法接近或无法看清",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "multi_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null,
+      "reference_section": "5.1 软管表面裂纹、擦伤、鼓包与压扁的检查",
+      "exclusive_options": [
+        "normal",
+        "unavailable"
+      ]
+    },
+    {
+      "id": "AIR-06",
+      "stage": "S1",
+      "cardId": "air-hose",
+      "title": "AIR-06 · 增压空气软管与支架、风扇罩等周边部件是否存在接触、摩擦痕或被夹住",
+      "prompt": "增压空气软管与支架、风扇罩等周边部件是否存在接触、摩擦痕或被夹住？",
+      "purpose": "区分软管与周边有明显间隙、轻微接触无损伤、已发生摩擦、正在干涉受压，以及无法检查",
+      "instructions": "发动机停机、点火开关关闭。热车刚停机时涡轮出口一侧软管和中冷器很烫，冷却后再触摸。散热器风扇会自动运转，有受伤危险；手需要伸到风扇护罩附近时，先脱开风扇电气连接插头〔手册·散热器、散热器风扇 p4〕。沿软管全长观察与支架、风扇罩及其他部件的间隙，在接触点附近查看软管表面有无摩擦痕、发亮、磨薄，轻推软管确认是否被夹住或持续受压。",
+      "factKey": "hose_interference",
+      "fields": [],
+      "assetIds": [
+        "M02"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "clear",
+          "label": "与周边部件有明显间隙",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "light_contact",
+          "label": "轻微接触、无摩擦痕",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "rub_mark",
+          "label": "存在摩擦痕",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "active_interference",
+          "label": "正在干涉、被夹住或持续受压",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null,
+      "reference_section": "5.2 软管与周边部件干涉的检查"
+    },
+    {
+      "id": "AIR-05",
+      "stage": "S1",
+      "cardId": "air-hose",
+      "title": "AIR-05 · 增压空气软管接头周围是否有局部集中油雾或新鲜湿痕",
+      "prompt": "增压空气软管接头周围是否有局部集中油雾或新鲜湿痕？",
+      "purpose": "区分接头周围未见油雾、轻微均匀油雾、局部集中油雾、新鲜湿痕，以及无法检查",
+      "instructions": "发动机停机、点火开关关闭。热车刚停机时涡轮出口一侧软管和中冷器很烫，冷却后再触摸。在光线充足处观察各接头周围及下方表面，区分均匀薄层油雾与局部集中油雾、陈旧油迹与新鲜湿痕，并记录油雾位于哪个接头。注意管路里有少量油迹不能直接判为异常。",
+      "factKey": "oil_trace_pattern",
+      "fields": [],
+      "assetIds": [
+        "M03"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "none",
+          "label": "未发现油雾",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "light_uniform",
+          "label": "轻微均匀油雾",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "localized_heavy",
+          "label": "局部集中油雾",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "fresh_wet",
+          "label": "新鲜湿痕",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null,
+      "reference_section": "5.3 接头周围油雾分布的检查"
+    },
+    {
+      "id": "AIR-07",
+      "stage": "S1",
+      "cardId": "air-connector",
+      "title": "AIR-07 · 增压空气软管是否插到空气管的止动位置",
+      "prompt": "增压空气软管是否插到空气管的止动位置？",
+      "purpose": "区分软管已插到止动位置、未插到位，以及无法检查",
+      "instructions": "发动机停机、点火开关关闭。热车刚停机时涡轮出口一侧软管和中冷器很烫，冷却后再触摸。沿轴向推软管，确认已插到止动位置、不能继续推进。",
+      "factKey": "hose_insertion",
+      "fields": [],
+      "assetIds": [
+        "M03"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "inserted",
+          "label": "已插到止动位置",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "not_inserted",
+          "label": "未插到止动位置",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-02"
+      ],
+      "capture": null,
+      "reference_section": "6.1 软管是否插到止动位置、标记是否对齐的检查"
+    },
+    {
+      "id": "AIR-08",
+      "stage": "S1",
+      "cardId": "air-connector",
+      "title": "AIR-08 · 空气管上的标记与软管上的标记是否对齐",
+      "prompt": "空气管上的标记与软管上的标记是否对齐？",
+      "purpose": "区分标记对齐、错开、看不清，以及无法检查",
+      "instructions": "发动机停机、点火开关关闭。热车刚停机时涡轮出口一侧软管和中冷器很烫，冷却后再触摸。找到空气管上的标记与软管上的标记，目视两者是否对齐；标记看不清时记录该接头无法按标记判断。",
+      "factKey": "hose_mark_alignment",
+      "fields": [],
+      "assetIds": [
+        "M03"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "aligned",
+          "label": "两标记对齐",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "misaligned",
+          "label": "标记错开",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "mark_unreadable",
+          "label": "标记看不清",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-02"
+      ],
+      "capture": null,
+      "reference_section": "6.1 软管是否插到止动位置、标记是否对齐的检查"
+    },
+    {
+      "id": "AIR-09",
+      "stage": "S1",
+      "cardId": "air-connector",
+      "title": "AIR-09 · 螺旋卡箍是否压在接头配合段上、紧固到规定力矩",
+      "prompt": "螺旋卡箍是否压在接头配合段上、紧固到规定力矩？",
+      "purpose": "区分卡箍紧固到位、松动、位置不对，以及无法检查",
+      "instructions": "发动机停机、点火开关关闭。热车刚停机时涡轮出口一侧软管和中冷器很烫，冷却后再触摸。需要可读 5.5 Nm 的扭矩扳手。检查卡箍是否压在接头配合段上、未偏到边缘之外；用扭矩扳手按 5.5 Nm 检查是否已达规定力矩（只检查，紧固属于处理）。",
+      "factKey": "clamp_tightness",
+      "fields": [],
+      "assetIds": [
+        "M03"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "secure",
+          "label": "卡箍压在配合段上，按 5.5 Nm 检查已达力矩",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "loose",
+          "label": "卡箍松动",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "mispositioned",
+          "label": "卡箍位置不对（没压在接头上）",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-02"
+      ],
+      "capture": null,
+      "reference_section": "6.2 螺旋卡箍紧固与类型的检查"
+    },
+    {
+      "id": "AIR-10",
+      "stage": "S1",
+      "cardId": "air-connector",
+      "title": "AIR-10 · 螺旋卡箍本身是否为原厂类型、有无损坏或蜗杆打滑",
+      "prompt": "螺旋卡箍本身是否为原厂类型、有无损坏或蜗杆打滑？",
+      "purpose": "区分卡箍类型正确无损坏、类型不符、损坏或打滑，以及无法检查",
+      "instructions": "发动机停机、点火开关关闭。热车刚停机时涡轮出口一侧软管和中冷器很烫，冷却后再触摸。对照原厂（电子备件目录 ETKA）检查卡箍类型；检查蜗杆螺丝是否打滑、卡箍是否损坏。",
+      "factKey": "clamp_condition",
+      "fields": [],
+      "assetIds": [
+        "M03"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "类型与原厂一致、无损坏",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "wrong_type",
+          "label": "类型与原厂不同",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "damaged",
+          "label": "损坏或蜗杆打滑",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-02"
+      ],
+      "capture": null,
+      "reference_section": "6.2 螺旋卡箍紧固与类型的检查"
+    },
+    {
+      "id": "AIR-11",
+      "stage": "S1",
+      "cardId": "air-intercooler",
+      "title": "AIR-11 · 中冷器可见表面是否有碰撞痕迹、变形或明显污染",
+      "prompt": "中冷器可见表面是否有碰撞痕迹、变形或明显污染？",
+      "purpose": "区分中冷器外观完整、有碰撞痕迹、变形、明显污染，以及无法检查",
+      "instructions": "发动机停机、点火开关关闭。热车刚停机时涡轮出口一侧软管和中冷器很烫，冷却后再触摸。散热器风扇会自动运转，有受伤危险；手需要伸到风扇护罩附近时，先脱开风扇电气连接插头〔手册·散热器、散热器风扇 p4〕。只做外观检查，不拆软管、不封堵管路。从可见面目视中冷器表面有无碰撞痕迹、凹陷，观察整体外形是否变形，表面是否有明显污染、堵塞。不拆下软管、不封堵管路。",
+      "factKey": "intercooler_external",
+      "fields": [],
+      "assetIds": [
+        "M02"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "外观完整、无碰撞痕迹、无明显污染",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "impact",
+          "label": "有碰撞痕迹",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "deformed",
+          "label": "变形",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "contaminated",
+          "label": "明显污染",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null,
+      "reference_section": "7.1 中冷器外观撞击、变形与污染的检查"
+    },
+    {
+      "id": "AIR-12",
+      "stage": "S1",
+      "cardId": "air-intercooler",
+      "title": "AIR-12 · 中冷器左右接口软管是否在位、卡箍是否紧固，接口周围有无局部油雾或新鲜湿痕",
+      "prompt": "中冷器左右接口软管是否在位、卡箍是否紧固，接口周围有无局部油雾或新鲜湿痕？",
+      "purpose": "区分两侧接口均正常、左侧可疑、右侧可疑、两侧均可疑，以及无法检查",
+      "instructions": "发动机停机、点火开关关闭。热车刚停机时涡轮出口一侧软管和中冷器很烫，冷却后再触摸。散热器风扇会自动运转，有受伤危险；手需要伸到风扇护罩附近时，先脱开风扇电气连接插头〔手册·散热器、散热器风扇 p4〕。只做外观、座合与卡箍检查，不拆软管、不封堵管路。目视左右接口软管是否在位、是否松脱，检查接口处卡箍是否压在配合段上、是否紧固，观察接口周围有无局部油雾或新鲜湿痕，分别记录左侧、右侧结果。不拆下软管、不封堵管路。",
+      "factKey": "intercooler_joint",
+      "fields": [],
+      "assetIds": [
+        "M02"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "normal",
+          "label": "两侧接口在位、卡箍紧固、无油雾湿痕",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "left_suspect",
+          "label": "左侧接口可疑（松脱、卡箍异常或油雾湿痕）",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "right_suspect",
+          "label": "右侧接口可疑",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "both_suspect",
+          "label": "两侧均可疑",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-01"
+      ],
+      "capture": null,
+      "reference_section": "7.2 中冷器左右接口座合与油雾的检查"
+    },
+    {
+      "id": "AIR-13",
+      "stage": "S1",
+      "cardId": "air-leak-test",
+      "title": "AIR-13 · 增压空气系统测试仪 V.A.G 1687 及转接器 V.A.G1687/10、V.A.G1687/14 是否可用",
+      "prompt": "增压空气系统测试仪 V.A.G 1687 及转接器 V.A.G1687/10、V.A.G1687/14 是否可用？",
+      "purpose": "区分检漏工具可用、仅有等效安全检漏能力、无法取得，决定能否执行加压检漏",
+      "instructions": "发动机停机、点火开关关闭。确认增压空气系统测试仪 V.A.G 1687 及转接器 V.A.G1687/10、V.A.G1687/14 齐全可用。",
+      "factKey": "leak_test_capability",
+      "fields": [],
+      "assetIds": [
+        "M05",
+        "M06"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "available",
+          "label": "V.A.G 1687 及转接器 V.A.G1687/10、/14 齐全可用",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "alternative_safe_tool",
+          "label": "无 V.A.G 1687，但有等效安全检漏能力",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法取得 V.A.G 1687 或等效安全检漏能力",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "single_choice",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": true,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [],
+        "when": "none for ordinary observation"
+      },
+      "dependency_question_ids": [],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-03"
+      ],
+      "capture": null,
+      "reference_section": "8.1 检漏设备连接与加压操作"
+    },
+    {
+      "id": "AIR-14",
+      "stage": "S1",
+      "cardId": "air-leak-test",
+      "title": "AIR-14 · 加压检漏时测试回路是否充至 0.5 bar 且压力未超过 0.5 bar",
+      "prompt": "加压检漏时测试回路是否充至 0.5 bar 且压力未超过 0.5 bar？",
+      "purpose": "区分加压条件符合手册要求、尚未执行、有超过 0.5 bar 趋势，以及无法执行",
+      "instructions": "手册要求测试前先检查所有空气软管和管路座合是否牢固〔手册·增压空气系统 p1〕，建议先完成 AIR-07、AIR-09。压力不得超过 0.5 bar。发动机停机。松开软管夹拆下空气管，用转接器 V.A.G1687/14 将 V.A.G1687/10 连接到涡轮增压器进气管接头，接上测试仪；完全按下压力调节阀关闭阀门，连接压缩空气（观测镜中有水时从排水螺母排尽）后打开阀门，用压力调节阀将压力调至 0.5 bar，不得超过 0.5 bar；打开另一阀门等测试回路充满，必要时重新调至 0.5 bar。",
+      "factKey": "leak_test_safety",
+      "fields": [
+        {
+          "id": "pressureBar",
+          "label": "实际加压值",
+          "unit": "bar",
+          "defaultValue": "0.5",
+          "type": "number",
+          "demo_default_only": true,
+          "required_when_recorded": false,
+          "validation": "finite_positive; explicit unit; no default-as-fact"
+        },
+        {
+          "id": "tool",
+          "label": "受控检漏工具",
+          "type": "text",
+          "defaultValue": "",
+          "demo_default_only": false,
+          "required_when_recorded": true,
+          "validation": "nonempty when within_limit"
+        }
+      ],
+      "assetIds": [
+        "M05",
+        "M06"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "within_limit",
+          "label": "未超过 0.5 bar，测试回路已充满",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "not_performed",
+          "label": "尚未执行",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        },
+        {
+          "id": "unsafe_stop",
+          "label": "压力有超过 0.5 bar 的趋势，已停止并泄压",
+          "outcome": "unavailable",
+          "status_semantics": "not_executed_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "conditional_operation",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [
+          "AIR-13"
+        ],
+        "when": "AIR-13=available|alternative_safe_tool；超过 0.5 bar 禁止提交完成。"
+      },
+      "dependency_question_ids": [
+        "AIR-13"
+      ],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-03"
+      ],
+      "capture": null,
+      "operation_kind": "controlled_leak_test",
+      "execution_conditions": {
+        "bypass_options": [
+          "not_performed",
+          "unsafe_stop"
+        ],
+        "requirements": [
+          {
+            "ref": "AIR-13",
+            "allowed": [
+              "available",
+              "alternative_safe_tool"
+            ],
+            "label": "安全检漏工具可用"
+          }
+        ]
+      },
+      "reference_section": "8.1 检漏设备连接与加压操作"
+    },
+    {
+      "id": "AIR-15",
+      "stage": "S1",
+      "cardId": "air-leak-test",
+      "title": "AIR-15 · 加压至 0.5 bar 后，泄漏响应出现在软管、接头、中冷器还是节气门侧",
+      "prompt": "加压至 0.5 bar 后，泄漏响应出现在软管、接头、中冷器还是节气门侧？",
+      "purpose": "区分未发现响应、响应在软管、接头、中冷器、节气门侧、多处响应，以及无法检查",
+      "instructions": "在测试回路已充至 0.5 bar 的状态下，从涡轮增压器出口开始沿增压空气通路逐段听、摸，对可疑点喷气体检漏喷剂观察是否起泡，难以接近处用超声波检测仪 V.A.G1842 定位；记录响应位置属于哪一段。",
+      "factKey": "leak_location",
+      "fields": [
+        {
+          "id": "location",
+          "label": "位置补充",
+          "defaultValue": "管路接头",
+          "type": "text",
+          "demo_default_only": true,
+          "required_when_recorded": false,
+          "validation": "trimmed text; no default-as-fact"
+        }
+      ],
+      "assetIds": [
+        "M05",
+        "M06"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "none",
+          "label": "未发现响应",
+          "outcome": "normal",
+          "status_semantics": "observed_no_issue_not_component_certified"
+        },
+        {
+          "id": "hose",
+          "label": "响应在软管",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "connector",
+          "label": "响应在接头",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "intercooler",
+          "label": "响应在中冷器",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "throttle_side",
+          "label": "响应在节气门侧",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "multiple",
+          "label": "多处泄漏响应",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "conditional_operation",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [
+          "AIR-13",
+          "AIR-14"
+        ],
+        "when": "已执行合规检漏（AIR-14=within_limit）；无法执行记录 unavailable。"
+      },
+      "dependency_question_ids": [
+        "AIR-13",
+        "AIR-14"
+      ],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-03"
+      ],
+      "capture": null,
+      "operation_kind": "leak_localization",
+      "execution_conditions": {
+        "bypass_options": [
+          "unavailable"
+        ],
+        "requirements": [
+          {
+            "ref": "AIR-14",
+            "allowed": [
+              "within_limit"
+            ],
+            "label": "合规检漏已完成"
+          }
+        ]
+      },
+      "reference_section": "8.2 泄漏响应的定位与强度判断"
+    },
+    {
+      "id": "AIR-16",
+      "stage": "S1",
+      "cardId": "air-leak-test",
+      "title": "AIR-16 · 泄漏响应的证据强度是声音或气泡明确定位、超声定位，还是仅痕迹线索",
+      "prompt": "泄漏响应的证据强度是声音或气泡明确定位、超声定位，还是仅痕迹线索？",
+      "purpose": "区分证据强度足以定位、仅痕迹线索无法定位，以及无法检查",
+      "instructions": "在测试回路已充至 0.5 bar 的状态下，对可疑点喷气体检漏喷剂观察是否起泡，用超声波检测仪 V.A.G1842 对难以接近的位置定位；记录证据强度：声音或气泡明确定位、超声定位、仅痕迹线索。",
+      "factKey": "leak_evidence_strength",
+      "fields": [],
+      "assetIds": [
+        "M05",
+        "M06"
+      ],
+      "sources": [
+        "FACT_LOCAL_MANUAL"
+      ],
+      "options": [
+        {
+          "id": "audible_or_bubble",
+          "label": "声音或气泡明确定位",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "ultrasonic",
+          "label": "超声定位",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "trace_only",
+          "label": "仅痕迹线索、无法形成定位",
+          "outcome": "abnormal",
+          "status_semantics": "abnormal_clue_not_diagnosis"
+        },
+        {
+          "id": "unavailable",
+          "label": "无法检查",
+          "outcome": "unavailable",
+          "status_semantics": "unknown_or_unavailable_not_normal"
+        }
+      ],
+      "area_id": "boost-air",
+      "phase": "diagnostic_observation",
+      "answer_kind": "conditional_operation",
+      "submission_semantics": "server_persisted_observation",
+      "normal_observation_independent": false,
+      "required_policy": "only_if_in_case_plan_and_applicable",
+      "applicability": {
+        "$recipe": "question_applicability"
+      },
+      "prerequisites": {
+        "refs": [
+          "AIR-15"
+        ],
+        "when": "已有定位观察；油雾/痕迹单独不能升级为已定位泄漏。"
+      },
+      "dependency_question_ids": [
+        "AIR-15"
+      ],
+      "unavailable_unknown_policy": "distinct from not_checked; never infer normal or zero; keep reason and evidence",
+      "source_refs": [
+        "EDITORIAL_TEMPLATE",
+        "SRC-CHARGE-AIR"
+      ],
+      "source_scope": "Manual assets support location/assembly/safety only; wording, options and routing are editorial reference unless independently attributed.",
+      "long_card_ids": [
+        "LC-03"
+      ],
+      "capture": null,
+      "operation_kind": "evidence_grading",
+      "execution_conditions": {
+        "bypass_options": [
+          "unavailable"
+        ],
+        "requirements": [
+          {
+            "ref": "AIR-15",
+            "allowed": [
+              "hose",
+              "connector",
+              "intercooler",
+              "throttle_side",
+              "multiple"
+            ],
+            "label": "先记录已定位的泄漏位置"
+          }
+        ]
+      },
+      "reference_section": "8.2 泄漏响应的定位与强度判断"
+    }
+  ],
+  "calculation_rules": [],
+  "focus_rules": [
+    {
+      "id": "air-joint-followup",
+      "all": [
+        {
+          "question_id": "AIR-07",
+          "option_ids": [
+            "not_inserted"
+          ]
+        }
+      ],
+      "question_ids": [
+        "AIR-08",
+        "AIR-09",
+        "AIR-10"
+      ]
+    }
+  ],
+  "conflict_rules": []
+}
