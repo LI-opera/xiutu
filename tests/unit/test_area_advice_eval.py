@@ -282,3 +282,26 @@ def test_abnormal_records_without_an_action_fail_the_records_check():
     empty = {"summary": "s", "steps": [], "conditional_branches": [], "missing": [], "directions": []}
     check = ev.records_planned(payload, empty, topic)
     assert not check["passed"] and "AIR-07" in check["detail"]
+
+
+@pytest.mark.parametrize("case_id, area", [
+    ("c7-actuator-linkage", "actuator"), ("c8-turbo-oil", "turbo"), ("c9-misfire-cyl3", "powertrain")])
+def test_cases_for_the_other_areas_send_that_area(case_id, area):
+    payload = payload_of(case_id)
+    assert area in {a["id"] for a in payload["areas"]}
+    assert any(o["question_id"].startswith({"actuator": "ACT", "turbo": "TUR", "powertrain": "X"}[area])
+               for o in payload["observations"])
+
+
+def test_direct_coil_replacement_and_setting_before_linkage_are_caught():
+    case = CASES["c9-misfire-cyl3"]
+    replaced = by_id(ev.grade(case, payload_of("c9-misfire-cyl3"),
+                              result([step("repair", "更换三缸点火线圈 N291")])))
+    assert replaced["no_coil_replacement_now"] is False
+    swapped = by_id(ev.grade(case, payload_of("c9-misfire-cyl3"),
+                             result([step("check", "二三缸点火线圈对调", ["X-05"])])))
+    assert swapped["addresses_cyl3"] and swapped["no_coil_replacement_now"]
+    case = CASES["c7-actuator-linkage"]
+    early = by_id(ev.grade(case, payload_of("c7-actuator-linkage"),
+                           result([step("check", "执行基本设置", ["ACT-09"])])))
+    assert early["no_setting_now"] is False and early["addresses_linkage"] is False
