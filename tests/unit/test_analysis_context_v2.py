@@ -165,3 +165,14 @@ def test_changed_questions_need_a_review_and_stale_reviews_are_rejected():
         assert roles_of(template_id, "3", result) == roles_of(template_id, "3")
     with pytest.raises(ReviewRequired, match="not needed"):
         build(ROLES_DATA, reviews=reviews)
+
+
+def test_v4_carries_other_areas_and_has_reviewed_boost_air_roles():
+    for template_id in ("tayron-dkvb-p0299", "tayron-dkvb-p0236"):
+        v3, v4 = roles_of(template_id, "3"), roles_of(template_id, "4")
+        assert set(v4) == set(v3) | {"AIR-17"}
+        for qid in (q for q in v3 if not q.startswith("AIR-")):
+            assert without_hash(v4[qid]) == without_hash(v3[qid])
+        assert set(v4["AIR-13"]["option_roles"].values()) == {"inspection_status"}
+        assert v4["AIR-14"]["option_roles"]["unsafe_stop"] == "inspection_status"
+        assert v4["AIR-17"]["option_roles"]["unavailable"] == "inspection_status"

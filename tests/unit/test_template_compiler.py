@@ -13,7 +13,7 @@ LIBRARY = ROOT / "resources/template-library/tayron-dkvb"
 def test_modules_reassemble_the_published_templates_exactly():
     results = run(LIBRARY)
     assert {item["recipe"] for item in results} == {f"tayron-dkvb-{code}-v{version}.json"
-                                                    for code in ("p0299", "p0236") for version in (2, 3)}
+                                                    for code in ("p0299", "p0236") for version in (2, 3, 4)}
     for item in results:
         published = json.loads((ROOT / item["output"]).read_text(encoding="utf-8"))
         assert item["status"] == "identical"
@@ -82,3 +82,18 @@ def test_v3_changes_only_the_boost_air_connector_questions():
         assert new["observation_rules"]["conflict_rules"] == []
         assert new["observation_rules"]["focus_rules"][0]["all"] == [
             {"question_id": "AIR-07", "option_ids": ["not_inserted"]}]
+
+
+def test_v4_changes_only_the_boost_air_area():
+    """boost-air v3 was drafted from the reviewed guide: AIR-01..16 keep their ids, AIR-17 is new,
+    and the other areas are untouched."""
+    folder = ROOT / "resources/templates/tayron-v2"
+    for code in ("p0299", "p0236"):
+        old = json.loads((folder / f"tayron-dkvb-{code}-v3.json").read_text(encoding="utf-8"))
+        new = json.loads((folder / f"tayron-dkvb-{code}-v4.json").read_text(encoding="utf-8"))
+        old_q = {q["id"]: q for q in old["questions"]}
+        new_q = {q["id"]: q for q in new["questions"]}
+        assert set(new_q) - set(old_q) == {"AIR-17"} and set(old_q) <= set(new_q)
+        assert {i for i in old_q if old_q[i] != new_q[i]} == {f"AIR-{n:02d}" for n in range(1, 17)}
+        assert [a for a in new["areas"] if a["id"] != "boost-air"] == [a for a in old["areas"] if a["id"] != "boost-air"]
+        assert all(q["reference_section"] for q in new["questions"] if q["area_id"] == "boost-air")
