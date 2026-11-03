@@ -195,3 +195,10 @@ def test_v6_carries_unchanged_questions_and_has_reviewed_actuator_roles():
         for qid in (q for q in v5 if not q.startswith("ACT-") or q in ("ACT-08", "ACT-09", "ACT-10")):
             assert without_hash(v6[qid]) == without_hash(v5[qid])
         assert v6["ACT-12"]["option_roles"]["wire_mismatch"] == "observation"
+
+
+def test_v7_keeps_the_disposition_question_roles():
+    v6, v7 = roles_of("tayron-dkvb-p0299", "6"), roles_of("tayron-dkvb-p0299", "7")
+    assert set(v7) == set(v6) | {f"TUR-{n}" for n in range(11, 16)}
+    for qid in (q for q in v6 if not q.startswith("TUR-") or q in ("TUR-09", "TUR-10")):
+        assert without_hash(v7[qid]) == without_hash(v6[qid])
